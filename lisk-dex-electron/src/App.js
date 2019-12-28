@@ -1,5 +1,4 @@
 import React from "react";
-import logo from "./logo.svg";
 import "./App.css";
 
 class App extends React.Component {
@@ -18,7 +17,7 @@ class App extends React.Component {
             <b>Lisk DEX</b>
           </div>
           <div className="top-bar-left">
-            SIGNED IN AS 138410298310283L. API Status: <span style={{ color: "green" }}>Connected</span>
+            API Status: <span style={{ color: "green" }}>Connected</span>
           </div>
         </div>
         <div className="container">
