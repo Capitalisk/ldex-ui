@@ -1,4 +1,5 @@
 import React from "react";
+import Orderbook from "./Orderbook";
 import "./App.css";
 
 class App extends React.Component {
@@ -23,15 +24,11 @@ class App extends React.Component {
         <div className="container">
           <div className="buy-panel">BUY</div>
           <div className="sell-panel">SELL</div>
-          <div className="buy-orders">
-            ORDERS TO BUY
-            <br></br>
-            increasing price top to bottom
-          </div>
           <div className="sell-orders">
-            ORDERS TO SELL
-            <br></br>
-            decreasing price top to bottom
+            <Orderbook side="asks"></Orderbook>
+          </div>
+          <div className="buy-orders">
+            <Orderbook side="bids"></Orderbook>
           </div>
           <div className="depth-chart">DEPTH CHART / LINES</div>
           <div className="your-orders">YOUR ORDERS</div>

@@ -10,11 +10,12 @@
       "build/**/*",
       "node_modules/**/*"
     ],
-    "directories":{
+    "directories": {
       "buildResources": "assets"
     }
   },
   "dependencies": {
+    "axios": "^0.19.0",
     "electron-is-dev": "^1.1.0",
     "react": "^16.10.2",
     "react-dom": "^16.10.2",

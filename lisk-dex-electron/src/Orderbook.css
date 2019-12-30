@@ -1,0 +1,13 @@
+.askOrderList {
+    display: flex;
+    align-items: flex-start;
+    flex-direction: column-reverse;
+    height: 100%;
+}
+
+.bidOrderList {
+    display: flex;
+    align-items: flex-start;
+    flex-direction: column;
+    height: 100%;
+}
