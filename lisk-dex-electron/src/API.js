@@ -9,5 +9,6 @@ const instance = axios.create({
 
 export async function getOrderbook() {
     const orders = await instance.get('/orders?sort=price:asc');
+    console.log("HIT API");
     return orders;
 }
