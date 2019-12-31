@@ -5,9 +5,8 @@ body {
 
 .container {
   display: grid;
-  grid-template-columns: 20% 20% 40% 20%;
+  grid-template-columns: 20% 20% 45% 15%;
   grid-template-rows: 310px 310px;
-  border: 1px solid white;
   margin: 10px;
 }
 
@@ -23,38 +22,39 @@ body {
 .market-name-and-stats {
   grid-column: 4;
   grid-row: 1/3;
-  border: 1px solid white;
+  background-color: #0d0e0e;
 }
 
 .buy-panel {
   grid-column: 1;
   grid-row: 1 / 2;
-  border: 1px solid white;
+  background-color: #15191a;
+  border-bottom: 1px dashed black;
 }
 .sell-panel {
   grid-column: 1;
   grid-row: 2 / 3;
-  border: 1px solid white;
+  background-color: #15191a;
 }
 
 .sell-orders {
   grid-column: 2;
   grid-row: 1 / 2;
-  border: 1px solid white;
+  background-color: #1a1c1c;
 }
 .buy-orders {
   grid-column: 2;
   grid-row: 2 / 3;
-  border: 1px solid white;
+  background-color: #1a1c1c;
+  border-bottom: 1px dashed black;
 }
 
 .depth-chart {
   grid-column: 3;
   grid-row: 1 / 2;
-  border: 1px solid white;
 }
 .your-orders {
   grid-column: 3;
   grid-row: 2 / 3;
-  border: 1px solid white;
+  background-color: #131414;
 }
