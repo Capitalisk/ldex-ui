@@ -1,8 +1,6 @@
 .orderLine {
     width: 100%;
     box-sizing: border-box;
-    margin-top: 2px;
-    margin-bottom: 2px;
     padding: 3px;
     background: linear-gradient(to right, #700d0d 70%, rgba(0,0,0,0) 30%);
 }

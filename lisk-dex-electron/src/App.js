@@ -2,8 +2,10 @@ import React from "react";
 import Orderbook from "./Orderbook";
 import Chart from "./Chart";
 import PlaceOrder from "./PlaceOrder";
+import YourOrders from "./YourOrders";
 import { getOrderbook } from "./API";
 import "./App.css";
+import MarketList from "./MarketList";
 
 class App extends React.Component {
   constructor(props) {
@@ -60,7 +62,7 @@ class App extends React.Component {
             <b>Lisk DEX</b>
           </div>
           <div className="top-bar-left">
-            API Status: <span style={{ color: "green" }}>Connected</span>
+            API Status: <span style={{ color: "green" }}>Connected</span>. Next refresh in 30 seconds.
           </div>
         </div>
         <div className="container">
@@ -84,16 +86,11 @@ class App extends React.Component {
           <div className="depth-chart">
             <Chart whole={Math.pow(10, 8)} currentMarket={this.state.currentMarket}></Chart>
           </div>
-          <div className="your-orders">YOUR ORDERS</div>
+          <div className="your-orders">
+            <YourOrders></YourOrders>
+          </div>
           <div className="market-name-and-stats">
-            MRCL/LSK (current market name)
-            <br></br>
-            <br></br>
-            list of other markets
-            <br></br>
-            <br></br>
-            <br></br>
-            ect
+            <MarketList></MarketList>
           </div>
         </div>
       </>

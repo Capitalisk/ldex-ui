@@ -28,22 +28,22 @@ body {
 .buy-panel {
   grid-column: 1;
   grid-row: 1 / 2;
-  background-color: #15191a;
+  background-color: #1a1c1c;
   border-bottom: 1px dashed black;
 }
 .sell-panel {
   grid-column: 1;
   grid-row: 2 / 3;
-  background-color: #15191a;
+  background-color: #1a1c1c;
 }
 
 .sell-orders {
   height: 290px;
-  background-color: #1a1c1c;
+  background-color: #15191a;
 }
 .buy-orders {
   height: 290px;
-  background-color: #1a1c1c;
+  background-color: #15191a;
 }
 .price-display {
   height: 40px;
