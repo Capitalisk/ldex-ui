@@ -6,15 +6,6 @@ export default class Orderbook extends React.Component {
   constructor(props) {
     super(props);
     this.state = {};
-    /*
-      Schema of the orders element:
-      {
-          amount: size of the order
-          price: price at which the order is
-      }
-
-      Orders at the same price will be merged.
-      */
   }
 
   render() {
@@ -23,7 +14,7 @@ export default class Orderbook extends React.Component {
         <SingleOrder
           whole={Math.pow(10, 8)} // 10 ** 8 beddow in one LSK
           key={order.orderId}
-          size={order.size}
+          size={order.sizeRemaining}
           price={order.price}
           maxSize={this.props.orderBookData.maxSize}
           side={this.props.side}
@@ -37,13 +28,14 @@ export default class Orderbook extends React.Component {
         <SingleOrder
           whole={Math.pow(10, 8)} // 10 ** 8 beddow in one LSK
           key={order.orderId}
-          size={order.size}
+          size={order.sizeRemaining}
           price={order.price}
           maxSize={this.props.orderBookData.maxSize}
           side={this.props.side}
           decimals={4}
         ></SingleOrder>
       ));
+      orders.reverse();
       return <div className="bidOrderList">{orders}</div>;
     }
   }
