@@ -10,9 +10,21 @@ export default class SignInState extends React.Component {
 
   render() {
     return (
-      <button onClick={this.props.showSignIn} className="sign-in-button">
-        Sign in
-      </button>
+      <>
+        {!this.props.signedIn &&
+          <button onClick={this.props.showSignIn} className="sign-in-button">
+            Sign in
+          </button>
+        }
+        {this.props.signedIn &&
+          <span style={{ fontSize: '16px', marginRight: '10px' }}>Signed in as {this.props.address}</span>
+        }
+         {this.props.signedIn &&
+          <button onClick={this.props.signOut} className="sign-in-button">
+            Sign out
+          </button>
+        }
+      </>
     );
   }
 }

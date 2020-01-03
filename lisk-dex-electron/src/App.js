@@ -77,23 +77,32 @@ class App extends React.Component {
   passphraseSubmit(passphrase) {
     console.log(`got ${passphrase} from lifted state`);
     if (!Mnemonic.validateMnemonic(passphrase, Mnemonic.wordlists.english)) {
-      this.setState({signInFailure: true});
+      this.setState({ signInFailure: true });
     } else {
-      const address = cryptography.getAddressAndPublicKeyFromPassphrase(passphrase);
-      console.log(address);
+      const address = (cryptography.getAddressAndPublicKeyFromPassphrase(passphrase)).address;
+      this.setState({ currentUser: { passphrase, address }, signedIn: true, displaySigninModal: false });
     }
   }
+
+  closeSignInModal = () => {
+    this.setState({ displaySigninModal: false });
+  }
+
+  signOut = () => {
+    this.setState({ signedIn: false });
+  }
+
 
   render() {
     return (
       <>
-        {this.state.displaySigninModal && <SignInModal failure={this.state.signInFailure} passphraseSubmit={this.passphraseSubmit}></SignInModal>}
+        {this.state.displaySigninModal && <SignInModal failure={this.state.signInFailure} passphraseSubmit={this.passphraseSubmit} close={this.closeSignInModal}></SignInModal>}
         <div className="top-bar">
           <div className="top-bar-right">
             <b>Lisk DEX</b>
           </div>
           <div className="top-bar-left">
-            <SignInState showSignIn={this.showSignIn}></SignInState>
+            <SignInState showSignIn={this.showSignIn} address={this.state.currentUser.address} signedIn={this.state.signedIn} signOut={this.signOut}></SignInState>
           </div>
         </div>
         <div className="container">

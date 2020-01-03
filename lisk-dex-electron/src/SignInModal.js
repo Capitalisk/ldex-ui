@@ -33,6 +33,9 @@ export default class PlaceOrder extends React.Component {
     }
     return (
       <div id="sign-in-modal">
+        <div style={{ textAlign: 'right', width: '100%' }}>
+          <button className="place-order-button" onClick={this.props.close}>Close</button>
+        </div>
         <h2>Sign in using your Lisk passphrase.</h2>
 
         <form onSubmit={this.handleSubmit}>
