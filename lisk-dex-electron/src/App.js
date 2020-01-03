@@ -3,9 +3,15 @@ import Orderbook from "./Orderbook";
 import Chart from "./Chart";
 import PlaceOrder from "./PlaceOrder";
 import YourOrders from "./YourOrders";
+import SignInModal from "./SignInModal";
+import SignInState from "./SignInState";
 import { getOrderbook } from "./API";
 import "./App.css";
 import MarketList from "./MarketList";
+
+import * as cryptography from "@liskhq/lisk-cryptography";
+import * as passphrase from "@liskhq/lisk-passphrase";
+const { Mnemonic } = passphrase;
 
 class App extends React.Component {
   constructor(props) {
@@ -16,7 +22,18 @@ class App extends React.Component {
       orderBookData: { orders: [], bids: [], asks: [], maxSize: { bid: 0, ask: 0 } },
       currentMarket: ["clsk", "lsk"],
       currentMaxBid: 0,
+      displaySigninModal: false,
+      signedIn: false,
+      signInFailure: false,
+      currentUser: {
+        passphrase: "",
+        address: ""
+      }
     };
+
+
+    this.showSignIn = this.showSignIn.bind(this);
+    this.passphraseSubmit = this.passphraseSubmit.bind(this);
   }
 
   refreshOrderbook() {
@@ -53,16 +70,30 @@ class App extends React.Component {
     this.refreshOrderbook();
   }
 
+  showSignIn() {
+    this.setState({ displaySigninModal: true });
+  }
+
+  passphraseSubmit(passphrase) {
+    console.log(`got ${passphrase} from lifted state`);
+    if (!Mnemonic.validateMnemonic(passphrase, Mnemonic.wordlists.english)) {
+      this.setState({signInFailure: true});
+    } else {
+      const address = cryptography.getAddressAndPublicKeyFromPassphrase(passphrase);
+      console.log(address);
+    }
+  }
+
   render() {
-    console.log(this.state.orderBookData.bids);
     return (
       <>
+        {this.state.displaySigninModal && <SignInModal failure={this.state.signInFailure} passphraseSubmit={this.passphraseSubmit}></SignInModal>}
         <div className="top-bar">
           <div className="top-bar-right">
             <b>Lisk DEX</b>
           </div>
           <div className="top-bar-left">
-            API Status: <span style={{ color: "green" }}>Connected</span>. Next refresh in 30 seconds.
+            <SignInState showSignIn={this.showSignIn}></SignInState>
           </div>
         </div>
         <div className="container">
@@ -77,7 +108,7 @@ class App extends React.Component {
               <Orderbook orderBookData={this.state.orderBookData} side="asks"></Orderbook>
             </div>
             <div className="price-display">
-              Price: {this.state.currentMaxBid} {this.state.currentMarket[1].toUpperCase()} 
+              Price: {this.state.currentMaxBid} {this.state.currentMarket[1].toUpperCase()}
             </div>
             <div className="buy-orders">
               <Orderbook orderBookData={this.state.orderBookData} side="bids"></Orderbook>
@@ -91,6 +122,9 @@ class App extends React.Component {
           </div>
           <div className="market-name-and-stats">
             <MarketList></MarketList>
+            <small>
+              API Status: <span style={{ color: "green" }}>Connected</span>. <br></br>Data refreshed every 10 seconds.
+            </small>
           </div>
         </div>
       </>

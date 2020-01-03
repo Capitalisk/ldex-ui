@@ -68,3 +68,13 @@ body {
   grid-row: 2 / 3;
   background-color: #131414;
 }
+
+.sign-in-button {
+  font-size: 18px;
+  padding: 3px;
+  padding-left: 5px;
+  padding-right: 5px;
+  background-color: rgb(46, 46, 126);
+  color: white;
+  border: 1px solid grey;
+}

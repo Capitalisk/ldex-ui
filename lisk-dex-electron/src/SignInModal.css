@@ -1,0 +1,21 @@
+#sign-in-modal {
+    position: absolute;
+    z-index: 2;
+    top: 150px;
+    left: 25%;
+    border: 2px solid rgb(69, 69, 179);
+    width: 50%;
+    box-shadow: 10px 10px 5px black;
+    padding: 45px;
+    background-color: rgb(27, 27, 27);
+}
+
+#sign-in-textarea {
+    font-size: 20px;
+    width: 100%;
+    background-color: rgb(36, 35, 35);
+    color: white;
+    font-family: 'Courier New', Courier, monospace;
+    margin-top: 20px;
+    margin-bottom: 8px;
+}
