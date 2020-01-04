@@ -21,13 +21,18 @@ class App extends React.Component {
     this.state = {
       orderBookData: { orders: [], bids: [], asks: [], maxSize: { bid: 0, ask: 0 } },
       currentMarket: ["clsk", "lsk"],
+      enabledAssets: ["lsk", "clsk"],
       currentMaxBid: 0,
       displaySigninModal: false,
       signedIn: false,
       signInFailure: false,
-      currentUser: {
-        passphrase: "",
-        address: ""
+      // to prevent cross-chain replay attacks, the user can specify a key for each chain that they are trading on.
+      // the address will be used when the asset is being used as the destination chain.
+      keys: {
+        'lsk': {
+          passphrase: '',
+          address: ''
+        },
       }
     };
 
@@ -71,17 +76,24 @@ class App extends React.Component {
   }
 
   showSignIn() {
-    this.setState({ displaySigninModal: true });
+    this.setState({ displaySigninModal: true, signInFailure: false, });
   }
 
-  passphraseSubmit(passphrase) {
-    console.log(`got ${passphrase} from lifted state`);
-    if (!Mnemonic.validateMnemonic(passphrase, Mnemonic.wordlists.english)) {
-      this.setState({ signInFailure: true });
-    } else {
-      const address = (cryptography.getAddressAndPublicKeyFromPassphrase(passphrase)).address;
-      this.setState({ currentUser: { passphrase, address }, signedIn: true, displaySigninModal: false });
+  passphraseSubmit(payload) {
+    const keys = {};
+    for (const asset in payload) {
+      if (payload[asset] !== '') {
+        const passphrase = payload[asset];
+        if (!Mnemonic.validateMnemonic(passphrase, Mnemonic.wordlists.english)) {
+          this.setState({ signInFailure: true });
+          return;
+        } else {
+          const address = (cryptography.getAddressAndPublicKeyFromPassphrase(passphrase)).address;
+          keys[asset] = {address, passphrase};
+        }
+      }
     }
+    this.setState({ keys, signedIn: true, displaySigninModal: false });
   }
 
   closeSignInModal = () => {
@@ -94,15 +106,16 @@ class App extends React.Component {
 
 
   render() {
+    console.log(this.state.keys);
     return (
       <>
-        {this.state.displaySigninModal && <SignInModal failure={this.state.signInFailure} passphraseSubmit={this.passphraseSubmit} close={this.closeSignInModal}></SignInModal>}
+        {this.state.displaySigninModal && <SignInModal failure={this.state.signInFailure} passphraseSubmit={this.passphraseSubmit} enabledAssets={this.state.enabledAssets} close={this.closeSignInModal}></SignInModal>}
         <div className="top-bar">
           <div className="top-bar-right">
             <b>Lisk DEX</b>
           </div>
           <div className="top-bar-left">
-            <SignInState showSignIn={this.showSignIn} address={this.state.currentUser.address} signedIn={this.state.signedIn} signOut={this.signOut}></SignInState>
+            <SignInState showSignIn={this.showSignIn} keys={this.state.keys} signedIn={this.state.signedIn} signOut={this.signOut}></SignInState>
           </div>
         </div>
         <div className="container">

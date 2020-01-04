@@ -9,6 +9,10 @@ export default class SignInState extends React.Component {
   }
 
   render() {
+    let addressesInfo = '';
+    for (const asset in this.props.keys) {
+      addressesInfo += `${this.props.keys[asset].address} (${asset.toUpperCase()}) `;
+    }
     return (
       <>
         {!this.props.signedIn &&
@@ -17,9 +21,9 @@ export default class SignInState extends React.Component {
           </button>
         }
         {this.props.signedIn &&
-          <span style={{ fontSize: '16px', marginRight: '10px' }}>Signed in as {this.props.address}</span>
+          <span style={{ fontSize: '12px', marginRight: '10px' }}>Signed in as {addressesInfo}</span>
         }
-         {this.props.signedIn &&
+        {this.props.signedIn &&
           <button onClick={this.props.signOut} className="sign-in-button">
             Sign out
           </button>
