@@ -52,7 +52,6 @@ export default class PlaceOrder extends React.Component {
             <button className="place-order-button" onClick={this.props.close}>Close</button>
           </div>
           <h2>Sign in using your Lisk passphrases.</h2>
-
           <p>
             <span style={{ color: 'red' }}>Be careful!</span> Only enter your Lisk passphrase in applications you trust and obtained from official sources.
           </p>

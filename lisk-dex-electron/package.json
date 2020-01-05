@@ -20,6 +20,7 @@
     "@liskhq/lisk-passphrase": "^2.0.3",
     "@liskhq/lisk-transactions": "^2.3.1",
     "axios": "^0.19.0",
+    "cors-anywhere": "^0.4.1",
     "electron-is-dev": "^1.1.0",
     "react": "^16.10.2",
     "react-dom": "^16.10.2",

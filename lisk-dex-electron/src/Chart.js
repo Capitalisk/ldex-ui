@@ -21,7 +21,7 @@ class Chart extends React.Component {
 
     chart.dataSource.url = `${API_URL}/orders?sort=price:asc`;
     //chart.dataSource.url = "https://poloniex.com/public?command=returnOrderBook&currencyPair=BTC_ETH&depth=50";
-    chart.dataSource.reloadFrequency = 30000;
+    chart.dataSource.reloadFrequency = 15000;
     chart.dataSource.adapter.add("parsedData", (data) => {
       // Function to process (sort and calculate cummulative volume)
       const processData = (list, type, desc) => {

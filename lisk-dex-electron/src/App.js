@@ -8,10 +8,13 @@ import SignInState from "./SignInState";
 import { getOrderbook } from "./API";
 import "./App.css";
 import MarketList from "./MarketList";
+import { userContext } from './context';
 
 import * as cryptography from "@liskhq/lisk-cryptography";
 import * as passphrase from "@liskhq/lisk-passphrase";
 const { Mnemonic } = passphrase;
+
+
 
 class App extends React.Component {
   constructor(props) {
@@ -22,17 +25,19 @@ class App extends React.Component {
       orderBookData: { orders: [], bids: [], asks: [], maxSize: { bid: 0, ask: 0 } },
       currentMarket: ["clsk", "lsk"],
       enabledAssets: ["lsk", "clsk"],
-      currentMaxBid: 0,
       displaySigninModal: false,
       signedIn: false,
       signInFailure: false,
+      currentPrice: 0,
       // to prevent cross-chain replay attacks, the user can specify a key for each chain that they are trading on.
       // the address will be used when the asset is being used as the destination chain.
       keys: {
+        /*
         'lsk': {
           passphrase: '',
           address: ''
         },
+        */
       }
     };
 
@@ -41,12 +46,12 @@ class App extends React.Component {
     this.passphraseSubmit = this.passphraseSubmit.bind(this);
   }
 
-  refreshOrderbook() {
+  refreshOrderbook = () => {
+    console.log('refreshing orderbook');
     getOrderbook().then(results => {
       const bids = [];
       const asks = [];
       let maxSize = { bid: 0, ask: 0 };
-      let currentMaxBid = 0;
       for (let result of results.data) {
         if (
           // filter for the turrent trading pair.
@@ -66,13 +71,17 @@ class App extends React.Component {
           }
         }
       }
-      currentMaxBid = bids[bids.length - 1].price;
-      this.setState({ orderBookData: { bids, asks, maxSize }, currentMaxBid });
+      let currentPrice = 0;
+      if (bids.length > 0) {
+        currentPrice = bids[bids.length - 1].price;
+      }
+      this.setState({ orderBookData: { bids, asks, maxSize }, currentPrice});
     });
   }
 
   componentDidMount() {
     this.refreshOrderbook();
+    setInterval(this.refreshOrderbook, 10000);
   }
 
   showSignIn() {
@@ -81,19 +90,24 @@ class App extends React.Component {
 
   passphraseSubmit(payload) {
     const keys = {};
+    let atLeastOneKey = false;
     for (const asset in payload) {
-      if (payload[asset] !== '') {
-        const passphrase = payload[asset];
+      console.log(payload);
+      if (payload[asset] !== undefined) {
+        atLeastOneKey = true;
+        const passphrase = payload[asset].trim();
         if (!Mnemonic.validateMnemonic(passphrase, Mnemonic.wordlists.english)) {
           this.setState({ signInFailure: true });
           return;
         } else {
           const address = (cryptography.getAddressAndPublicKeyFromPassphrase(passphrase)).address;
-          keys[asset] = {address, passphrase};
+          keys[asset] = { address, passphrase };
         }
       }
     }
-    this.setState({ keys, signedIn: true, displaySigninModal: false });
+    if (atLeastOneKey) {
+      this.setState({ keys, signedIn: true, displaySigninModal: false });
+    }
   }
 
   closeSignInModal = () => {
@@ -101,14 +115,13 @@ class App extends React.Component {
   }
 
   signOut = () => {
-    this.setState({ signedIn: false });
+    this.setState({ signedIn: false, keys: {} });
   }
 
 
   render() {
-    console.log(this.state.keys);
     return (
-      <>
+      <userContext.Provider value={{ ...this.state }}>
         {this.state.displaySigninModal && <SignInModal failure={this.state.signInFailure} passphraseSubmit={this.passphraseSubmit} enabledAssets={this.state.enabledAssets} close={this.closeSignInModal}></SignInModal>}
         <div className="top-bar">
           <div className="top-bar-right">
@@ -130,7 +143,7 @@ class App extends React.Component {
               <Orderbook orderBookData={this.state.orderBookData} side="asks"></Orderbook>
             </div>
             <div className="price-display">
-              Price: {this.state.currentMaxBid} {this.state.currentMarket[1].toUpperCase()}
+              Price: {this.state.currentPrice} {this.state.currentMarket[1].toUpperCase()}
             </div>
             <div className="buy-orders">
               <Orderbook orderBookData={this.state.orderBookData} side="bids"></Orderbook>
@@ -149,7 +162,7 @@ class App extends React.Component {
             </small>
           </div>
         </div>
-      </>
+      </userContext.Provider>
     );
   }
 }
