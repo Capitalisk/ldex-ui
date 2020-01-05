@@ -43,7 +43,7 @@ export default class BalanceDisplay extends React.Component {
         this.interval = setInterval(this.update, 10000);
       }
     } else {
-      return <div style={{ color: 'grey', fontSize: '10px', marginBottom: '10px' }}>No {this.props.asset.toUpperCase()} passphrase.</div>;
+      return <div></div>;
     }
     return (
       <div style={{ color: 'grey', fontSize: '15px', marginBottom: '10px' }}>Bal: {this.state.balance / this.props.whole} {this.props.asset.toUpperCase()}</div>
