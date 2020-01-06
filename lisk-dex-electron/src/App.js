@@ -80,7 +80,7 @@ class App extends React.Component {
       if (asks.length > 0) {
         minAsk = asks[0].price;
       }
-      this.setState({ orderBookData: { bids, asks, maxSize }, maxBid, minAsk});
+      this.setState({ orderBookData: { bids, asks, maxSize }, maxBid, minAsk });
     });
   }
 
@@ -129,10 +129,12 @@ class App extends React.Component {
       <userContext.Provider value={{ ...this.state }}>
         {this.state.displaySigninModal && <SignInModal failure={this.state.signInFailure} passphraseSubmit={this.passphraseSubmit} enabledAssets={this.state.enabledAssets} close={this.closeSignInModal}></SignInModal>}
         <div className="top-bar">
-          <div className="top-bar-right">
-            <b>Lisk DEX</b>
+          <div>
+            <b style={{ fontSize: '21px' }}>Lisk DEX</b> &nbsp;
+            <a style={{ color: '#34cfeb', fontSize: '14px' }} href="https://github.com/Jaxkr/lisk-dex-ui/issues/new?assignees=&labels=&template=bug_report.md&title=" rel="noopener noreferrer" target="_blank">Report bug</a> &nbsp;
+            <a style={{ color: '#34cfeb', fontSize: '14px' }} href="https://github.com/Jaxkr/lisk-dex-ui/issues/new?assignees=&labels=&template=feature_request.md&title=" rel="noopener noreferrer" target="_blank">Request feature</a>
           </div>
-          <div className="top-bar-left">
+          <div>
             <SignInState showSignIn={this.showSignIn} keys={this.state.keys} signedIn={this.state.signedIn} signOut={this.signOut}></SignInState>
           </div>
         </div>

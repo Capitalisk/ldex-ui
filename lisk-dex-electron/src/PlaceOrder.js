@@ -152,12 +152,22 @@ export default class PlaceOrder extends React.Component {
             Amount: <br></br>
             <input name="amount" className="order-val-input" type="number" value={this.state.amount} onChange={this.handleChange} />
             {this.state.marketMode &&
-              <div>≈ {this.state.amount}</div>
+              <>
+                {
+                  this.props.side === 'buy' &&
+                  <div style={{ color: 'grey', fontSize: '15px', marginBottom: '10px' }}>≈ {(this.state.amount / this.context.minAsk).toFixed(4)} {this.context.currentMarket[0].toUpperCase()}</div>
+                }
+                {
+                  this.props.side === 'sell' &&
+                  <div style={{ color: 'grey', fontSize: '15px', marginBottom: '10px' }}>≈ {(this.state.amount * this.context.maxBid).toFixed(4)} {this.context.currentMarket[1].toUpperCase()}</div>
+                }
+              </>
             }
             <input className="place-order-button" type="submit" value="Submit" />
           </form>
         }
-        {!canTrade &&
+        {
+          !canTrade &&
           <p style={{ color: 'grey' }}>
             Please sign in with your {this.context.currentMarket[0].toUpperCase()} <b>and</b> {this.context.currentMarket[1].toUpperCase()} passphrase to trade.
           </p>

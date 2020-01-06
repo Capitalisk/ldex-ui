@@ -20,6 +20,10 @@ function createWindow() {
       ? 'http://localhost:3000'
       : `file://${path.join(__dirname, '../build/index.html')}`,
   )
+  mainWindow.webContents.on("new-window", function (event, url) {
+    event.preventDefault();
+    electron.shell.openExternal(url);
+  });
 
   mainWindow.on('closed', () => {
     mainWindow = null
