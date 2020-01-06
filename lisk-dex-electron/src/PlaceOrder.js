@@ -151,6 +151,9 @@ export default class PlaceOrder extends React.Component {
             }
             Amount: <br></br>
             <input name="amount" className="order-val-input" type="number" value={this.state.amount} onChange={this.handleChange} />
+            {this.state.marketMode &&
+              <div>≈ {this.state.amount}</div>
+            }
             <input className="place-order-button" type="submit" value="Submit" />
           </form>
         }

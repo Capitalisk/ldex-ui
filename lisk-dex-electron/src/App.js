@@ -28,7 +28,8 @@ class App extends React.Component {
       displaySigninModal: false,
       signedIn: false,
       signInFailure: false,
-      currentPrice: 0,
+      maxBid: 0,
+      minAsk: 0,
       // to prevent cross-chain replay attacks, the user can specify a key for each chain that they are trading on.
       // the address will be used when the asset is being used as the destination chain.
       keys: {
@@ -71,11 +72,15 @@ class App extends React.Component {
           }
         }
       }
-      let currentPrice = 0;
+      let maxBid = 0;
+      let minAsk = 0;
       if (bids.length > 0) {
-        currentPrice = bids[bids.length - 1].price;
+        maxBid = bids[bids.length - 1].price;
       }
-      this.setState({ orderBookData: { bids, asks, maxSize }, currentPrice});
+      if (asks.length > 0) {
+        minAsk = asks[0].price;
+      }
+      this.setState({ orderBookData: { bids, asks, maxSize }, maxBid, minAsk});
     });
   }
 
@@ -143,7 +148,7 @@ class App extends React.Component {
               <Orderbook orderBookData={this.state.orderBookData} side="asks"></Orderbook>
             </div>
             <div className="price-display">
-              Price: {this.state.currentPrice} {this.state.currentMarket[1].toUpperCase()}
+              Price: {this.state.maxBid} {this.state.currentMarket[1].toUpperCase()}
             </div>
             <div className="buy-orders">
               <Orderbook orderBookData={this.state.orderBookData} side="bids"></Orderbook>
