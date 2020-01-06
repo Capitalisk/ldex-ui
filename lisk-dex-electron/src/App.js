@@ -133,6 +133,8 @@ class App extends React.Component {
             <b style={{ fontSize: '21px' }}>Lisk DEX</b> &nbsp;
             <a style={{ color: '#34cfeb', fontSize: '14px' }} href="https://github.com/Jaxkr/lisk-dex-ui/issues/new?assignees=&labels=&template=bug_report.md&title=" rel="noopener noreferrer" target="_blank">Report bug</a> &nbsp;
             <a style={{ color: '#34cfeb', fontSize: '14px' }} href="https://github.com/Jaxkr/lisk-dex-ui/issues/new?assignees=&labels=&template=feature_request.md&title=" rel="noopener noreferrer" target="_blank">Request feature</a>
+            {/* eslint-disable-next-line jsx-a11y/accessible-emoji*/}
+            &nbsp; <span style={{ fontSize: '14px' }}>Thanks! 😊</span>
           </div>
           <div>
             <SignInState showSignIn={this.showSignIn} keys={this.state.keys} signedIn={this.state.signedIn} signOut={this.signOut}></SignInState>
