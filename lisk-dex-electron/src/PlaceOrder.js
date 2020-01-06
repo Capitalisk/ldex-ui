@@ -163,6 +163,18 @@ export default class PlaceOrder extends React.Component {
                 }
               </>
             }
+            {!this.state.marketMode &&
+              <>
+                {
+                  this.props.side === 'buy' &&
+                  <div style={{ color: 'grey', fontSize: '15px', marginBottom: '10px' }}>≈ {(this.state.amount / this.state.price).toFixed(4)} {this.context.currentMarket[0].toUpperCase()}</div>
+                }
+                {
+                  this.props.side === 'sell' &&
+                  <div style={{ color: 'grey', fontSize: '15px', marginBottom: '10px' }}>≈ {(this.state.amount * this.state.price).toFixed(4)} {this.context.currentMarket[1].toUpperCase()}</div>
+                }
+              </>
+            }
             <input className="place-order-button" type="submit" value="Submit" />
           </form>
         }
