@@ -36,6 +36,8 @@ export default class BalanceDisplay extends React.Component {
   }
 
   render() {
+    // Note: don't use context for dynamic or frequently changed content.
+    // This implementation is a mistake, but I am keeping it as lesson on what not to do.
     if (this.context.signedIn === true && this.props.asset in this.context.keys) {
       if (this.interval === undefined) {
         console.log('SETTING INTERVAL');

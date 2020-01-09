@@ -114,7 +114,7 @@ class Chart extends React.Component {
     xAxis.dataFields.category = "value";
     //xAxis.renderer.grid.template.location = 0;
     xAxis.renderer.minGridDistance = 50;
-    xAxis.title.text = `Price (${this.props.currentMarket[1].toUpperCase()}/${this.props.currentMarket[0].toUpperCase()})`;
+    xAxis.title.text = `Price (${this.props.currentMarket[0].toUpperCase()}/${this.props.currentMarket[1].toUpperCase()})`;
 
     var yAxis = chart.yAxes.push(new am4charts.ValueAxis());
     yAxis.title.text = "Volume";

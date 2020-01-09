@@ -30,6 +30,7 @@ class App extends React.Component {
       signInFailure: false,
       maxBid: 0,
       minAsk: 0,
+      myOrders: [],
       // to prevent cross-chain replay attacks, the user can specify a key for each chain that they are trading on.
       // the address will be used when the asset is being used as the destination chain.
       keys: {
@@ -53,6 +54,7 @@ class App extends React.Component {
       const bids = [];
       const asks = [];
       let maxSize = { bid: 0, ask: 0 };
+      let myOrders = [];
       for (let result of results.data) {
         if (
           // filter for the turrent trading pair.
@@ -64,14 +66,22 @@ class App extends React.Component {
             if (result.size > maxSize.bid) {
               maxSize.bid = result.sizeRemaining;
             }
+            if (result.senderId === this.state.keys[this.state.currentMarket[1]]?.address) {
+              myOrders.push(result);
+            }
           } else if (result.side === "ask") {
             asks.push(result);
             if (result.size > maxSize.ask) {
               maxSize.ask = result.sizeRemaining;
             }
+            if (result.senderId === this.state.keys[this.state.currentMarket[0]]?.address) {
+              myOrders.push(result);
+            }
           }
         }
       }
+      console.log('my orders');
+      console.log(myOrders);
       let maxBid = 0;
       let minAsk = 0;
       if (bids.length > 0) {
@@ -112,6 +122,7 @@ class App extends React.Component {
     }
     if (atLeastOneKey) {
       this.setState({ keys, signedIn: true, displaySigninModal: false });
+      this.refreshOrderbook();
     }
   }
 
@@ -162,13 +173,10 @@ class App extends React.Component {
             <Chart whole={Math.pow(10, 8)} currentMarket={this.state.currentMarket}></Chart>
           </div>
           <div className="your-orders">
-            <YourOrders></YourOrders>
+            <YourOrders orders={this.state.myOrders}></YourOrders>
           </div>
           <div className="market-name-and-stats">
             <MarketList></MarketList>
-            <small>
-              API Status: <span style={{ color: "green" }}>Connected</span>. <br></br>Data refreshed every 10 seconds.
-            </small>
           </div>
         </div>
       </userContext.Provider>

@@ -28,9 +28,8 @@ export default class YourOrders extends React.Component {
   render() {
     return (
       <div style={{ padding: "5px" }}>
-          <div className="action-name">YOUR ORDERS</div>
+        <div className="action-name">YOUR ORDERS</div>
 
-          
       </div>
     );
   }

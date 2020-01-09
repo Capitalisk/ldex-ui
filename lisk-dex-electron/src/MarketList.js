@@ -27,9 +27,16 @@ export default class MarketList extends React.Component {
 
   render() {
     return (
-      <div style={{ padding: "5px" }}>
+      <>
+        <div style={{ padding: "5px" }}>
           <div className="action-name">MARKETS</div>
-      </div>
+          <p>Current market: <b>CLSK/LSK</b></p>
+          <p>More markets coming soon!</p>
+        </div>
+        <small>
+          <br></br>Data refreshed every 15 seconds.
+        </small>
+      </>
     );
   }
 }
