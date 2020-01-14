@@ -2,7 +2,7 @@
 
 ## How to run
 
-1. Clone repository.
+1. Clone repository and `cd` into it.
 2. `cd lisk-dex-electron && npm i`
 3. `npm run start`
 4. Leaving the last process running, `npm run electron`.
