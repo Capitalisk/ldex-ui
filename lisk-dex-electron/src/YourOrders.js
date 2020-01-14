@@ -1,5 +1,6 @@
 import React from "react";
 import "./PlaceOrder.css";
+import UserOrder from './UserOrder';
 
 export default class YourOrders extends React.Component {
   constructor(props) {
@@ -26,11 +27,21 @@ export default class YourOrders extends React.Component {
   }
 
   render() {
+    console.log(this.props.orders);
     return (
-      <div style={{ padding: "5px" }}>
-        <div className="action-name">YOUR ORDERS</div>
-
-      </div>
+      <>
+        <div style={{ padding: "5px" }}>
+          <div className="action-name">YOUR ORDERS</div>
+        </div>
+        <div style={{ width: '100%', margin: 0, padding: 0, display: 'flex' }}>
+          <div style={{ width: '50%', height: '250px', margin: 0, padding: 0, overflow: 'scroll' }}>
+            {this.props.orders.slice().reverse().map(order => <UserOrder key={order.orderId} side='bid' order={order}></UserOrder>)}
+          </div>
+          <div style={{ width: '50%', height: '250px', margin: 0, padding: 0, overflow: 'scroll' }}>
+            {this.props.orders.map(order => <UserOrder key={order.orderId} side='ask' order={order}></UserOrder>)}
+          </div>
+        </div>
+      </>
     );
   }
 }

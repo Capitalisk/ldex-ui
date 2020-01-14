@@ -1,0 +1,10 @@
+.cancel-order-button {
+  font-size: 12px;
+  background-color: rgb(45, 46, 56);
+  color: white;
+  font-family: 'Courier New', Courier, monospace;
+  outline-color: rgb(194, 194, 194);
+  float: right;
+  margin-right: 5px;
+  margin-top: 5px;
+}

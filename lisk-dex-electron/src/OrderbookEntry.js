@@ -1,7 +1,7 @@
 import React from "react";
-import "./SingleOrder.css";
+import "./OrderbookEntry.css";
 
-export default class SingleOrder extends React.Component {
+export default class OrderbookEntry extends React.Component {
   constructor(props) {
     super(props);
     this.state = {};

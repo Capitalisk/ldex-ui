@@ -90,7 +90,7 @@ class App extends React.Component {
       if (asks.length > 0) {
         minAsk = asks[0].price;
       }
-      this.setState({ orderBookData: { bids, asks, maxSize }, maxBid, minAsk });
+      this.setState({ orderBookData: { bids, asks, maxSize }, maxBid, minAsk, myOrders });
     });
   }
 
@@ -142,8 +142,7 @@ class App extends React.Component {
         <div className="top-bar">
           <div>
             <b style={{ fontSize: '21px' }}>Lisk DEX</b> &nbsp;
-            <a style={{ color: '#34cfeb', fontSize: '14px' }} href="https://github.com/Jaxkr/lisk-dex-ui/issues/new?assignees=&labels=&template=bug_report.md&title=" rel="noopener noreferrer" target="_blank">Report bug</a> &nbsp;
-            <a style={{ color: '#34cfeb', fontSize: '14px' }} href="https://github.com/Jaxkr/lisk-dex-ui/issues/new?assignees=&labels=&template=feature_request.md&title=" rel="noopener noreferrer" target="_blank">Request feature</a>
+            <a style={{ color: '#34cfeb', fontSize: '14px' }} href="https://github.com/Jaxkr/lisk-dex-ui/issues/new" rel="noopener noreferrer" target="_blank">Report bug / send feedback</a> 
             {/* eslint-disable-next-line jsx-a11y/accessible-emoji*/}
             &nbsp; <span style={{ fontSize: '14px' }}>Thanks! 😊</span>
           </div>

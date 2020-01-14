@@ -6,6 +6,10 @@ import { blockchainAPIURLS } from './BalanceDisplay';
 import * as transactions from '@liskhq/lisk-transactions';
 import axios from 'axios';
 
+export const dex_addresses = {
+  'lsk': '11279270540263472697L',
+  'clsk': '6054385933994690091L',
+}
 
 export default class PlaceOrder extends React.Component {
   static contextType = userContext;
@@ -40,10 +44,6 @@ export default class PlaceOrder extends React.Component {
     this.setState({ marketMode: !this.state.marketMode });
   }
 
-  dex_addresses = {
-    'lsk': '11279270540263472697L',
-    'clsk': '6054385933994690091L',
-  }
   placeOrder = () => {
     if (this.state.marketMode) {
       let dexAddress = undefined;
@@ -52,13 +52,13 @@ export default class PlaceOrder extends React.Component {
       let destChain = undefined;
       let broadcastURL = undefined;
       if (this.props.side === 'buy') {
-        dexAddress = this.dex_addresses[this.context.currentMarket[1]]
+        dexAddress = dex_addresses[this.context.currentMarket[1]]
         destAddress = this.context.keys[this.context.currentMarket[0]].address;
         passphrase = this.context.keys[this.context.currentMarket[1]].passphrase;
         destChain = this.context.currentMarket[0];
         broadcastURL = blockchainAPIURLS[this.context.currentMarket[1]];
       } else if (this.props.side === 'sell') {
-        dexAddress = this.dex_addresses[this.context.currentMarket[0]]
+        dexAddress = dex_addresses[this.context.currentMarket[0]]
         destAddress = this.context.keys[this.context.currentMarket[1]].address;
         passphrase = this.context.keys[this.context.currentMarket[0]].passphrase;
         destChain = this.context.currentMarket[1];

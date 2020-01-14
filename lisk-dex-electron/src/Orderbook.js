@@ -1,5 +1,5 @@
 import React from "react";
-import SingleOrder from "./SingleOrder";
+import OrderbookEntry from "./OrderbookEntry";
 import "./Orderbook.css";
 
 export default class Orderbook extends React.Component {
@@ -11,7 +11,7 @@ export default class Orderbook extends React.Component {
   render() {
     if (this.props.side === "asks") {
       const orders = this.props.orderBookData.asks.map(order => (
-        <SingleOrder
+        <OrderbookEntry
           whole={Math.pow(10, 8)} // 10 ** 8 beddow in one LSK
           key={order.orderId}
           size={order.sizeRemaining}
@@ -19,13 +19,13 @@ export default class Orderbook extends React.Component {
           maxSize={this.props.orderBookData.maxSize}
           side={this.props.side}
           decimals={4}
-        ></SingleOrder>
+        ></OrderbookEntry>
       ));
       return <div className="askOrderList">{orders}</div>;
     }
     if (this.props.side === "bids") {
       const orders = this.props.orderBookData.bids.map(order => (
-        <SingleOrder
+        <OrderbookEntry
           whole={Math.pow(10, 8)} // 10 ** 8 beddow in one LSK
           key={order.orderId}
           size={order.sizeRemaining}
@@ -33,7 +33,7 @@ export default class Orderbook extends React.Component {
           maxSize={this.props.orderBookData.maxSize}
           side={this.props.side}
           decimals={4}
-        ></SingleOrder>
+        ></OrderbookEntry>
       ));
       orders.reverse();
       return <div className="bidOrderList">{orders}</div>;
