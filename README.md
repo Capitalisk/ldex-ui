@@ -9,3 +9,5 @@
 
 This setup allows Electron to hot-reload from a web server, making development much more convenient; And, we can still produce a bundled app that works offline.
 
+Alternatively, you can view the running application at http://localhost:3000/
+
