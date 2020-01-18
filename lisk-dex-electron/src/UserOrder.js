@@ -22,7 +22,7 @@ export default class UserOrder extends React.Component {
     let dexAddress = dex_addresses[this.props.order.sourceChain];
     let passphrase = this.context.keys[this.props.order.sourceChain].passphrase;
     let targetChain = this.props.order.targetChain;
-    let orderId = this.props.order.orderId;
+    let orderId = this.props.order.id;
     let broadcastURL = blockchainAPIURLS[this.props.order.sourceChain];
 
 
@@ -44,10 +44,13 @@ export default class UserOrder extends React.Component {
     if (this.props.order.side !== this.props.side) {
       return null;
     }
+    let amountRemaining = this.props.order.side === 'ask' ? this.props.order.sizeRemaining : this.props.order.valueRemaining;
+    let amount = this.props.order.side === 'ask' ? this.props.order.size : this.props.order.value;
+
     return (
 
       <div style={{ width: '100%', fontSize: '14px', backgroundColor: this.props.side === 'bid' ? '#286113' : '#700d0d', borderBottom: '1px solid black' }}>
-        {(this.props.order.sizeRemaining / Math.pow(10, 8)).toFixed(4)}/{(this.props.order.size / Math.pow(10, 8)).toFixed(4)} <button className="cancel-order-button" onClick={this.cancelOrder}>Cancel</button>
+        {(amountRemaining / Math.pow(10, 8)).toFixed(4)}/{(amount / Math.pow(10, 8)).toFixed(4)} <button className="cancel-order-button" onClick={this.cancelOrder}>Cancel</button>
         <br></br>
         Price: {this.props.order.price.toFixed(4)}
       </div>

@@ -63,8 +63,8 @@ class App extends React.Component {
         ) {
           if (result.side === "bid") {
             bids.push(result);
-            if (result.size > maxSize.bid) {
-              maxSize.bid = result.sizeRemaining;
+            if (result.value > maxSize.bid) {
+              maxSize.bid = result.valueRemaining;
             }
             if (result.senderId === this.state.keys[this.state.currentMarket[1]]?.address) {
               myOrders.push(result);
@@ -142,7 +142,7 @@ class App extends React.Component {
         <div className="top-bar">
           <div>
             <b style={{ fontSize: '21px' }}>Lisk DEX</b> &nbsp;
-            <a style={{ color: '#34cfeb', fontSize: '14px' }} href="https://github.com/Jaxkr/lisk-dex-ui/issues/new" rel="noopener noreferrer" target="_blank">Report bug / send feedback</a> 
+            <a style={{ color: '#34cfeb', fontSize: '14px' }} href="https://github.com/Jaxkr/lisk-dex-ui/issues/new" rel="noopener noreferrer" target="_blank">Report bug / send feedback</a>
             {/* eslint-disable-next-line jsx-a11y/accessible-emoji*/}
             &nbsp; <span style={{ fontSize: '14px' }}>Thanks! 😊</span>
           </div>
