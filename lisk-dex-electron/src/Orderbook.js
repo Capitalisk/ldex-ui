@@ -13,7 +13,7 @@ export default class Orderbook extends React.Component {
       const orders = this.props.orderBookData.asks.map(order => (
         <OrderbookEntry
           whole={Math.pow(10, 8)} // 10 ** 8 beddow in one LSK
-          key={order.orderId}
+          key={order.id}
           size={order.sizeRemaining}
           price={order.price}
           maxSize={this.props.orderBookData.maxSize}
@@ -27,8 +27,8 @@ export default class Orderbook extends React.Component {
       const orders = this.props.orderBookData.bids.map(order => (
         <OrderbookEntry
           whole={Math.pow(10, 8)} // 10 ** 8 beddow in one LSK
-          key={order.orderId}
-          size={order.sizeRemaining}
+          key={order.id}
+          size={order.valueRemaining}
           price={order.price}
           maxSize={this.props.orderBookData.maxSize}
           side={this.props.side}

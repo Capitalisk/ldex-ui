@@ -27,10 +27,19 @@ class Chart extends React.Component {
       const processData = (list, type, desc) => {
         // Convert to data points
         for (var i = 0; i < list.length; i++) {
-          list[i] = {
-            value: Number(list[i]["price"]),
-            volume: Number(list[i]["sizeRemaining"]) / this.props.whole
-          };
+          let currentOrder = list[i];
+          let currentOrderPrice = Number(currentOrder.price);
+          if (currentOrder.side === 'ask') {
+            list[i] = {
+              value: currentOrderPrice,
+              volume: Number(currentOrder.sizeRemaining) * currentOrderPrice / this.props.whole
+            };
+          } else {
+            list[i] = {
+              value: currentOrderPrice,
+              volume: Number(currentOrder.valueRemaining) / this.props.whole
+            };
+          }
         }
 
         // Sort list just in case
@@ -89,8 +98,8 @@ class Chart extends React.Component {
         ) {
           if (result.side === "bid") {
             bids.push(result);
-            if (result.size > maxSize.bid) {
-              maxSize.bid = result.size;
+            if (result.value > maxSize.bid) {
+              maxSize.bid = result.value;
             }
           } else if (result.side === "ask") {
             asks.push(result);
@@ -117,7 +126,7 @@ class Chart extends React.Component {
     xAxis.title.text = `Price (${this.props.currentMarket[0].toUpperCase()}/${this.props.currentMarket[1].toUpperCase()})`;
 
     var yAxis = chart.yAxes.push(new am4charts.ValueAxis());
-    yAxis.title.text = "Volume";
+    yAxis.title.text = "Volume (LSK)";
 
     // Create series
     var series = chart.series.push(new am4charts.StepLineSeries());
