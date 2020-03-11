@@ -99,9 +99,9 @@ class App extends React.Component {
   componentDidMount() {
     // Enable navigation prompt
     window.onbeforeunload = (e) => {
-      this.setDisplayLeaveWarning(true);
-      e.preventDefault();
-      return true;
+      //this.setDisplayLeaveWarning(true);
+      //e.preventDefault();
+      //return true;
     };
 
     this.refreshOrderbook();
