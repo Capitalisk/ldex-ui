@@ -12,6 +12,7 @@ import { userContext } from './context';
 
 import * as cryptography from "@liskhq/lisk-cryptography";
 import * as passphrase from "@liskhq/lisk-passphrase";
+import LeaveWarning from "./LeaveWarning";
 const { Mnemonic } = passphrase;
 
 
@@ -23,11 +24,12 @@ class App extends React.Component {
     // having to re-fetch the data in each.
     this.state = {
       orderBookData: { orders: [], bids: [], asks: [], maxSize: { bid: 0, ask: 0 } },
-      currentMarket: ["clsk", "lsk"],
-      enabledAssets: ["lsk", "clsk"],
+      currentMarket: ["lsh", "lsk"],
+      enabledAssets: ["lsk", "lsh"],
       displaySigninModal: false,
       signedIn: false,
       signInFailure: false,
+      displayLeaveWarning: false,
       maxBid: 0,
       minAsk: 0,
       myOrders: [],
@@ -95,6 +97,13 @@ class App extends React.Component {
   }
 
   componentDidMount() {
+    // Enable navigation prompt
+    window.onbeforeunload = (e) => {
+      this.setDisplayLeaveWarning(true);
+      e.preventDefault();
+      return true;
+    };
+
     this.refreshOrderbook();
     setInterval(this.refreshOrderbook, 10000);
   }
@@ -134,11 +143,16 @@ class App extends React.Component {
     this.setState({ signedIn: false, keys: {} });
   }
 
+  setDisplayLeaveWarning = (val) => {
+    this.setState({ displayLeaveWarning: val });
+  }
+
 
   render() {
     return (
       <userContext.Provider value={{ ...this.state }}>
         {this.state.displaySigninModal && <SignInModal failure={this.state.signInFailure} passphraseSubmit={this.passphraseSubmit} enabledAssets={this.state.enabledAssets} close={this.closeSignInModal}></SignInModal>}
+        {this.state.displayLeaveWarning && <LeaveWarning setDisplayLeaveWarning={this.setDisplayLeaveWarning}></LeaveWarning>}
         <div className="top-bar">
           <div>
             <b style={{ fontSize: '21px' }}>Lisk DEX</b> &nbsp;

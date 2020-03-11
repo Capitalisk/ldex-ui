@@ -5,7 +5,7 @@ import "./App.css";
 
 export const blockchainAPIURLS = {
   'lsk': ['https://test-02.liskapi.io/api'],
-  'clsk': ['http://3.93.232.78:7010/api']
+  'clsk': ['http://54.174.172.179:7010']
 }
 
 export default class BalanceDisplay extends React.Component {

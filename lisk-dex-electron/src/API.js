@@ -1,10 +1,10 @@
 import axios from 'axios';
-export const API_URL = 'http://3.93.232.78:7011';
+export const API_URL = 'http://54.174.172.179:7011';
 
 const instance = axios.create({
   baseURL: API_URL,
   timeout: 10000,
-  headers: { 'X-LiskDexUI-Version': '0.1' }
+  headers: { 'X-LiskDexUI-Version': '0.2' }
 });
 
 export async function getOrderbook() {
