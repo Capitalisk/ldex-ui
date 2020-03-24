@@ -10,24 +10,30 @@ import { DEXConfiguration } from "./util/Configuration";
 
 export default class PlaceOrder extends React.Component<any, any> {
   static contextType = userContext;
-  constructor(props) {
-    super(props);
+  constructor(props, context) {
+    super(props, context);
     this.state = {
       price: 0,
       amount: 0,
       marketMode: true,
     };
 
+
     this.handleChange = this.handleChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
-    const config = (this.context.configuration as DEXConfiguration);
+    const config = (context.configuration as DEXConfiguration);
     this.dex_addresses = {
-      [this.context.currentMarket[0]]: config.markets[this.context.currentMarket].DEX_ADDRESSES[this.context.currentMarket[0]],
-      [this.context.currentMarket[1]]: config.markets[this.context.currentMarket].DEX_ADDRESSES[this.context.currentMarket[1]],
+      [context.currentMarket[0]]: config.markets[context.activeMarket].DEX_ADDRESSES[context.currentMarket[0].toUpperCase()],
+      [context.currentMarket[1]]: config.markets[context.activeMarket].DEX_ADDRESSES[context.currentMarket[1].toUpperCase()],
     }
+    Object.keys(this.dex_addresses).forEach(e => {
+      if (this.dex_addresses[e] === undefined) {
+        throw new Error("Invalid active market or bad configuration.")
+      }
+    })
     this.blockchainAPIURLs = {
-      [this.context.currentMarket[0]]: config.markets[this.context.currentMarket].LISK_API_URLS[this.context.currentMarket[0]],
-      [this.context.currentMarket[1]]: config.markets[this.context.currentMarket].LISK_API_URLS[this.context.currentMarket[1]],
+      [context.currentMarket[0]]: config.markets[context.activeMarket].LISK_API_URLS[context.currentMarket[0]],
+      [context.currentMarket[1]]: config.markets[context.activeMarket].LISK_API_URLS[context.currentMarket[1]],
     }
   }
   dex_addresses = {}
@@ -136,7 +142,7 @@ export default class PlaceOrder extends React.Component<any, any> {
   }
 
   render() {
-    console.log(this.dex_addresses);
+    // console.log(this.dex_addresses);
     let canTrade = false;
     if (this.context.currentMarket[0] in this.context.keys && this.context.currentMarket[1] in this.context.keys) {
       canTrade = true;

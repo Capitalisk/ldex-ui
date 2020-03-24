@@ -10,6 +10,6 @@ export function getClient(api_base_url: string) {
 
 export async function getOrderbook(instance: AxiosInstance) {
   const orders = await instance.get('/orders?sort=price:asc');
-  console.log("HIT API");
+  //console.log("HIT API");
   return orders;
 }

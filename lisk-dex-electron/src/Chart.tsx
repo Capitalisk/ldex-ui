@@ -12,11 +12,13 @@ import { DEXConfiguration } from "./util/Configuration";
 
 class Chart extends React.Component<any, any> {
   static contextType = userContext;
-  constructor(props) {
-    super(props);
+  constructor(props, context) {
+    super(props, context);
     this.state = {};
+    this.API_URL = (this.context.configuration as DEXConfiguration).markets[this.context.activeMarket].DEX_API_URL;
+
   }
-  API_URL = (this.context.configuration as DEXConfiguration).markets[this.context.currentMarket].DEX_API_URL;
+  API_URL: string;
 
   componentDidMount() {
     am4core.useTheme(am4themes_animated);

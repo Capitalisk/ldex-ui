@@ -78,6 +78,7 @@ export async function processConfiguration(config: UnprocessedDEXConfiguration) 
         }
 
     }
+    console.log('Loaded configuration: ');
     console.log(_config);
     return _config;
 }

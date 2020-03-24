@@ -24,6 +24,7 @@ class App extends React.Component {
     // This state has too many members. This is because we want to share data from API calls with various different components without
     // having to re-fetch the data in each.
     this.state = {
+      configurationLoaded: false,
       configuration: {},
       orderBookData: { orders: [], bids: [], asks: [], maxSize: { bid: 0, ask: 0 } },
       currentMarket: ["lsh", "lsk"],
@@ -51,17 +52,22 @@ class App extends React.Component {
 
 
     this.showSignIn = this.showSignIn.bind(this);
+    this.intervalRegistered = false;
     this.passphraseSubmit = this.passphraseSubmit.bind(this);
-
-
+    this.loadConfiguration();
 
   }
 
-  refreshOrderbook = async () => {
+  loadConfiguration = async () => {
     this.setState({
-      configuration: (await processConfiguration(defaultConfiguration))
+      configuration: (await processConfiguration(defaultConfiguration)),
+      configurationLoaded: true
     });
-    console.log('refreshing orderbook');
+  }
+
+  refreshOrderbook = async () => {
+
+    //console.log('refreshing orderbook');
     getOrderbook(getClient(this.state.configuration.markets[this.state.activeMarket].DEX_API_URL)).then(results => {
       const bids = [];
       const asks = [];
@@ -92,8 +98,8 @@ class App extends React.Component {
           }
         }
       }
-      console.log('my orders');
-      console.log(myOrders);
+      //console.log('my orders');
+      //console.log(myOrders);
       let maxBid = 0;
       let minAsk = 0;
       if (bids.length > 0) {
@@ -114,8 +120,14 @@ class App extends React.Component {
       //return true;
     };
 
-    this.refreshOrderbook();
-    setInterval(this.refreshOrderbook, 10000);
+
+  }
+  componentDidUpdate() {
+    if (this.state.configurationLoaded && !this.intervalRegistered) {
+      this.refreshOrderbook();
+      setInterval(this.refreshOrderbook, 10000);
+      this.intervalRegistered = true;
+    }
   }
 
   showSignIn() {
@@ -159,7 +171,10 @@ class App extends React.Component {
 
 
   render() {
-    return (
+    if (!this.state.configurationLoaded) {
+      return <div>Loading...</div>
+    }
+    return <>
       <userContext.Provider value={{ ...this.state }}>
         {this.state.displaySigninModal && <SignInModal failure={this.state.signInFailure} passphraseSubmit={this.passphraseSubmit} enabledAssets={this.state.enabledAssets} close={this.closeSignInModal}></SignInModal>}
         {this.state.displayLeaveWarning && <LeaveWarning setDisplayLeaveWarning={this.setDisplayLeaveWarning}></LeaveWarning>}
@@ -203,7 +218,7 @@ class App extends React.Component {
           </div>
         </div>
       </userContext.Provider>
-    );
+    </>;
   }
 }
 
