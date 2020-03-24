@@ -1,29 +1,39 @@
 import React from "react";
 import './UserOrder.css';
-import { dex_addresses } from './PlaceOrder';
 import { userContext } from './context';
-import { blockchainAPIURLS } from './BalanceDisplay';
 import * as transactions from '@liskhq/lisk-transactions';
 import axios from 'axios';
+import { DEXConfiguration } from "./util/Configuration";
 
 
 
-export default class UserOrder extends React.Component {
+export default class UserOrder extends React.Component<any, any> {
   static contextType = userContext;
   constructor(props) {
     super(props);
     this.state = {};
+    const config = (this.context.configuration as DEXConfiguration);
+    this.blockchainAPIURLs = {
+      [this.context.currentMarket[0]]: config.markets[this.context.currentMarket].LISK_API_URLS[this.context.currentMarket[0]],
+      [this.context.currentMarket[1]]: config.markets[this.context.currentMarket].LISK_API_URLS[this.context.currentMarket[1]],
+    }
+    this.dex_addresses = {
+      [this.context.currentMarket[0]]: config.markets[this.context.currentMarket].DEX_ADDRESSES[this.context.currentMarket[0]],
+      [this.context.currentMarket[1]]: config.markets[this.context.currentMarket].DEX_ADDRESSES[this.context.currentMarket[1]],
+    }
   }
+  blockchainAPIURLs = {}
+  dex_addresses = {}
 
 
   cancelOrder = () => {
     console.log(this.props.order);
 
-    let dexAddress = dex_addresses[this.props.order.sourceChain];
+    let dexAddress = this.dex_addresses[this.props.order.sourceChain];
     let passphrase = this.context.keys[this.props.order.sourceChain].passphrase;
     let targetChain = this.props.order.targetChain;
     let orderId = this.props.order.id;
-    let broadcastURL = blockchainAPIURLS[this.props.order.sourceChain];
+    let broadcastURL = this.blockchainAPIURLs[this.props.order.sourceChain];
 
 
     const tx = transactions.transfer({

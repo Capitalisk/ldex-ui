@@ -2,16 +2,13 @@ import React from "react";
 import "./PlaceOrder.css";
 import BalanceDisplay from './BalanceDisplay';
 import { userContext } from './context';
-import { blockchainAPIURLS } from './BalanceDisplay';
 import * as transactions from '@liskhq/lisk-transactions';
 import axios from 'axios';
+import { DEXConfiguration } from "./util/Configuration";
 
-export const dex_addresses = {
-  'lsk': '11279270540263472697L',
-  'clsk': '6054385933994690091L',
-}
+ 
 
-export default class PlaceOrder extends React.Component {
+export default class PlaceOrder extends React.Component<any, any> {
   static contextType = userContext;
   constructor(props) {
     super(props);
@@ -23,7 +20,20 @@ export default class PlaceOrder extends React.Component {
 
     this.handleChange = this.handleChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
+    const config = (this.context.configuration as DEXConfiguration);
+    this.dex_addresses = {
+      [this.context.currentMarket[0]]: config.markets[this.context.currentMarket].DEX_ADDRESSES[this.context.currentMarket[0]],
+      [this.context.currentMarket[1]]: config.markets[this.context.currentMarket].DEX_ADDRESSES[this.context.currentMarket[1]],
+    }
+    this.blockchainAPIURLs = {
+      [this.context.currentMarket[0]]: config.markets[this.context.currentMarket].LISK_API_URLS[this.context.currentMarket[0]],
+      [this.context.currentMarket[1]]: config.markets[this.context.currentMarket].LISK_API_URLS[this.context.currentMarket[1]],
+    }
   }
+  dex_addresses = {}
+  blockchainAPIURLs = {}
+  
+
 
   handleChange(event) {
     const target = event.target;
@@ -52,17 +62,17 @@ export default class PlaceOrder extends React.Component {
       let destChain = undefined;
       let broadcastURL = undefined;
       if (this.props.side === 'buy') {
-        dexAddress = dex_addresses[this.context.currentMarket[1]]
+        dexAddress = this.dex_addresses[this.context.currentMarket[1]]
         destAddress = this.context.keys[this.context.currentMarket[0]].address;
         passphrase = this.context.keys[this.context.currentMarket[1]].passphrase;
         destChain = this.context.currentMarket[0];
-        broadcastURL = blockchainAPIURLS[this.context.currentMarket[1]];
+        broadcastURL = this.blockchainAPIURLs[this.context.currentMarket[1]];
       } else if (this.props.side === 'sell') {
-        dexAddress = dex_addresses[this.context.currentMarket[0]]
+        dexAddress = this.dex_addresses[this.context.currentMarket[0]]
         destAddress = this.context.keys[this.context.currentMarket[1]].address;
         passphrase = this.context.keys[this.context.currentMarket[0]].passphrase;
         destChain = this.context.currentMarket[1];
-        broadcastURL = blockchainAPIURLS[this.context.currentMarket[0]];
+        broadcastURL = this.blockchainAPIURLs[this.context.currentMarket[0]];
 
       }
 
@@ -91,17 +101,17 @@ export default class PlaceOrder extends React.Component {
       let destChain = undefined;
       let broadcastURL = undefined;
       if (this.props.side === 'buy') {
-        dexAddress = dex_addresses[this.context.currentMarket[1]]
+        dexAddress = this.dex_addresses[this.context.currentMarket[1]]
         destAddress = this.context.keys[this.context.currentMarket[0]].address;
         passphrase = this.context.keys[this.context.currentMarket[1]].passphrase;
         destChain = this.context.currentMarket[0];
-        broadcastURL = blockchainAPIURLS[this.context.currentMarket[1]];
+        broadcastURL = this.blockchainAPIURLs[this.context.currentMarket[1]];
       } else if (this.props.side === 'sell') {
-        dexAddress = dex_addresses[this.context.currentMarket[0]]
+        dexAddress = this.dex_addresses[this.context.currentMarket[0]]
         destAddress = this.context.keys[this.context.currentMarket[1]].address;
         passphrase = this.context.keys[this.context.currentMarket[0]].passphrase;
         destChain = this.context.currentMarket[1];
-        broadcastURL = blockchainAPIURLS[this.context.currentMarket[0]];
+        broadcastURL = this.blockchainAPIURLs[this.context.currentMarket[0]];
 
       }
 
@@ -126,6 +136,7 @@ export default class PlaceOrder extends React.Component {
   }
 
   render() {
+    console.log(this.dex_addresses);
     let canTrade = false;
     if (this.context.currentMarket[0] in this.context.keys && this.context.currentMarket[1] in this.context.keys) {
       canTrade = true;

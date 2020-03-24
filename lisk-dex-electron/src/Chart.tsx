@@ -5,21 +5,25 @@ import * as am4core from "@amcharts/amcharts4/core";
 import * as am4charts from "@amcharts/amcharts4/charts";
 import am4themes_animated from "@amcharts/amcharts4/themes/animated";
 import am4themes_dark from "@amcharts/amcharts4/themes/dark";
+import { userContext } from './context';
+import { DEXConfiguration } from "./util/Configuration";
 
-import { API_URL } from "./API";
 
-class Chart extends React.Component {
+
+class Chart extends React.Component<any, any> {
+  static contextType = userContext;
   constructor(props) {
     super(props);
     this.state = {};
   }
+  API_URL = (this.context.configuration as DEXConfiguration).markets[this.context.currentMarket].DEX_API_URL;
 
   componentDidMount() {
     am4core.useTheme(am4themes_animated);
     am4core.useTheme(am4themes_dark);
     var chart = am4core.create("chart", am4charts.XYChart);
 
-    chart.dataSource.url = `${API_URL}/orders?sort=price:asc`;
+    chart.dataSource.url = `${this.API_URL}/orders?sort=price:asc`;
     //chart.dataSource.url = "https://poloniex.com/public?command=returnOrderBook&currencyPair=BTC_ETH&depth=50";
     chart.dataSource.reloadFrequency = 15000;
     chart.dataSource.adapter.add("parsedData", (data) => {

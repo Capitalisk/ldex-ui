@@ -60,6 +60,9 @@ export async function processConfiguration(config: UnprocessedDEXConfiguration) 
         const market = config.markets[Object.keys(config.markets)[i]];
         const client = getClient(market.DEX_API_URL);
         const data = (await client.get('/status')).data;
+        if (!(data && data.chains)) {
+            throw new Error(`DEX API ${market.DEX_API_URL} returned an invalid response.`)
+        }
 
         for (let j = 0; j < 2; j++) {
             const asset = data.chains[market.ASSETS[j].ticker.toLowerCase()];
