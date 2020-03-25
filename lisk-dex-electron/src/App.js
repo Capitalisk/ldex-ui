@@ -214,7 +214,7 @@ class App extends React.Component {
             <YourOrders orders={this.state.myOrders}></YourOrders>
           </div>
           <div className="market-name-and-stats">
-            <MarketList></MarketList>
+            <MarketList markets={this.state.configuration.markets}></MarketList>
           </div>
         </div>
       </userContext.Provider>
