@@ -65,7 +65,7 @@ export default class PlaceOrder extends React.Component<any, any> {
           const tx = transactions.transfer({
             amount: transactions.utils.convertLSKToBeddows(this.state.amount.toString()).toString(),
             recipientId: dexAddress,
-            data: `${destChain.toLowerCase()},market,${destAddress}`,
+            data: `${destChain},market,${destAddress}`,
             passphrase: passphrase,
           });
           console.log(tx);
@@ -102,7 +102,7 @@ export default class PlaceOrder extends React.Component<any, any> {
           const tx = transactions.transfer({
             amount: transactions.utils.convertLSKToBeddows(this.state.amount.toString()).toString(),
             recipientId: dexAddress,
-            data: `${destChain.toLowerCase()},limit,${this.state.price},${destAddress}`,
+            data: `${destChain},limit,${this.state.price},${destAddress}`,
             passphrase: passphrase,
           });
           console.log(tx);

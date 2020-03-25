@@ -24,7 +24,7 @@ export default class UserOrder extends React.Component<any, any> {
       amount: transactions.utils.convertLSKToBeddows('0.11').toString(),
       recipientId: dexAddress,
       data: `${targetChain},close,${orderId}`,
-      passphrase: passphrase,
+      passphrase,
     });
     console.log(tx);
     axios.post(`${broadcastURL}/transactions`, tx).then((data) => {

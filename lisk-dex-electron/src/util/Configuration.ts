@@ -34,19 +34,19 @@ export const defaultConfiguration: UnprocessedDEXConfiguration = {
     // lisk of markets.
     markets: {
         // <asset ticket>/<base ticker>
-        'LSH/LSK': {
+        'lsh/lsk': {
             // the assets of this pair, in the order they appear in the key.
             ASSETS: [
-                { name: 'Leasehold Token', ticker: 'LSH' },
-                { name: 'Testnet Lisk', ticker: 'LSK' }
+                { name: 'Leasehold Token', ticker: 'lsh' },
+                { name: 'Testnet Lisk', ticker: 'lsk' }
             ],
             // API URL that serves orderbook information.
             // The addresses for the DEX are fetched from this endpoint.
             DEX_API_URL: 'http://54.174.172.179:7011',
             // Endpoints that are used for broadcasting transactions.
             LISK_API_URLS: {
-                'LSH': 'http://54.174.172.179:7010/api',
-                'LSK': 'https://test-02.liskapi.io/api',
+                'lsh': 'http://54.174.172.179:7010/api',
+                'lsk': 'https://test-02.liskapi.io/api',
             },
         }
     }
@@ -65,7 +65,7 @@ export async function processConfiguration(config: UnprocessedDEXConfiguration) 
         }
 
         for (let j = 0; j < 2; j++) {
-            const asset = data.chains[market.ASSETS[j].ticker.toLowerCase()];
+            const asset = data.chains[market.ASSETS[j].ticker];
             if (asset === undefined) {
                 throw new Error("Market asset names do not match configuration. Please try a different configuration");
             }

@@ -42,7 +42,7 @@ class App extends React.Component {
       // the address will be used when the asset is being used as the destination chain.
       keys: {
         /*
-        'LSK': {
+        'lsk': {
           passphrase: '',
           address: ''
         },
@@ -55,12 +55,16 @@ class App extends React.Component {
     this.intervalRegistered = false;
     this.passphraseSubmit = this.passphraseSubmit.bind(this);
     this.loadConfiguration();
-
   }
 
   loadConfiguration = async () => {
+    const configuration = await processConfiguration(defaultConfiguration);
+    const marketSymbols = Object.keys(configuration.markets);
+    const defaultMarketName = marketSymbols[0];
     this.setState({
-      configuration: (await processConfiguration(defaultConfiguration)),
+      configuration,
+      activeMarket: defaultMarketName,
+      currentMarket: configuration.markets[defaultMarketName].ASSETS.map(asset => asset.ticker),
       configurationLoaded: true
     });
   }
