@@ -32,7 +32,7 @@ export default class MarketList extends React.Component {
           <div className="action-name">MARKETS</div>
           {Object.keys(this.props.markets).map(marketSymbol => {
             return (
-              <div style={{ padding: "5px" }}>
+              <div key={marketSymbol} style={{ padding: "5px" }}>
                 <p>Current market: <b>{marketSymbol}</b></p>
                 <p>More markets coming soon!</p>
               </div>
