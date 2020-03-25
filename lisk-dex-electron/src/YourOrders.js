@@ -33,10 +33,10 @@ export default class YourOrders extends React.Component {
           <div className="action-name">YOUR ORDERS</div>
         </div>
         <div style={{ width: '100%', margin: 0, padding: 0, display: 'flex' }}>
-          <div style={{ width: '50%', height: '250px', margin: 0, padding: 0, overflow: 'scroll' }}>
+          <div style={{ width: '50%', height: '260px', margin: 0, padding: 0, overflowY: 'scroll' }}>
             {this.props.orders.slice().reverse().map(order => <UserOrder key={order.id} side='bid' order={order}></UserOrder>)}
           </div>
-          <div style={{ width: '50%', height: '250px', margin: 0, padding: 0, overflow: 'scroll' }}>
+          <div style={{ width: '50%', height: '260px', margin: 0, padding: 0, overflowY: 'scroll' }}>
             {this.props.orders.map(order => <UserOrder key={order.id} side='ask' order={order}></UserOrder>)}
           </div>
         </div>

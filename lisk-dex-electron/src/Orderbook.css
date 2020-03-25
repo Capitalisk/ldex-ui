@@ -3,7 +3,7 @@
     align-items: flex-start;
     flex-direction: column-reverse;
     height: 100%;
-    overflow: scroll;
+    overflow-y: scroll;
 }
 
 .bidOrderList {
@@ -11,5 +11,5 @@
     align-items: flex-start;
     flex-direction: column;
     height: 100%;
-    overflow: scroll;
+    overflow-y: scroll;
 }
