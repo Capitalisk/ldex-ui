@@ -27,10 +27,10 @@ class App extends React.Component {
       configurationLoaded: false,
       configuration: {},
       orderBookData: { orders: [], bids: [], asks: [], maxSize: { bid: 0, ask: 0 } },
-      currentMarket: ["LSH", "LSK"],
+      currentMarket: [],
       // new, activeMarket string for selecting the active market out of the configuration object.
-      activeMarket: 'LSH/LSK',
-      enabledAssets: ["LSK", "LSH"],
+      activeMarket: '',
+      enabledAssets: [],
       displaySigninModal: false,
       signedIn: false,
       signInFailure: false,
@@ -43,6 +43,10 @@ class App extends React.Component {
       keys: {
         /*
         'lsk': {
+          passphrase: '',
+          address: ''
+        },
+        'lsh': {
           passphrase: '',
           address: ''
         },
@@ -60,11 +64,12 @@ class App extends React.Component {
   loadConfiguration = async () => {
     const configuration = await processConfiguration(defaultConfiguration);
     const marketSymbols = Object.keys(configuration.markets);
-    const defaultMarketName = marketSymbols[0];
+    const defaultMarketKey = marketSymbols[0];
     this.setState({
       configuration,
-      activeMarket: defaultMarketName,
-      currentMarket: configuration.markets[defaultMarketName].ASSETS.map(asset => asset.ticker),
+      activeMarket: defaultMarketKey,
+      currentMarket: configuration.markets[defaultMarketKey].assets,
+      enabledAssets: Object.keys(configuration.assets),
       configurationLoaded: true
     });
   }
@@ -72,7 +77,7 @@ class App extends React.Component {
   refreshOrderbook = async () => {
 
     //console.log('refreshing orderbook');
-    getOrderbook(getClient(this.state.configuration.markets[this.state.activeMarket].DEX_API_URL)).then(results => {
+    getOrderbook(getClient(this.state.configuration.markets[this.state.activeMarket].dexApiUrl)).then(results => {
       const bids = [];
       const asks = [];
       let maxSize = { bid: 0, ask: 0 };

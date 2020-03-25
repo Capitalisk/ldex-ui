@@ -46,17 +46,17 @@ export default class PlaceOrder extends React.Component<any, any> {
       let destChain = undefined;
       let broadcastURL = undefined;
       if (this.props.side === 'buy') {
-        dexAddress = this.context.configuration.markets[this.context.activeMarket].DEX_ADDRESSES[this.context.currentMarket[1]];
+        dexAddress = this.context.configuration.markets[this.context.activeMarket].dexAddresses[this.context.currentMarket[1]];
         destAddress = this.context.keys[this.context.currentMarket[0]].address;
         passphrase = this.context.keys[this.context.currentMarket[1]].passphrase;
         destChain = this.context.currentMarket[0];
-        broadcastURL = this.context.configuration.markets[this.context.activeMarket].LISK_API_URLS[this.context.currentMarket[1]];
+        broadcastURL = this.context.configuration.assets[this.context.currentMarket[1]].apiUrl;
       } else if (this.props.side === 'sell') {
-        dexAddress = this.context.configuration.markets[this.context.activeMarket].DEX_ADDRESSES[this.context.currentMarket[0]];
+        dexAddress = this.context.configuration.markets[this.context.activeMarket].dexAddresses[this.context.currentMarket[0]];
         destAddress = this.context.keys[this.context.currentMarket[1]].address;
         passphrase = this.context.keys[this.context.currentMarket[0]].passphrase;
         destChain = this.context.currentMarket[1];
-        broadcastURL = this.context.configuration.markets[this.context.activeMarket].LISK_API_URLS[this.context.currentMarket[0]];
+        broadcastURL = this.context.configuration.assets[this.context.currentMarket[0]].apiUrl;
       }
 
       if (dexAddress && destAddress && passphrase && destChain && broadcastURL) {
@@ -83,17 +83,17 @@ export default class PlaceOrder extends React.Component<any, any> {
       let destChain = undefined;
       let broadcastURL = undefined;
       if (this.props.side === 'buy') {
-        dexAddress = this.context.configuration.markets[this.context.activeMarket].DEX_ADDRESSES[this.context.currentMarket[1]];
+        dexAddress = this.context.configuration.markets[this.context.activeMarket].dexAddresses[this.context.currentMarket[1]];
         destAddress = this.context.keys[this.context.currentMarket[0]].address;
         passphrase = this.context.keys[this.context.currentMarket[1]].passphrase;
         destChain = this.context.currentMarket[0];
-        broadcastURL = this.context.configuration.markets[this.context.activeMarket].LISK_API_URLS[this.context.currentMarket[1]];
+        broadcastURL = this.context.configuration.assets[this.context.currentMarket[1]].apiUrl;
       } else if (this.props.side === 'sell') {
-        dexAddress = this.context.configuration.markets[this.context.activeMarket].DEX_ADDRESSES[this.context.currentMarket[0]];
+        dexAddress = this.context.configuration.markets[this.context.activeMarket].dexAddresses[this.context.currentMarket[0]];
         destAddress = this.context.keys[this.context.currentMarket[1]].address;
         passphrase = this.context.keys[this.context.currentMarket[0]].passphrase;
         destChain = this.context.currentMarket[1];
-        broadcastURL = this.context.configuration.markets[this.context.activeMarket].LISK_API_URLS[this.context.currentMarket[0]];
+        broadcastURL = this.context.configuration.assets[this.context.currentMarket[0]].apiUrl;
       }
 
       if (dexAddress && destAddress && passphrase && destChain && broadcastURL) {

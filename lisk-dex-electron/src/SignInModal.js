@@ -39,7 +39,7 @@ export default class PlaceOrder extends React.Component {
     for (let asset of this.props.enabledAssets) {
       passphraseTextareas.push(
         <div key={asset}>
-          <span>Passphrase for {asset}: </span>
+          <span>Passphrase for {asset.toUpperCase()}: </span>
           <textarea style={styles} rows={4} name={asset} id="sign-in-textarea" value={this.state[asset]} onChange={this.handleChange} />
         </div>
       )
@@ -51,9 +51,9 @@ export default class PlaceOrder extends React.Component {
             <input className="sign-in-button" style={{ fontSize: '20px', marginRight: '10px' }} type="submit" value="Submit" />
             <button className="place-order-button" onClick={this.props.close}>Close</button>
           </div>
-          <h2>Sign in using your Lisk passphrases.</h2>
+          <h2>Sign in using your blockchain passphrases.</h2>
           <p>
-            <span style={{ color: 'red' }}>Be careful!</span> Only enter your Lisk passphrase in applications you trust and obtained from official sources.
+            <span style={{ color: 'red' }}>Be careful!</span> Only enter your passphrase in applications you trust and obtained from official sources.
           </p>
           <p>
             It is <b>strongly recommended for security</b> that you provide a separate passphrase for every chain you will trade across. Using the same passphrase for multiple assets will make

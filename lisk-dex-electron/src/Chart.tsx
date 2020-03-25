@@ -19,7 +19,7 @@ class Chart extends React.Component<any, any> {
     am4core.useTheme(am4themes_dark);
     var chart = am4core.create("chart", am4charts.XYChart);
 
-    chart.dataSource.url = `${this.context.configuration.markets[this.context.activeMarket].DEX_API_URL}/orders?sort=price:asc`;
+    chart.dataSource.url = `${this.context.configuration.markets[this.context.activeMarket].dexApiUrl}/orders?sort=price:asc`;
 
     //chart.dataSource.url = "https://poloniex.com/public?command=returnOrderBook&currencyPair=BTC_ETH&depth=50";
     chart.dataSource.reloadFrequency = 15000;

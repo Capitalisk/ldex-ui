@@ -27,7 +27,6 @@ export default class YourOrders extends React.Component {
   }
 
   render() {
-    // console.log(this.props.orders);
     return (
       <>
         <div style={{ padding: "5px" }}>

@@ -2,27 +2,33 @@ import { getClient } from '../API';
 
 // All the information that the user needs to provide.
 export interface UnprocessedDEXConfiguration {
+    assets: {
+        [symbol: string]: {
+            name: string,
+            apiUrl: string
+        }
+    },
     markets: {
         [key: string]: {
-            ASSETS: Array<{ name: string, ticker: string }>,
-            DEX_API_URL: string,
-            LISK_API_URLS: {
-                [key: string]: string
-            }
+            assets: Array<string>,
+            dexApiUrl: string
         }
     }
 }
 
-// A ready-to-use DEX configuration with the DEX_ADDRESSES (which are fetched from the DEX_API_URL) populated.
+// A ready-to-use DEX configuration with the dexAddresses (which are fetched from the dexApiUrl) populated.
 export interface DEXConfiguration {
+    assets: {
+        [symbol: string]: {
+            name: string,
+            apiUrl: string
+        }
+    },
     markets: {
         [key: string]: {
-            ASSETS: Array<{ name: string, ticker: string }>,
-            DEX_API_URL: string,
-            LISK_API_URLS: {
-                [key: string]: string
-            },
-            DEX_ADDRESSES: {
+            assets: Array<string>,
+            dexApiUrl: string,
+            dexAddresses: {
                 [key: string]: string
             }
         }
@@ -31,23 +37,23 @@ export interface DEXConfiguration {
 
 
 export const defaultConfiguration: UnprocessedDEXConfiguration = {
+    assets: {
+        'lsk': {
+            name: 'Lisk testnet',
+            apiUrl: 'https://test-02.liskapi.io/api'
+        },
+        'lsh': {
+            name: 'Leasehold testnet',
+            apiUrl: 'http://54.174.172.179:7010/api'
+        }
+    },
     // lisk of markets.
     markets: {
-        // <asset ticket>/<base ticker>
         'lsh/lsk': {
-            // the assets of this pair, in the order they appear in the key.
-            ASSETS: [
-                { name: 'Leasehold Token', ticker: 'lsh' },
-                { name: 'Testnet Lisk', ticker: 'lsk' }
-            ],
             // API URL that serves orderbook information.
             // The addresses for the DEX are fetched from this endpoint.
-            DEX_API_URL: 'http://54.174.172.179:7011',
-            // Endpoints that are used for broadcasting transactions.
-            LISK_API_URLS: {
-                'lsh': 'http://54.174.172.179:7010/api',
-                'lsk': 'https://test-02.liskapi.io/api',
-            },
+            dexApiUrl: 'http://54.174.172.179:7011',
+            assets: ['lsh', 'lsk']
         }
     }
 }
@@ -58,22 +64,22 @@ export async function processConfiguration(config: UnprocessedDEXConfiguration) 
 
     for (let i = 0; i < Object.keys(config.markets).length; i++) {
         const market = config.markets[Object.keys(config.markets)[i]];
-        const client = getClient(market.DEX_API_URL);
+        const client = getClient(market.dexApiUrl);
         const data = (await client.get('/status')).data;
         if (!(data && data.chains)) {
-            throw new Error(`DEX API ${market.DEX_API_URL} returned an invalid response.`)
+            throw new Error(`DEX API ${market.dexApiUrl} returned an invalid response.`)
         }
 
         for (let j = 0; j < 2; j++) {
-            const asset = data.chains[market.ASSETS[j].ticker];
+            const asset = data.chains[market.assets[j]];
             if (asset === undefined) {
                 throw new Error("Market asset names do not match configuration. Please try a different configuration");
             }
             if (j === 0) {
-                // initialize DEX_ADDRESSES as it doesn't yet exist on this object.
-                _config.markets[Object.keys(config.markets)[i]].DEX_ADDRESSES = {};
+                // initialize dexAddresses as it doesn't yet exist on this object.
+                _config.markets[Object.keys(config.markets)[i]].dexAddresses = {};
             }
-            _config.markets[Object.keys(config.markets)[i]].DEX_ADDRESSES[market.ASSETS[j].ticker] = asset.walletAddress;
+            _config.markets[Object.keys(config.markets)[i]].dexAddresses[market.assets[j]] = asset.walletAddress;
 
         }
 

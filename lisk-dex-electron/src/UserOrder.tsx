@@ -14,11 +14,11 @@ export default class UserOrder extends React.Component<any, any> {
   cancelOrder = () => {
     console.log(this.props.order);
 
-    let dexAddress = this.context.configuration.markets[this.context.activeMarket].DEX_ADDRESSES[this.props.order.sourceChain];
+    let dexAddress = this.context.configuration.markets[this.context.activeMarket].dexAddresses[this.props.order.sourceChain];
     let passphrase = this.context.keys[this.props.order.sourceChain].passphrase;
     let targetChain = this.props.order.targetChain;
     let orderId = this.props.order.id;
-    let broadcastURL = this.context.configuration.markets[this.context.activeMarket].LISK_API_URLS[this.props.order.sourceChain];
+    let broadcastURL = this.context.configuration.assets[this.props.order.sourceChain].apiUrl;
 
     const tx = transactions.transfer({
       amount: transactions.utils.convertLSKToBeddows('0.11').toString(),

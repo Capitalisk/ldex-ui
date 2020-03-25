@@ -20,7 +20,7 @@ export default class BalanceDisplay extends React.Component<any, any> {
       console.log('Updating balance');
       const c = axios.create();
       c.defaults.timeout = 10000;
-      const targetEndpoint = this.context.configuration.markets[this.context.activeMarket].LISK_API_URLS[this.props.asset];
+      const targetEndpoint = this.context.configuration.assets[this.props.asset].apiUrl;
       c.get(`${targetEndpoint}/accounts?address=${this.context.keys[this.props.asset].address}`)
         .then((data) => {
           // "data" :))
