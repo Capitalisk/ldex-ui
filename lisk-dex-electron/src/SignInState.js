@@ -11,7 +11,7 @@ export default class SignInState extends React.Component {
   render() {
     let addressesInfo = '';
     for (const asset in this.props.keys) {
-      addressesInfo += `${this.props.keys[asset].address} (${asset.toUpperCase()}) `;
+      addressesInfo += `${this.props.keys[asset].address} (${asset}) `;
     }
     return (
       <>

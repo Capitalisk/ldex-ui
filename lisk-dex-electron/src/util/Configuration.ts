@@ -45,7 +45,7 @@ export const defaultConfiguration: UnprocessedDEXConfiguration = {
             DEX_API_URL: 'http://54.174.172.179:7011',
             // Endpoints that are used for broadcasting transactions.
             LISK_API_URLS: {
-                'LSH': 'http://54.174.172.179:7010',
+                'LSH': 'http://54.174.172.179:7010/api',
                 'LSK': 'https://test-02.liskapi.io/api',
             },
         }

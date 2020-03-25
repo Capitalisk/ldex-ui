@@ -39,7 +39,7 @@ export default class PlaceOrder extends React.Component {
     for (let asset of this.props.enabledAssets) {
       passphraseTextareas.push(
         <div key={asset}>
-          <span>Passphrase for {asset.toUpperCase()}: </span>
+          <span>Passphrase for {asset}: </span>
           <textarea style={styles} rows={4} name={asset} id="sign-in-textarea" value={this.state[asset]} onChange={this.handleChange} />
         </div>
       )

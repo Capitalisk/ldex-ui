@@ -4,9 +4,6 @@ import BalanceDisplay from './BalanceDisplay';
 import { userContext } from './context';
 import * as transactions from '@liskhq/lisk-transactions';
 import axios from 'axios';
-import { DEXConfiguration } from "./util/Configuration";
-
- 
 
 export default class PlaceOrder extends React.Component<any, any> {
   static contextType = userContext;
@@ -18,28 +15,9 @@ export default class PlaceOrder extends React.Component<any, any> {
       marketMode: true,
     };
 
-
     this.handleChange = this.handleChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
-    const config = (context.configuration as DEXConfiguration);
-    this.dex_addresses = {
-      [context.currentMarket[0]]: config.markets[context.activeMarket].DEX_ADDRESSES[context.currentMarket[0].toUpperCase()],
-      [context.currentMarket[1]]: config.markets[context.activeMarket].DEX_ADDRESSES[context.currentMarket[1].toUpperCase()],
-    }
-    Object.keys(this.dex_addresses).forEach(e => {
-      if (this.dex_addresses[e] === undefined) {
-        throw new Error("Invalid active market or bad configuration.")
-      }
-    })
-    this.blockchainAPIURLs = {
-      [context.currentMarket[0]]: config.markets[context.activeMarket].LISK_API_URLS[context.currentMarket[0]],
-      [context.currentMarket[1]]: config.markets[context.activeMarket].LISK_API_URLS[context.currentMarket[1]],
-    }
   }
-  dex_addresses = {}
-  blockchainAPIURLs = {}
-  
-
 
   handleChange(event) {
     const target = event.target;
@@ -68,28 +46,26 @@ export default class PlaceOrder extends React.Component<any, any> {
       let destChain = undefined;
       let broadcastURL = undefined;
       if (this.props.side === 'buy') {
-        dexAddress = this.dex_addresses[this.context.currentMarket[1]]
+        dexAddress = this.context.configuration.markets[this.context.activeMarket].DEX_ADDRESSES[this.context.currentMarket[1]];
         destAddress = this.context.keys[this.context.currentMarket[0]].address;
         passphrase = this.context.keys[this.context.currentMarket[1]].passphrase;
         destChain = this.context.currentMarket[0];
-        broadcastURL = this.blockchainAPIURLs[this.context.currentMarket[1]];
+        broadcastURL = this.context.configuration.markets[this.context.activeMarket].LISK_API_URLS[this.context.currentMarket[1]];
       } else if (this.props.side === 'sell') {
-        dexAddress = this.dex_addresses[this.context.currentMarket[0]]
+        dexAddress = this.context.configuration.markets[this.context.activeMarket].DEX_ADDRESSES[this.context.currentMarket[0]];
         destAddress = this.context.keys[this.context.currentMarket[1]].address;
         passphrase = this.context.keys[this.context.currentMarket[0]].passphrase;
         destChain = this.context.currentMarket[1];
-        broadcastURL = this.blockchainAPIURLs[this.context.currentMarket[0]];
-
+        broadcastURL = this.context.configuration.markets[this.context.activeMarket].LISK_API_URLS[this.context.currentMarket[0]];
       }
 
       if (dexAddress && destAddress && passphrase && destChain && broadcastURL) {
-        broadcastURL = broadcastURL[0];
         console.log(broadcastURL);
         if (this.state.amount > 0) {
           const tx = transactions.transfer({
             amount: transactions.utils.convertLSKToBeddows(this.state.amount.toString()).toString(),
             recipientId: dexAddress,
-            data: `${destChain},market,${destAddress}`,
+            data: `${destChain.toLowerCase()},market,${destAddress}`,
             passphrase: passphrase,
           });
           console.log(tx);
@@ -107,28 +83,26 @@ export default class PlaceOrder extends React.Component<any, any> {
       let destChain = undefined;
       let broadcastURL = undefined;
       if (this.props.side === 'buy') {
-        dexAddress = this.dex_addresses[this.context.currentMarket[1]]
+        dexAddress = this.context.configuration.markets[this.context.activeMarket].DEX_ADDRESSES[this.context.currentMarket[1]];
         destAddress = this.context.keys[this.context.currentMarket[0]].address;
         passphrase = this.context.keys[this.context.currentMarket[1]].passphrase;
         destChain = this.context.currentMarket[0];
-        broadcastURL = this.blockchainAPIURLs[this.context.currentMarket[1]];
+        broadcastURL = this.context.configuration.markets[this.context.activeMarket].LISK_API_URLS[this.context.currentMarket[1]];
       } else if (this.props.side === 'sell') {
-        dexAddress = this.dex_addresses[this.context.currentMarket[0]]
+        dexAddress = this.context.configuration.markets[this.context.activeMarket].DEX_ADDRESSES[this.context.currentMarket[0]];
         destAddress = this.context.keys[this.context.currentMarket[1]].address;
         passphrase = this.context.keys[this.context.currentMarket[0]].passphrase;
         destChain = this.context.currentMarket[1];
-        broadcastURL = this.blockchainAPIURLs[this.context.currentMarket[0]];
-
+        broadcastURL = this.context.configuration.markets[this.context.activeMarket].LISK_API_URLS[this.context.currentMarket[0]];
       }
 
       if (dexAddress && destAddress && passphrase && destChain && broadcastURL) {
-        broadcastURL = broadcastURL[0];
         console.log(broadcastURL);
         if (this.state.amount > 0) {
           const tx = transactions.transfer({
             amount: transactions.utils.convertLSKToBeddows(this.state.amount.toString()).toString(),
             recipientId: dexAddress,
-            data: `${destChain},limit,${this.state.price},${destAddress}`,
+            data: `${destChain.toLowerCase()},limit,${this.state.price},${destAddress}`,
             passphrase: passphrase,
           });
           console.log(tx);
@@ -142,7 +116,6 @@ export default class PlaceOrder extends React.Component<any, any> {
   }
 
   render() {
-    // console.log(this.dex_addresses);
     let canTrade = false;
     if (this.context.currentMarket[0] in this.context.keys && this.context.currentMarket[1] in this.context.keys) {
       canTrade = true;
@@ -172,11 +145,11 @@ export default class PlaceOrder extends React.Component<any, any> {
               <>
                 {
                   this.props.side === 'buy' &&
-                  <div style={{ color: 'grey', fontSize: '15px', marginBottom: '10px' }}>≈ {(this.state.amount / this.context.minAsk).toFixed(4)} {this.context.currentMarket[0].toUpperCase()}</div>
+                  <div style={{ color: 'grey', fontSize: '15px', marginBottom: '10px' }}>≈ {(this.state.amount / this.context.minAsk).toFixed(4)} {this.context.currentMarket[0]}</div>
                 }
                 {
                   this.props.side === 'sell' &&
-                  <div style={{ color: 'grey', fontSize: '15px', marginBottom: '10px' }}>≈ {(this.state.amount * this.context.maxBid).toFixed(4)} {this.context.currentMarket[1].toUpperCase()}</div>
+                  <div style={{ color: 'grey', fontSize: '15px', marginBottom: '10px' }}>≈ {(this.state.amount * this.context.maxBid).toFixed(4)} {this.context.currentMarket[1]}</div>
                 }
               </>
             }
@@ -184,11 +157,11 @@ export default class PlaceOrder extends React.Component<any, any> {
               <>
                 {
                   this.props.side === 'buy' &&
-                  <div style={{ color: 'grey', fontSize: '15px', marginBottom: '10px' }}>≈ {(this.state.amount / this.state.price).toFixed(4)} {this.context.currentMarket[0].toUpperCase()}</div>
+                  <div style={{ color: 'grey', fontSize: '15px', marginBottom: '10px' }}>≈ {(this.state.amount / this.state.price).toFixed(4)} {this.context.currentMarket[0]}</div>
                 }
                 {
                   this.props.side === 'sell' &&
-                  <div style={{ color: 'grey', fontSize: '15px', marginBottom: '10px' }}>≈ {(this.state.amount * this.state.price).toFixed(4)} {this.context.currentMarket[1].toUpperCase()}</div>
+                  <div style={{ color: 'grey', fontSize: '15px', marginBottom: '10px' }}>≈ {(this.state.amount * this.state.price).toFixed(4)} {this.context.currentMarket[1]}</div>
                 }
               </>
             }
@@ -198,7 +171,7 @@ export default class PlaceOrder extends React.Component<any, any> {
         {
           !canTrade &&
           <p style={{ color: 'grey' }}>
-            Please sign in with your {this.context.currentMarket[0].toUpperCase()} <b>and</b> {this.context.currentMarket[1].toUpperCase()} passphrase to trade.
+            Please sign in with your {this.context.currentMarket[0]} <b>and</b> {this.context.currentMarket[1]} passphrase to trade.
           </p>
         }
       </div >

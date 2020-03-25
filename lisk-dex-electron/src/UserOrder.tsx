@@ -3,43 +3,22 @@ import './UserOrder.css';
 import { userContext } from './context';
 import * as transactions from '@liskhq/lisk-transactions';
 import axios from 'axios';
-import { DEXConfiguration } from "./util/Configuration";
-
-
 
 export default class UserOrder extends React.Component<any, any> {
   static contextType = userContext;
   constructor(props, context) {
     super(props, context);
     this.state = {};
-    const config = (this.context.configuration as DEXConfiguration);
-    this.dex_addresses = {
-      [context.currentMarket[0]]: config.markets[context.activeMarket].DEX_ADDRESSES[context.currentMarket[0].toUpperCase()],
-      [context.currentMarket[1]]: config.markets[context.activeMarket].DEX_ADDRESSES[context.currentMarket[1].toUpperCase()],
-    }
-    Object.keys(this.dex_addresses).forEach(e => {
-      if (this.dex_addresses[e] === undefined) {
-        throw new Error("Invalid active market or bad configuration.")
-      }
-    })
-    this.blockchainAPIURLs = {
-      [context.currentMarket[0]]: config.markets[context.activeMarket].LISK_API_URLS[context.currentMarket[0]],
-      [context.currentMarket[1]]: config.markets[context.activeMarket].LISK_API_URLS[context.currentMarket[1]],
-    }
   }
-  blockchainAPIURLs = {}
-  dex_addresses = {}
-
 
   cancelOrder = () => {
     console.log(this.props.order);
 
-    let dexAddress = this.dex_addresses[this.props.order.sourceChain];
+    let dexAddress = this.context.configuration.markets[this.context.activeMarket].DEX_ADDRESSES[this.props.order.sourceChain];
     let passphrase = this.context.keys[this.props.order.sourceChain].passphrase;
     let targetChain = this.props.order.targetChain;
     let orderId = this.props.order.id;
-    let broadcastURL = this.blockchainAPIURLs[this.props.order.sourceChain];
-
+    let broadcastURL = this.context.configuration.markets[this.context.activeMarket].LISK_API_URLS[this.props.order.sourceChain];
 
     const tx = transactions.transfer({
       amount: transactions.utils.convertLSKToBeddows('0.11').toString(),

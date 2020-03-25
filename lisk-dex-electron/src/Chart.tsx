@@ -6,26 +6,21 @@ import * as am4charts from "@amcharts/amcharts4/charts";
 import am4themes_animated from "@amcharts/amcharts4/themes/animated";
 import am4themes_dark from "@amcharts/amcharts4/themes/dark";
 import { userContext } from './context';
-import { DEXConfiguration } from "./util/Configuration";
-
-
 
 class Chart extends React.Component<any, any> {
   static contextType = userContext;
   constructor(props, context) {
     super(props, context);
     this.state = {};
-    this.API_URL = (this.context.configuration as DEXConfiguration).markets[this.context.activeMarket].DEX_API_URL;
-
   }
-  API_URL: string;
 
   componentDidMount() {
     am4core.useTheme(am4themes_animated);
     am4core.useTheme(am4themes_dark);
     var chart = am4core.create("chart", am4charts.XYChart);
 
-    chart.dataSource.url = `${this.API_URL}/orders?sort=price:asc`;
+    chart.dataSource.url = `${this.context.configuration.markets[this.context.activeMarket].DEX_API_URL}/orders?sort=price:asc`;
+
     //chart.dataSource.url = "https://poloniex.com/public?command=returnOrderBook&currencyPair=BTC_ETH&depth=50";
     chart.dataSource.reloadFrequency = 15000;
     chart.dataSource.adapter.add("parsedData", (data) => {
@@ -96,22 +91,15 @@ class Chart extends React.Component<any, any> {
       const asks = [];
       let maxSize = { bid: 0, ask: 0 };
       for (let result of data) {
-        //console.log(result);
-        if (
-          // filter for the turrent trading pair.
-          (result.targetChain === this.props.currentMarket[0] || result.sourceChain === this.props.currentMarket[0]) &&
-          (result.targetChain === this.props.currentMarket[1] || result.sourceChain === this.props.currentMarket[1])
-        ) {
-          if (result.side === "bid") {
-            bids.push(result);
-            if (result.value > maxSize.bid) {
-              maxSize.bid = result.value;
-            }
-          } else if (result.side === "ask") {
-            asks.push(result);
-            if (result.size > maxSize.ask) {
-              maxSize.ask = result.size;
-            }
+        if (result.side === "bid") {
+          bids.push(result);
+          if (result.value > maxSize.bid) {
+            maxSize.bid = result.value;
+          }
+        } else if (result.side === "ask") {
+          asks.push(result);
+          if (result.size > maxSize.ask) {
+            maxSize.ask = result.size;
           }
         }
       }
@@ -129,7 +117,7 @@ class Chart extends React.Component<any, any> {
     xAxis.dataFields.category = "value";
     //xAxis.renderer.grid.template.location = 0;
     xAxis.renderer.minGridDistance = 50;
-    xAxis.title.text = `Price (${this.props.currentMarket[0].toUpperCase()}/${this.props.currentMarket[1].toUpperCase()})`;
+    xAxis.title.text = `Price (${this.props.currentMarket[0]}/${this.props.currentMarket[1]})`;
 
     var yAxis = chart.yAxes.push(new am4charts.ValueAxis());
     yAxis.title.text = "Volume (LSK)";

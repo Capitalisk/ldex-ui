@@ -27,10 +27,10 @@ class App extends React.Component {
       configurationLoaded: false,
       configuration: {},
       orderBookData: { orders: [], bids: [], asks: [], maxSize: { bid: 0, ask: 0 } },
-      currentMarket: ["lsh", "lsk"],
+      currentMarket: ["LSH", "LSK"],
       // new, activeMarket string for selecting the active market out of the configuration object.
       activeMarket: 'LSH/LSK',
-      enabledAssets: ["lsk", "lsh"],
+      enabledAssets: ["LSK", "LSH"],
       displaySigninModal: false,
       signedIn: false,
       signInFailure: false,
@@ -42,7 +42,7 @@ class App extends React.Component {
       // the address will be used when the asset is being used as the destination chain.
       keys: {
         /*
-        'lsk': {
+        'LSK': {
           passphrase: '',
           address: ''
         },
@@ -74,27 +74,21 @@ class App extends React.Component {
       let maxSize = { bid: 0, ask: 0 };
       let myOrders = [];
       for (let result of results.data) {
-        if (
-          // filter for the turrent trading pair.
-          (result.targetChain === this.state.currentMarket[0] || result.sourceChain === this.state.currentMarket[0]) &&
-          (result.targetChain === this.state.currentMarket[1] || result.sourceChain === this.state.currentMarket[1])
-        ) {
-          if (result.side === "bid") {
-            bids.push(result);
-            if (result.value > maxSize.bid) {
-              maxSize.bid = result.valueRemaining;
-            }
-            if (result.senderId === this.state.keys[this.state.currentMarket[1]]?.address) {
-              myOrders.push(result);
-            }
-          } else if (result.side === "ask") {
-            asks.push(result);
-            if (result.size > maxSize.ask) {
-              maxSize.ask = result.sizeRemaining;
-            }
-            if (result.senderId === this.state.keys[this.state.currentMarket[0]]?.address) {
-              myOrders.push(result);
-            }
+        if (result.side === "bid") {
+          bids.push(result);
+          if (result.value > maxSize.bid) {
+            maxSize.bid = result.valueRemaining;
+          }
+          if (result.senderId === this.state.keys[this.state.currentMarket[1]]?.address) {
+            myOrders.push(result);
+          }
+        } else if (result.side === "ask") {
+          asks.push(result);
+          if (result.size > maxSize.ask) {
+            maxSize.ask = result.sizeRemaining;
+          }
+          if (result.senderId === this.state.keys[this.state.currentMarket[0]]?.address) {
+            myOrders.push(result);
           }
         }
       }
@@ -201,7 +195,7 @@ class App extends React.Component {
               <Orderbook orderBookData={this.state.orderBookData} side="asks"></Orderbook>
             </div>
             <div className="price-display">
-              Price: {this.state.maxBid} {this.state.currentMarket[1].toUpperCase()}
+              Price: {this.state.maxBid} {this.state.currentMarket[1]}
             </div>
             <div className="buy-orders">
               <Orderbook orderBookData={this.state.orderBookData} side="bids"></Orderbook>
