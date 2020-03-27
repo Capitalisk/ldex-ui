@@ -38,13 +38,13 @@ export default class BalanceDisplay extends React.Component<any, any> {
       if (this.interval === undefined) {
         // console.log('SETTING INTERVAL');
         this.update();
-        this.interval = setInterval(this.update, 10000);
+        this.interval = setInterval(this.update, this.context.configuration.refreshInterval);
       }
     } else {
       return <div></div>;
     }
     return (
-      <div style={{ color: 'grey', fontSize: '15px', marginBottom: '10px' }}>Bal: {this.state.balance / this.props.whole} {this.props.asset}</div>
+      <div style={{ color: '#FFFFFF', marginBottom: '10px' }}>Balance: <span style={{ fontWeight: 'bold' }}>{Math.round(this.state.balance * 100 / this.props.whole) / 100} {this.props.asset.toUpperCase()}</span></div>
     );
   }
 }

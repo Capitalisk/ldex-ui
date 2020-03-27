@@ -10,30 +10,30 @@
     font-family: 'Courier New', Courier, monospace;
     font-size: 18px;
     margin-top: 6px;
+    height: 20px;
+    padding: 5px;
     width: 90%;
     border: 1px solid grey;
     outline-color: rgb(194, 194, 194);
-    margin-bottom: 2px;
+    margin-bottom: 10px;
 }
 
-.place-order-button {
-    font-size: 20px;
-    background-color: rgb(45, 46, 56);
-    color: white;
-    font-family: 'Courier New', Courier, monospace;
-    outline-color: rgb(194, 194, 194);
+.place-buy-order-button {
+  cursor: pointer;
+  font-size: 20px;
+  color: #FFFFFF;
+  border: 0;
+  padding: 5px 15px 5px 15px;
+  outline: none;
+  background: #008800;
 }
 
-.market-limit-buttons {
-    font-size: 14px;
-    background-color: rgb(45, 46, 56);
-    color: white;
-    font-family: 'Courier New', Courier, monospace;
-    outline-color: transparent;
-    margin-bottom: 15px;
+.place-sell-order-button {
+  cursor: pointer;
+  font-size: 20px;
+  color: #FFFFFF;
+  border: 0;
+  padding: 5px 15px 5px 15px;
+  outline: none;
+  background: #880000;
 }
-
-.market-limit-buttons:disabled {
-    background-color: rgb(84, 91, 175);
-}
-

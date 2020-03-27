@@ -117,7 +117,7 @@ class Chart extends React.Component<any, any> {
     xAxis.dataFields.category = "value";
     //xAxis.renderer.grid.template.location = 0;
     xAxis.renderer.minGridDistance = 50;
-    xAxis.title.text = `Price (${this.props.currentMarket[0]}/${this.props.currentMarket[1]})`;
+    xAxis.title.text = `Price (${this.props.activeAssets[0].toUpperCase()}/${this.props.activeAssets[1].toUpperCase()})`;
 
     var yAxis = chart.yAxes.push(new am4charts.ValueAxis());
     yAxis.title.text = "Volume (LSK)";
@@ -130,7 +130,7 @@ class Chart extends React.Component<any, any> {
     series.stroke = am4core.color("#0f0");
     series.fill = series.stroke;
     series.fillOpacity = 0.1;
-    series.tooltipText = "Ask: [bold]{categoryX}[/]\nTotal volume: [bold]{valueY}[/]\nVolume: [bold]{bidsvolume}[/]";
+    series.tooltipText = "Bid: [bold]{categoryX}[/]\nTotal volume: [bold]{valueY}[/]\nVolume: [bold]{bidsvolume}[/]";
 
     var series2 = chart.series.push(new am4charts.StepLineSeries());
     series2.dataFields.categoryX = "value";

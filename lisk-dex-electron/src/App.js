@@ -27,7 +27,7 @@ class App extends React.Component {
       configurationLoaded: false,
       configuration: {},
       orderBookData: { orders: [], bids: [], asks: [], maxSize: { bid: 0, ask: 0 } },
-      currentMarket: [],
+      activeAssets: [],
       // new, activeMarket string for selecting the active market out of the configuration object.
       activeMarket: '',
       enabledAssets: [],
@@ -68,14 +68,13 @@ class App extends React.Component {
     this.setState({
       configuration,
       activeMarket: defaultMarketKey,
-      currentMarket: configuration.markets[defaultMarketKey].assets,
+      activeAssets: configuration.markets[defaultMarketKey].assets,
       enabledAssets: Object.keys(configuration.assets),
       configurationLoaded: true
     });
   }
 
   refreshOrderbook = async () => {
-
     //console.log('refreshing orderbook');
     getOrderbook(getClient(this.state.configuration.markets[this.state.activeMarket].dexApiUrl)).then(results => {
       const bids = [];
@@ -88,7 +87,7 @@ class App extends React.Component {
           if (result.value > maxSize.bid) {
             maxSize.bid = result.valueRemaining;
           }
-          if (result.senderId === this.state.keys[this.state.currentMarket[1]]?.address) {
+          if (result.senderId === this.state.keys[this.state.activeAssets[1]]?.address) {
             myOrders.push(result);
           }
         } else if (result.side === "ask") {
@@ -96,7 +95,7 @@ class App extends React.Component {
           if (result.size > maxSize.ask) {
             maxSize.ask = result.sizeRemaining;
           }
-          if (result.senderId === this.state.keys[this.state.currentMarket[0]]?.address) {
+          if (result.senderId === this.state.keys[this.state.activeAssets[0]]?.address) {
             myOrders.push(result);
           }
         }
@@ -122,13 +121,12 @@ class App extends React.Component {
       //e.preventDefault();
       //return true;
     };
-
-
   }
+
   componentDidUpdate() {
     if (this.state.configurationLoaded && !this.intervalRegistered) {
       this.refreshOrderbook();
-      setInterval(this.refreshOrderbook, 10000);
+      setInterval(this.refreshOrderbook, this.state.configuration.refreshInterval);
       this.intervalRegistered = true;
     }
   }
@@ -172,10 +170,9 @@ class App extends React.Component {
     this.setState({ displayLeaveWarning: val });
   }
 
-
   render() {
     if (!this.state.configurationLoaded) {
-      return <div>Loading...</div>
+      return <div style={{ margin: '10px' }}>Loading...</div>
     }
     return <>
       <userContext.Provider value={{ ...this.state }}>
@@ -183,41 +180,39 @@ class App extends React.Component {
         {this.state.displayLeaveWarning && <LeaveWarning setDisplayLeaveWarning={this.setDisplayLeaveWarning}></LeaveWarning>}
         <div className="top-bar">
           <div>
-            <b style={{ fontSize: '21px' }}>Lisk DEX</b> &nbsp;
-            <a style={{ color: '#34cfeb', fontSize: '14px' }} href="https://github.com/Jaxkr/lisk-dex-ui/issues/new" rel="noopener noreferrer" target="_blank">Report bug / send feedback</a>
-            {/* eslint-disable-next-line jsx-a11y/accessible-emoji*/}
-            &nbsp; <span style={{ fontSize: '14px' }}>Thanks! 😊</span>
+            <b style={{ fontSize: '21px' }}>{this.state.configuration.appTitle}</b> &nbsp;
+            <a style={{ color: '#34cfeb', fontSize: '14px' }} href={this.state.configuration.feedbackLink.url} rel="noopener noreferrer" target="_blank">{this.state.configuration.feedbackLink.text}</a>
           </div>
           <div>
             <SignInState showSignIn={this.showSignIn} keys={this.state.keys} signedIn={this.state.signedIn} signOut={this.signOut}></SignInState>
           </div>
         </div>
         <div className="container">
-          <div className="buy-panel">
-            <PlaceOrder side="buy"></PlaceOrder>
-          </div>
           <div className="sell-panel">
             <PlaceOrder side="sell"></PlaceOrder>
+          </div>
+          <div className="buy-panel">
+            <PlaceOrder side="buy"></PlaceOrder>
           </div>
           <div className="orderbook-container">
             <div className="sell-orders">
               <Orderbook orderBookData={this.state.orderBookData} side="asks"></Orderbook>
             </div>
             <div className="price-display">
-              Price: {this.state.maxBid} {this.state.currentMarket[1]}
+              Price: {this.state.maxBid} {this.state.activeAssets[1].toUpperCase()}
             </div>
             <div className="buy-orders">
               <Orderbook orderBookData={this.state.orderBookData} side="bids"></Orderbook>
             </div>
           </div>
           <div className="depth-chart">
-            <Chart whole={Math.pow(10, 8)} currentMarket={this.state.currentMarket}></Chart>
+            <Chart whole={Math.pow(10, 8)} activeAssets={this.state.activeAssets}></Chart>
           </div>
           <div className="your-orders">
             <YourOrders orders={this.state.myOrders}></YourOrders>
           </div>
           <div className="market-name-and-stats">
-            <MarketList markets={this.state.configuration.markets}></MarketList>
+            <MarketList markets={this.state.configuration.markets} refreshInterval={this.state.configuration.refreshInterval}></MarketList>
           </div>
         </div>
       </userContext.Provider>

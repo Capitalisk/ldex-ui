@@ -2,9 +2,15 @@
   font-size: 12px;
   background-color: rgb(45, 46, 56);
   color: white;
-  font-family: 'Courier New', Courier, monospace;
-  outline-color: rgb(194, 194, 194);
   float: right;
   margin-right: 5px;
-  margin-top: 5px;
+  margin-top: 4px;
+  border: 0;
+  padding: 5px;
+  outline: none;
+  cursor: pointer;
+}
+
+.cancel-order-button:hover {
+  text-decoration: underline;
 }

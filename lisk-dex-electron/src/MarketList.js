@@ -28,18 +28,18 @@ export default class MarketList extends React.Component {
   render() {
     return (
       <>
-        <div style={{ padding: "5px" }}>
+        <div style={{ padding: "10px" }}>
           <div className="action-name">MARKETS</div>
           {Object.keys(this.props.markets).map(marketSymbol => {
             return (
-              <div key={marketSymbol} style={{ padding: "5px" }}>
+              <div key={marketSymbol}>
                 <p>Current market: <b>{marketSymbol.toUpperCase()}</b></p>
                 <p>More markets coming soon!</p>
               </div>
             );
           })}
           <small>
-            <br></br>Data refreshed every 15 seconds.
+            <br></br>Data refreshed every {Math.round(this.props.refreshInterval / 1000)} seconds.
           </small>
         </div>
       </>

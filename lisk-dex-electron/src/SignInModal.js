@@ -45,24 +45,27 @@ export default class PlaceOrder extends React.Component {
       )
     }
     return (
-      <div id="sign-in-modal">
-        <form onSubmit={this.handleSubmit}>
-          <div style={{ textAlign: 'right', width: '100%' }}>
-            <input className="sign-in-button" style={{ fontSize: '20px', marginRight: '10px' }} type="submit" value="Submit" />
-            <button className="place-order-button" onClick={this.props.close}>Close</button>
-          </div>
-          <h2>Sign in using your blockchain passphrases.</h2>
-          <p>
-            <span style={{ color: 'red' }}>Be careful!</span> Only enter your passphrase in applications you trust and obtained from official sources.
-          </p>
-          <p>
-            It is <b>strongly recommended for security</b> that you provide a separate passphrase for every chain you will trade across. Using the same passphrase for multiple assets will make
-            you vulnerable to cross-chain replay attacks.
-          </p>
-          {passphraseTextareas}
-          <input className="sign-in-button" style={{ fontSize: '20px', marginTop: '15px' }} type="submit" value="Submit" />
-        </form>
-      </div>
+      <>
+        <div className="modal-background"></div>
+        <div id="sign-in-modal" className="modal-foreground">
+          <form onSubmit={this.handleSubmit}>
+            <div style={{ textAlign: 'right', width: '100%' }}>
+              <input className="button-primary" style={{ fontSize: '20px', marginRight: '10px' }} type="submit" value="Submit" />
+              <button className="button-secondary" onClick={this.props.close}>Close</button>
+            </div>
+            <h2>Sign in using your blockchain passphrases.</h2>
+            <p>
+              <span style={{ color: 'red' }}>Be careful!</span> Only enter your passphrase in applications you trust and obtained from official sources.
+            </p>
+            <p>
+              It is <b>strongly recommended for security</b> that you provide a separate passphrase for every chain you will trade across. Using the same passphrase for multiple assets will make
+              you vulnerable to cross-chain replay attacks.
+            </p>
+            {passphraseTextareas}
+            <input className="button-primary" style={{ fontSize: '20px', marginTop: '15px' }} type="submit" value="Submit" />
+          </form>
+        </div>
+      </>
     );
   }
 }

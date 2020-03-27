@@ -3,13 +3,11 @@
     z-index: 2;
     top: 100px;
     left: 25%;
-    border: 2px solid rgb(69, 69, 179);
     width: 50%;
     box-shadow: 10px 10px 5px black;
     padding: 45px;
     background-color: rgb(27, 27, 27);
-    overflow: scroll;
-    height: 400px;
+    height: 550px;
 }
 
 #sign-in-textarea {
