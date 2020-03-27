@@ -172,7 +172,7 @@ class App extends React.Component {
 
   render() {
     if (!this.state.configurationLoaded) {
-      return <div style={{ margin: '10px' }}>Loading...</div>
+      return <div style={{ padding: '10px' }}>Loading...</div>
     }
     return <>
       <userContext.Provider value={{ ...this.state }}>
