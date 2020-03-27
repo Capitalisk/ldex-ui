@@ -1,5 +1,6 @@
 import React from "react";
 import "./App.css";
+import axios from 'axios';
 
 import * as am4core from "@amcharts/amcharts4/core";
 import * as am4charts from "@amcharts/amcharts4/charts";
@@ -14,16 +15,21 @@ class Chart extends React.Component<any, any> {
     this.state = {};
   }
 
+  _fetchDataInterval = null;
+
   componentDidMount() {
     am4core.useTheme(am4themes_animated);
     am4core.useTheme(am4themes_dark);
     var chart = am4core.create("chart", am4charts.XYChart);
 
-    chart.dataSource.url = `${this.context.configuration.markets[this.context.activeMarket].dexApiUrl}/orders?sort=price:asc`;
+    const fetchOrderData = async () => {
+      const client = axios.create();
+      client.defaults.timeout = 10000;
+      let [{data: bids}, {data: asks}] = await Promise.all([
+        client.get(`${this.context.configuration.markets[this.context.activeMarket].dexApiUrl}/orders/bids?sort=price:desc`),
+        client.get(`${this.context.configuration.markets[this.context.activeMarket].dexApiUrl}/orders/asks?sort=price:asc`)
+      ]);
 
-    //chart.dataSource.url = "https://poloniex.com/public?command=returnOrderBook&currencyPair=BTC_ETH&depth=50";
-    chart.dataSource.reloadFrequency = 15000;
-    chart.dataSource.adapter.add("parsedData", (data) => {
       // Function to process (sort and calculate cummulative volume)
       const processData = (list, type, desc) => {
         // Convert to data points
@@ -87,27 +93,17 @@ class Chart extends React.Component<any, any> {
       // Init
       var res = [];
 
-      const bids = [];
-      const asks = [];
-      let maxSize = { bid: 0, ask: 0 };
-      for (let result of data) {
-        if (result.side === "bid") {
-          bids.push(result);
-          if (result.value > maxSize.bid) {
-            maxSize.bid = result.value;
-          }
-        } else if (result.side === "ask") {
-          asks.push(result);
-          if (result.size > maxSize.ask) {
-            maxSize.ask = result.size;
-          }
-        }
-      }
       processData(bids, "bids", true);
       processData(asks, "asks", false);
 
-      return res;
-    });
+      chart.data = res;
+    };
+
+    fetchOrderData();
+
+    this._fetchDataInterval = setInterval(async () => {
+      fetchOrderData();
+    }, this.context.configuration.refreshInterval);
 
     // Set up precision for numbers
     chart.numberFormatter.numberFormat = "#,###.####";
@@ -157,6 +153,10 @@ class Chart extends React.Component<any, any> {
 
     // Add cursor
     chart.cursor = new am4charts.XYCursor();
+  }
+
+  componentWillUnmount() {
+    clearInterval(this._fetchDataInterval);
   }
 
   render() {

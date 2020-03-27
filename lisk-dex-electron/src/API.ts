@@ -9,7 +9,9 @@ export function getClient(api_base_url: string) {
 }
 
 export async function getOrderbook(instance: AxiosInstance) {
-  const orders = await instance.get('/orders?sort=price:asc');
-  //console.log("HIT API");
-  return orders;
+  const [{data: bids}, {data: asks}] = await Promise.all([
+    instance.get('/orders/bids?sort=price:desc'),
+    instance.get('/orders/asks?sort=price:asc')
+  ]);
+  return bids.concat(asks);
 }

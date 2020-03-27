@@ -81,7 +81,7 @@ class App extends React.Component {
       const asks = [];
       let maxSize = { bid: 0, ask: 0 };
       let myOrders = [];
-      for (let result of results.data) {
+      for (let result of results) {
         if (result.side === "bid") {
           bids.push(result);
           if (result.value > maxSize.bid) {
