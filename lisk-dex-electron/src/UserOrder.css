@@ -14,3 +14,7 @@
 .cancel-order-button:hover {
   text-decoration: underline;
 }
+
+.order-pending-block {
+  opacity: 0.5;
+}

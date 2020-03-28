@@ -26,6 +26,7 @@ class App extends React.Component {
     this.state = {
       configurationLoaded: false,
       configuration: {},
+      myPendingOrders: [],
       orderBookData: { orders: [], bids: [], asks: [], maxSize: { bid: 0, ask: 0 } },
       activeAssets: [],
       // new, activeMarket string for selecting the active market out of the configuration object.
@@ -54,7 +55,6 @@ class App extends React.Component {
       }
     };
 
-
     this.showSignIn = this.showSignIn.bind(this);
     this.intervalRegistered = false;
     this.passphraseSubmit = this.passphraseSubmit.bind(this);
@@ -74,34 +74,54 @@ class App extends React.Component {
     });
   }
 
+  orderSubmit = async (order) => {
+    order.status = 'pending-block';
+    let myPendingOrders = [...this.state.myPendingOrders, order];
+    let myOrderMap = {};
+    for (let myPendingOrder of myPendingOrders) {
+      myOrderMap[myPendingOrder.id] = myPendingOrder;
+    }
+    for (let myOrder of this.state.myOrders) {
+      myOrderMap[myOrder.id] = myOrder;
+    }
+    this.setState({
+      myPendingOrders,
+      myOrders: Object.values(myOrderMap)
+    });
+  }
+
   refreshOrderbook = async () => {
     //console.log('refreshing orderbook');
-    getOrderbook(getClient(this.state.configuration.markets[this.state.activeMarket].dexApiUrl)).then(results => {
+    getOrderbook(getClient(this.state.configuration.markets[this.state.activeMarket].dexApiUrl)).then(orders => {
       const bids = [];
       const asks = [];
       let maxSize = { bid: 0, ask: 0 };
-      let myOrders = [];
-      for (let result of results) {
-        if (result.side === "bid") {
-          bids.push(result);
-          if (result.value > maxSize.bid) {
-            maxSize.bid = result.valueRemaining;
+      let myOrderMap = {};
+      for (let myPendingOrder of this.state.myPendingOrders) {
+        myOrderMap[myPendingOrder.id] = myPendingOrder;
+      }
+      for (let order of orders) {
+        order.status = 'ready';
+        if (order.side === "bid") {
+          bids.push(order);
+          if (order.value > maxSize.bid) {
+            maxSize.bid = order.valueRemaining;
           }
-          if (result.senderId === this.state.keys[this.state.activeAssets[1]]?.address) {
-            myOrders.push(result);
+          if (order.senderId === this.state.keys[this.state.activeAssets[1]]?.address) {
+            myOrderMap[order.id] = order;
           }
-        } else if (result.side === "ask") {
-          asks.push(result);
-          if (result.size > maxSize.ask) {
-            maxSize.ask = result.sizeRemaining;
+        } else if (order.side === "ask") {
+          asks.push(order);
+          if (order.size > maxSize.ask) {
+            maxSize.ask = order.sizeRemaining;
           }
-          if (result.senderId === this.state.keys[this.state.activeAssets[0]]?.address) {
-            myOrders.push(result);
+          if (order.senderId === this.state.keys[this.state.activeAssets[0]]?.address) {
+            myOrderMap[order.id] = order;
           }
         }
       }
       //console.log('my orders');
-      //console.log(myOrders);
+      //console.log(myOrderMap);
       let maxBid = 0;
       let minAsk = 0;
       if (bids.length > 0) {
@@ -110,7 +130,7 @@ class App extends React.Component {
       if (asks.length > 0) {
         minAsk = asks[0].price;
       }
-      this.setState({ orderBookData: { bids, asks, maxSize }, maxBid, minAsk, myOrders });
+      this.setState({ orderBookData: { bids, asks, maxSize }, maxBid, minAsk, myOrders: Object.values(myOrderMap) });
     });
   }
 
@@ -189,10 +209,10 @@ class App extends React.Component {
         </div>
         <div className="container">
           <div className="sell-panel">
-            <PlaceOrder side="sell"></PlaceOrder>
+            <PlaceOrder side="ask" orderSubmit={this.orderSubmit}></PlaceOrder>
           </div>
           <div className="buy-panel">
-            <PlaceOrder side="buy"></PlaceOrder>
+            <PlaceOrder side="bid" orderSubmit={this.orderSubmit}></PlaceOrder>
           </div>
           <div className="orderbook-container">
             <div className="sell-orders">

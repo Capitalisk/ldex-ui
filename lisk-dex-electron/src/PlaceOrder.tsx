@@ -46,7 +46,7 @@ export default class PlaceOrder extends React.Component<any, any> {
   validateOrder = () => {
     let success = true;
     let dexOptions = this.context.configuration.markets[this.context.activeMarket].dexOptions;
-    let sourceAsset = this.props.side === 'buy' ? this.context.activeAssets[1] : this.context.activeAssets[0];
+    let sourceAsset = this.props.side === 'bid' ? this.context.activeAssets[1] : this.context.activeAssets[0];
     let unitValue = this.context.configuration.assets[sourceAsset].unitValue;
     let minOrderAmount = dexOptions.chains[sourceAsset].minOrderAmount / unitValue;
     let errors = {
@@ -92,39 +92,64 @@ export default class PlaceOrder extends React.Component<any, any> {
     })
   }
 
+  handleTransactionSubmit = (tx, sourceChain, targetChain, side, price?) => {
+    let order: any = {
+      id: tx.id,
+      side,
+      senderId: tx.senderId,
+      recipientId: tx.recipientId,
+      sourceChain,
+      targetChain
+    };
+    if (side === 'bid') {
+      order.value = tx.amount;
+      order.valueRemaining = order.value;
+    } else {
+      order.size = tx.amount;
+      order.sizeRemaining = order.size;
+    }
+    if (price != null) {
+      order.price = price;
+    }
+    this.props.orderSubmit(order);
+  }
+
   placeOrder = () => {
     if (this.state.marketMode) {
       let dexAddress = undefined;
       let destAddress = undefined;
       let passphrase = undefined;
-      let destChain = undefined;
+      let sourceChain = undefined;
+      let targetChain = undefined;
       let broadcastURL = undefined;
-      if (this.props.side === 'buy') {
+      if (this.props.side === 'bid') {
         dexAddress = this.context.configuration.markets[this.context.activeMarket].dexOptions.chains[this.context.activeAssets[1]].walletAddress;
         destAddress = this.context.keys[this.context.activeAssets[0]].address;
         passphrase = this.context.keys[this.context.activeAssets[1]].passphrase;
-        destChain = this.context.activeAssets[0];
+        sourceChain = this.context.activeAssets[1];
+        targetChain = this.context.activeAssets[0];
         broadcastURL = this.context.configuration.assets[this.context.activeAssets[1]].apiUrl;
-      } else if (this.props.side === 'sell') {
+      } else if (this.props.side === 'ask') {
         dexAddress = this.context.configuration.markets[this.context.activeMarket].dexOptions.chains[this.context.activeAssets[0]].walletAddress;
         destAddress = this.context.keys[this.context.activeAssets[1]].address;
         passphrase = this.context.keys[this.context.activeAssets[0]].passphrase;
-        destChain = this.context.activeAssets[1];
+        sourceChain = this.context.activeAssets[0];
+        targetChain = this.context.activeAssets[1];
         broadcastURL = this.context.configuration.assets[this.context.activeAssets[0]].apiUrl;
       }
 
-      if (dexAddress && destAddress && passphrase && destChain && broadcastURL) {
+      if (dexAddress && destAddress && passphrase && targetChain && broadcastURL) {
         console.log(broadcastURL);
         if (this.state.amount > 0) {
           const tx = transactions.transfer({
             amount: transactions.utils.convertLSKToBeddows(this.state.amount.toString()).toString(),
             recipientId: dexAddress,
-            data: `${destChain},market,${destAddress}`,
+            data: `${targetChain},market,${destAddress}`,
             passphrase: passphrase,
           });
-          console.log(tx);
           axios.post(`${broadcastURL}/transactions`, tx).then((data) => {
             //console.log(data);
+            this.handleTransactionSubmit(tx, sourceChain, targetChain, this.props.side);
             alert(data.data.data.message);
           });
         }
@@ -133,34 +158,37 @@ export default class PlaceOrder extends React.Component<any, any> {
       let dexAddress = undefined;
       let destAddress = undefined;
       let passphrase = undefined;
-      let destChain = undefined;
+      let sourceChain = undefined;
+      let targetChain = undefined;
       let broadcastURL = undefined;
-      if (this.props.side === 'buy') {
+      if (this.props.side === 'bid') {
         dexAddress = this.context.configuration.markets[this.context.activeMarket].dexOptions.chains[this.context.activeAssets[1]].walletAddress;
         destAddress = this.context.keys[this.context.activeAssets[0]].address;
         passphrase = this.context.keys[this.context.activeAssets[1]].passphrase;
-        destChain = this.context.activeAssets[0];
+        sourceChain = this.context.activeAssets[1];
+        targetChain = this.context.activeAssets[0];
         broadcastURL = this.context.configuration.assets[this.context.activeAssets[1]].apiUrl;
-      } else if (this.props.side === 'sell') {
+      } else if (this.props.side === 'ask') {
         dexAddress = this.context.configuration.markets[this.context.activeMarket].dexOptions.chains[this.context.activeAssets[0]].walletAddress;
         destAddress = this.context.keys[this.context.activeAssets[1]].address;
         passphrase = this.context.keys[this.context.activeAssets[0]].passphrase;
-        destChain = this.context.activeAssets[1];
+        sourceChain = this.context.activeAssets[0];
+        targetChain = this.context.activeAssets[1];
         broadcastURL = this.context.configuration.assets[this.context.activeAssets[0]].apiUrl;
       }
 
-      if (dexAddress && destAddress && passphrase && destChain && broadcastURL) {
+      if (dexAddress && destAddress && passphrase && targetChain && broadcastURL) {
         console.log(broadcastURL);
         if (this.state.amount > 0) {
           const tx = transactions.transfer({
             amount: transactions.utils.convertLSKToBeddows(this.state.amount.toString()).toString(),
             recipientId: dexAddress,
-            data: `${destChain},limit,${this.state.price},${destAddress}`,
+            data: `${targetChain},limit,${this.state.price},${destAddress}`,
             passphrase: passphrase,
           });
-          console.log(tx);
           axios.post(`${broadcastURL}/transactions`, tx).then((data) => {
             //console.log(data);
+            this.handleTransactionSubmit(tx, sourceChain, targetChain, this.props.side, parseFloat(this.state.price));
             alert(data.data.data.message);
           });
         }
@@ -180,10 +208,10 @@ export default class PlaceOrder extends React.Component<any, any> {
           <button className="tab-button" disabled={this.state.marketMode} onClick={this.switchMode}>Market</button>
           <button className="tab-button" disabled={!this.state.marketMode} onClick={this.switchMode}>Limit</button>
         </div>
-        {(this.props.side === 'buy') &&
+        {(this.props.side === 'bid') &&
           <BalanceDisplay whole={Math.pow(10, 8)} asset={this.context.activeAssets[1]}></BalanceDisplay>
         }
-        {(this.props.side === 'sell') &&
+        {(this.props.side === 'ask') &&
           <BalanceDisplay whole={Math.pow(10, 8)} asset={this.context.activeAssets[0]}></BalanceDisplay>
         }
         {canTrade &&
@@ -201,11 +229,11 @@ export default class PlaceOrder extends React.Component<any, any> {
             {this.state.marketMode &&
               <>
                 {
-                  this.props.side === 'buy' &&
+                  this.props.side === 'bid' &&
                   <div style={{ color: 'grey', fontSize: '15px', marginBottom: '10px' }}>≈ {(this.state.amount / this.context.minAsk).toFixed(4)} {this.context.activeAssets[0].toUpperCase()}</div>
                 }
                 {
-                  this.props.side === 'sell' &&
+                  this.props.side === 'ask' &&
                   <div style={{ color: 'grey', fontSize: '15px', marginBottom: '10px' }}>≈ {(this.state.amount * this.context.maxBid).toFixed(4)} {this.context.activeAssets[1].toUpperCase()}</div>
                 }
               </>
@@ -213,20 +241,20 @@ export default class PlaceOrder extends React.Component<any, any> {
             {!this.state.marketMode &&
               <>
                 {
-                  this.props.side === 'buy' &&
+                  this.props.side === 'bid' &&
                   <div style={{ color: 'grey', fontSize: '15px', marginBottom: '10px' }}>≈ {(this.state.amount / this.state.price).toFixed(4)} {this.context.activeAssets[0].toUpperCase()}</div>
                 }
                 {
-                  this.props.side === 'sell' &&
+                  this.props.side === 'ask' &&
                   <div style={{ color: 'grey', fontSize: '15px', marginBottom: '10px' }}>≈ {(this.state.amount * this.state.price).toFixed(4)} {this.context.activeAssets[1].toUpperCase()}</div>
                 }
               </>
             }
             {
-              this.props.side === 'buy' && <input className="place-buy-order-button" type="submit" value="Submit" />
+              this.props.side === 'bid' && <input className="place-buy-order-button" type="submit" value="Submit" />
             }
             {
-              this.props.side === 'sell' && <input className="place-sell-order-button" type="submit" value="Submit" />
+              this.props.side === 'ask' && <input className="place-sell-order-button" type="submit" value="Submit" />
             }
           </form>
         }

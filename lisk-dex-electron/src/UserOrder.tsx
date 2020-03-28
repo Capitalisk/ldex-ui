@@ -34,21 +34,17 @@ export default class UserOrder extends React.Component<any, any> {
   }
 
   render() {
-    // don't render if this is on the wrong side.
-    if (this.props.order.side !== this.props.side) {
-      return null;
-    }
     let amountRemaining = this.props.order.side === 'ask' ? this.props.order.sizeRemaining : this.props.order.valueRemaining;
     let amount = this.props.order.side === 'ask' ? this.props.order.size : this.props.order.value;
 
+    let orderStatusClass = `order-${this.props.order.status || 'default'}`;
+
     return (
-
-      <div style={{ width: '100%', fontSize: '14px', backgroundColor: this.props.side === 'bid' ? '#286113' : '#700d0d', borderBottom: '1px solid black', padding: '2px', boxSizing: 'border-box' }}>
-        {(amountRemaining / Math.pow(10, 8)).toFixed(4)}/{(amount / Math.pow(10, 8)).toFixed(4)} <button className="cancel-order-button" onClick={this.cancelOrder}>Cancel</button>
-        <br></br>
-        Price: {this.props.order.price.toFixed(4)}
+      <div className={orderStatusClass} style={{ width: '100%', fontSize: '14px', backgroundColor: this.props.side === 'bid' ? '#286113' : '#700d0d', borderBottom: '1px solid black', padding: '2px', boxSizing: 'border-box' }}>
+        {(amountRemaining / Math.pow(10, 8)).toFixed(4)}/{(amount / Math.pow(10, 8)).toFixed(4)} {this.props.order.status === 'ready' && <button className="cancel-order-button" onClick={this.cancelOrder}>Cancel</button>}
+        {this.props.order.price && <br></br>}
+        {this.props.order.price && <div>Price: {this.props.order.price.toFixed(4)}</div>}
       </div>
-
     );
   }
 }
