@@ -2,6 +2,12 @@ import React from "react";
 import "./PlaceOrder.css";
 import UserOrder from './UserOrder';
 
+const statusValues = {
+  'pending-chain': 0,
+  'pending-dex': 1,
+  'ready': 2
+};
+
 export default class YourOrders extends React.Component {
   constructor(props) {
     super(props);
@@ -27,8 +33,20 @@ export default class YourOrders extends React.Component {
   }
 
   render() {
-    let bids = this.props.orders.filter(order => order.side === 'bid').slice().reverse();
-    let asks = this.props.orders.filter(order => order.side === 'ask');
+    let orders = [...this.props.orders];
+    orders.sort((a, b) => {
+      let valueA = statusValues[a.status];
+      let valueB = statusValues[b.status];
+      if (valueA < valueB) {
+        return -1;
+      }
+      if (valueA > valueB) {
+        return 1;
+      }
+      return 0;
+    });
+    let bids = orders.filter(order => order.side === 'bid').slice().reverse();
+    let asks = orders.filter(order => order.side === 'ask');
     return (
       <>
         <div style={{ padding: "5px" }}>

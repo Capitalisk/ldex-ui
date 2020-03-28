@@ -26,7 +26,7 @@ class App extends React.Component {
     this.state = {
       configurationLoaded: false,
       configuration: {},
-      myPendingOrders: [],
+      myPendingOrders: {},
       orderBookData: { orders: [], bids: [], asks: [], maxSize: { bid: 0, ask: 0 } },
       activeAssets: [],
       // new, activeMarket string for selecting the active market out of the configuration object.
@@ -75,10 +75,12 @@ class App extends React.Component {
   }
 
   orderSubmit = async (order) => {
-    order.status = 'pending-block';
-    let myPendingOrders = [...this.state.myPendingOrders, order];
+    order.status = 'pending-chain';
+    let myPendingOrders = {...this.state.myPendingOrders};
+    myPendingOrders[order.id] = order;
     let myOrderMap = {};
-    for (let myPendingOrder of myPendingOrders) {
+    let myPendingOrderList = Object.values(myPendingOrders);
+    for (let myPendingOrder of myPendingOrderList) {
       myOrderMap[myPendingOrder.id] = myPendingOrder;
     }
     for (let myOrder of this.state.myOrders) {
@@ -97,10 +99,15 @@ class App extends React.Component {
       const asks = [];
       let maxSize = { bid: 0, ask: 0 };
       let myOrderMap = {};
-      for (let myPendingOrder of this.state.myPendingOrders) {
+      let myPendingOrders = {...this.state.myPendingOrders};
+      let myPendingOrderList = Object.values(myPendingOrders);
+      for (let myPendingOrder of myPendingOrderList) {
         myOrderMap[myPendingOrder.id] = myPendingOrder;
       }
       for (let order of orders) {
+        if (myPendingOrders[order.id]) {
+          delete myPendingOrders[order.id];
+        }
         order.status = 'ready';
         if (order.side === "bid") {
           bids.push(order);
@@ -130,7 +137,7 @@ class App extends React.Component {
       if (asks.length > 0) {
         minAsk = asks[0].price;
       }
-      this.setState({ orderBookData: { bids, asks, maxSize }, maxBid, minAsk, myOrders: Object.values(myOrderMap) });
+      this.setState({ orderBookData: { bids, asks, maxSize }, maxBid, minAsk, myOrders: Object.values(myOrderMap), myPendingOrders });
     });
   }
 
