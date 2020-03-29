@@ -22,3 +22,11 @@
 .order-processing {
   opacity: 1;
 }
+
+.order-canceling {
+  opacity: 1;
+}
+
+.order-matching {
+  opacity: 1;
+}

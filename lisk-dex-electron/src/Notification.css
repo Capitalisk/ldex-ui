@@ -1,0 +1,44 @@
+@keyframes appear {
+  from {
+    opacity: 0;
+    top: 25%;
+  }
+  to {
+    top: 5px;
+    opacity: .8;
+  }
+}
+
+@keyframes disappear {
+  from {
+    opacity: .8;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+.notification-container {
+  position: absolute;
+  top: 5px;
+  color: #000000;
+  text-align: center;
+  left: 25%;
+  width: 50%;
+  padding: 10px;
+  opacity: 0.8;
+  border-radius: 10px;
+  background: #FFFFFF;
+}
+
+.notification-container.active {
+  animation-name: appear;
+  animation-duration: 1s;
+  opacity: 0.8;
+}
+
+.notification-container.inactive {
+  animation-name: disappear;
+  animation-duration: 1s;
+  opacity: 0;
+}

@@ -12,8 +12,6 @@ export default class UserOrder extends React.Component<any, any> {
   }
 
   cancelOrder = () => {
-    console.log(this.props.order);
-
     let dexAddress = this.context.configuration.markets[this.context.activeMarket].dexOptions.chains[this.props.order.sourceChain].walletAddress;
     let passphrase = this.context.keys[this.props.order.sourceChain].passphrase;
     let targetChain = this.props.order.targetChain;
@@ -26,10 +24,8 @@ export default class UserOrder extends React.Component<any, any> {
       data: `${targetChain},close,${orderId}`,
       passphrase,
     });
-    console.log(tx);
     axios.post(`${broadcastURL}/transactions`, tx).then((data) => {
-      //console.log(data);
-      alert(data.data.data.message);
+      this.props.orderCanceled(this.props.order);
     });
   }
 
@@ -42,8 +38,8 @@ export default class UserOrder extends React.Component<any, any> {
     return (
       <div className={orderStatusClass} style={{ width: '100%', fontSize: '14px', backgroundColor: this.props.side === 'bid' ? '#286113' : '#700d0d', borderBottom: '1px solid black', padding: '2px', boxSizing: 'border-box' }}>
         {(amountRemaining / Math.pow(10, 8)).toFixed(4)}/{(amount / Math.pow(10, 8)).toFixed(4)}
-        {this.props.order.status === 'ready' && <button className="cancel-order-button" onClick={this.cancelOrder}>Cancel</button>}
-        {(this.props.order.status === 'pending' || this.props.order.status === 'processing') && <div className="lds-dual-ring" style={{ float: 'right', marginRight: '20px' }}></div>}
+        {(this.props.order.status === 'ready' || this.props.order.status === 'matching') && <button className="cancel-order-button" onClick={this.cancelOrder}>Cancel</button>}
+        {this.props.order.status !== 'ready' && <div className="lds-dual-ring" style={{ float: 'right', marginRight: '10px' }}></div>}
         <br></br>
         {this.props.order.price != null && <div>Price: {this.props.order.price.toFixed(4)}</div>}
         {this.props.order.price == null && <div>Market order</div>}

@@ -9,6 +9,7 @@ import SignInModal from "./SignInModal";
 import SignInState from "./SignInState";
 import { getOrderbook, getPendingTransfers, getProcessedHeights, getClient } from "./API";
 import MarketList from "./MarketList";
+import Notification from "./Notification";
 import { userContext } from './context';
 import * as cryptography from "@liskhq/lisk-cryptography";
 import * as passphrase from "@liskhq/lisk-passphrase";
@@ -17,6 +18,8 @@ import { processConfiguration, defaultConfiguration } from "./util/Configuration
 
 // get what we're actually using from the passphrase library.
 const { Mnemonic } = passphrase;
+
+const NOTIFICATIONS_MAX_QUEUE_LENGTH = 3;
 
 class App extends React.Component {
   constructor(props) {
@@ -40,6 +43,7 @@ class App extends React.Component {
       myOrders: [],
       // to prevent cross-chain replay attacks, the user can specify a key for each chain that they are trading on.
       // the address will be used when the asset is being used as the destination chain.
+      notifications: [],
       keys: {
         /*
         'lsk': {
@@ -73,6 +77,31 @@ class App extends React.Component {
     });
   }
 
+  orderCancel = async (order) => {
+    let unitValue = this.state.configuration.assets[order.sourceChain].unitValue;
+    let chainSymbol = order.sourceChain.toUpperCase();
+
+    order.status = 'canceling';
+
+    let message;
+    if (order.type === 'limit') {
+      message = `A cancel order was submitted for the limit order with amount ${
+        Math.round((order.value || order.size) * 100 / unitValue) / 100
+      } ${chainSymbol} at price ${
+        order.price
+      }`;
+    } else {
+      message = `A cancel order was submitted for the market order with amount ${
+        Math.round((order.value || order.size) * 100 / unitValue) / 100
+      } ${chainSymbol}`;
+    }
+    this.notify(message);
+
+    this.setState({
+      myOrders: this.state.myOrders
+    });
+  }
+
   orderSubmit = async (order) => {
     let dexClient = getClient(this.state.configuration.markets[this.state.activeMarket].dexApiUrl);
     let processedHeights = await getProcessedHeights(dexClient);
@@ -89,8 +118,54 @@ class App extends React.Component {
 
     order.status = 'pending';
     myOrderMap[order.id] = order;
+
+    let orderDexAddress = this.state.configuration.markets[this.state.activeMarket].dexOptions.chains[order.sourceChain].walletAddress;
+    let unitValue = this.state.configuration.assets[order.sourceChain].unitValue;
+    let chainSymbol = order.sourceChain.toUpperCase();
+
+    let message;
+    if (order.type === 'limit') {
+      message = `A limit order with amount ${
+        Math.round((order.value || order.size) * 100 / unitValue) / 100
+      } ${chainSymbol} at price ${
+        order.price
+      } was submitted to the DEX address ${
+        orderDexAddress
+      } on the ${chainSymbol} blockchain`;
+    } else {
+      message = `A market order with amount ${
+        Math.round((order.value || order.size) * 100 / unitValue) / 100
+      } ${chainSymbol} was submitted to the DEX address ${
+        orderDexAddress
+      } on the ${chainSymbol} blockchain`;
+    }
+
+    this.notify(message);
+
     this.setState({
       myOrders: Object.values(myOrderMap)
+    });
+  }
+
+  notify = (message) => {
+    let newNotification = {message, isActive: true};
+
+    let updatedNotifications = this.state.notifications.map(notification => ({...notification, isActive: false}));
+    updatedNotifications.push(newNotification);
+
+    if (updatedNotifications.length >= NOTIFICATIONS_MAX_QUEUE_LENGTH) {
+      updatedNotifications.shift();
+    }
+
+    setTimeout(() => {
+      newNotification.isActive = false;
+      this.setState({
+        notifications: this.state.notifications
+      });
+    }, this.state.configuration.notificationDuration);
+
+    this.setState({
+      notifications: updatedNotifications
     });
   }
 
@@ -128,7 +203,12 @@ class App extends React.Component {
 
     for (let order of orders) {
       orderBookIds.add(order.id);
-      order.status = 'ready';
+      let existingOrder = myOrderMap[order.id];
+      if (!existingOrder || existingOrder.status === 'pending') {
+        order.status = 'ready';
+      } else {
+        order.status = existingOrder.status;
+      }
       if (order.side === 'bid') {
         bids.push(order);
         if (order.value > maxSize.bid) {
@@ -148,8 +228,6 @@ class App extends React.Component {
       }
     }
 
-    //console.log('my orders');
-    //console.log(myOrderMap);
     let maxBid = 0;
     let minAsk = 0;
     if (bids.length > 0) {
@@ -190,10 +268,6 @@ class App extends React.Component {
     for (let pendingTransfer of uniquePendingTransfers) {
       let originOrderId = getOriginOrderId(pendingTransfer);
       transferOrderIds.add(originOrderId);
-      let currentOrder = myOrderMap[originOrderId];
-      if (currentOrder) {
-        currentOrder.status = 'processing';
-      }
     }
 
     let myOrderList = Object.values(myOrderMap);
@@ -204,12 +278,32 @@ class App extends React.Component {
         if (currentHeight >= myOrder.submitExpiryHeight) {
           delete myOrderMap[myOrder.id];
         }
-      } else if (!orderBookIds.has(myOrder.id) && !transferOrderIds.has(myOrder.id)) {
-        delete myOrderMap[myOrder.id];
+        continue;
+      }
+      if (transferOrderIds.has(myOrder.id)) {
+        if (myOrder.status === 'pending') {
+          myOrder.status = 'processing';
+        } else if (myOrder.status === 'ready') {
+          myOrder.status = 'matching';
+        }
+      } else {
+        if (!orderBookIds.has(myOrder.id)) {
+          delete myOrderMap[myOrder.id];
+          continue;
+        }
+        if (myOrder.status === 'matching') {
+          myOrder.status = 'ready';
+        }
       }
     }
 
-    this.setState({ orderBookData: { bids, asks, maxSize }, maxBid, minAsk, myOrders: Object.values(myOrderMap) });
+    let newState = {
+      orderBookData: { bids, asks, maxSize },
+      maxBid, minAsk,
+      myOrders: Object.values(myOrderMap)
+    };
+
+    this.setState(newState);
   }
 
   componentDidMount() {
@@ -286,6 +380,9 @@ class App extends React.Component {
           </div>
         </div>
         <div className="container">
+          <div className="notifications">
+            {this.state.notifications.map((data, i) => <Notification key={i} data={data}></Notification>)}
+          </div>
           <div className="sell-panel">
             <PlaceOrder side="ask" orderSubmit={this.orderSubmit}></PlaceOrder>
           </div>
@@ -307,7 +404,7 @@ class App extends React.Component {
             <Chart whole={Math.pow(10, 8)} activeAssets={this.state.activeAssets}></Chart>
           </div>
           <div className="your-orders">
-            <YourOrders orders={this.state.myOrders}></YourOrders>
+            <YourOrders orders={this.state.myOrders} orderCanceled={this.orderCancel}></YourOrders>
           </div>
           <div className="market-name-and-stats">
             <MarketList markets={this.state.configuration.markets} refreshInterval={this.state.configuration.refreshInterval}></MarketList>

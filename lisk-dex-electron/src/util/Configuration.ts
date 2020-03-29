@@ -7,6 +7,7 @@ export interface UnprocessedDEXConfiguration {
       text: string,
       url: string
     },
+    notificationDuration: number,
     refreshInterval: number,
     assets: {
         [symbol: string]: {
@@ -31,6 +32,7 @@ export interface DEXConfiguration {
       text: string,
       url: string
     },
+    notificationDuration: number,
     refreshInterval: number,
     assets: {
         [symbol: string]: {
@@ -71,7 +73,8 @@ export const defaultConfiguration: UnprocessedDEXConfiguration = {
       text: 'Report bug / send feedback',
       url: 'https://github.com/Jaxkr/lisk-dex-ui/issues/new'
     },
-    refreshInterval: 10000,
+    notificationDuration: 10000,
+    refreshInterval: 15000,
     assets: {
         'lsk': {
             name: 'Lisk testnet',

@@ -22,7 +22,7 @@ export default class PlaceOrder extends React.Component<any, any> {
 
   handleChange(event) {
     const target = event.target;
-    const value = target.type === "checkbox" ? target.checked : target.value;
+    const value = target.type === 'checkbox' ? target.checked : target.value;
     const name = target.name;
 
     this.setState({
@@ -151,7 +151,6 @@ export default class PlaceOrder extends React.Component<any, any> {
           axios.post(`${broadcastURL}/transactions`, tx).then((data) => {
             //console.log(data);
             this.handleTransactionSubmit(tx, 'market', sourceChain, targetChain, this.props.side);
-            alert(data.data.data.message);
           });
         }
       }
@@ -190,7 +189,6 @@ export default class PlaceOrder extends React.Component<any, any> {
           axios.post(`${broadcastURL}/transactions`, tx).then((data) => {
             //console.log(data);
             this.handleTransactionSubmit(tx, 'limit', sourceChain, targetChain, this.props.side, parseFloat(this.state.price));
-            alert(data.data.data.message);
           });
         }
       }
