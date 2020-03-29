@@ -16,6 +16,14 @@ export async function getOrderbook(instance: AxiosInstance) {
   return bids.concat(asks);
 }
 
+export async function getBidsFromWallet(instance: AxiosInstance, sourceWalletAddress: string) {
+  return (await instance.get(`/orders/bids?sourceWalletAddress=${sourceWalletAddress}&sort=price:desc`)).data;
+}
+
+export async function getAsksFromWallet(instance: AxiosInstance, sourceWalletAddress: string) {
+  return (await instance.get(`/orders/asks?sourceWalletAddress=${sourceWalletAddress}&sort=price:asc`)).data;
+}
+
 export async function getPendingTransfers(instance: AxiosInstance, targetAssetSymbol: string, recipientId: string) {
   const transfers: Array<any> = (await instance.get(`/transfers/pending?targetChain=${targetAssetSymbol}&sort=timestamp:desc`)).data; // TODO 22 use query params to filter by transfer recipientId
   return transfers.filter(transfer => transfer.transaction.recipientId === recipientId);

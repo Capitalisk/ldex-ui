@@ -7,7 +7,14 @@ import PlaceOrder from "./PlaceOrder";
 import YourOrders from "./YourOrders";
 import SignInModal from "./SignInModal";
 import SignInState from "./SignInState";
-import { getOrderbook, getPendingTransfers, getProcessedHeights, getClient } from "./API";
+import {
+  getOrderbook,
+  getAsksFromWallet,
+  getBidsFromWallet,
+  getPendingTransfers,
+  getProcessedHeights,
+  getClient
+} from "./API";
 import MarketList from "./MarketList";
 import Notification from "./Notification";
 import { userContext } from './context';
@@ -215,14 +222,29 @@ class App extends React.Component {
       getProcessedHeights(dexClient)
     ];
     if (this.state.keys[baseAsset] && this.state.keys[quoteAsset]) {
-      apiResults.push(getPendingTransfers(dexClient, baseAsset, this.state.keys[baseAsset].address));
-      apiResults.push(getPendingTransfers(dexClient, quoteAsset, this.state.keys[quoteAsset].address));
+      let baseWalletAddress = this.state.keys[baseAsset].address;
+      let quoteWalletAddress = this.state.keys[quoteAsset].address;
+      apiResults.push(getAsksFromWallet(dexClient, quoteWalletAddress));
+      apiResults.push(getBidsFromWallet(dexClient, baseWalletAddress));
+      apiResults.push(getPendingTransfers(dexClient, quoteAsset, quoteWalletAddress));
+      apiResults.push(getPendingTransfers(dexClient, baseAsset, baseWalletAddress));
     } else {
+      apiResults.push(Promise.resolve([]));
+      apiResults.push(Promise.resolve([]));
       apiResults.push(Promise.resolve([]));
       apiResults.push(Promise.resolve([]));
     }
 
-    const [orders, processedHeights, pendingBaseAssetTransfers, pendingQuoteAssetTransfers] = await Promise.all(apiResults);
+    const [
+      orders,
+      processedHeights,
+      yourAsks,
+      yourBids,
+      pendingQuoteAssetTransfers,
+      pendingBaseAssetTransfers
+    ] = await Promise.all(apiResults);
+
+    let yourOrders = [...yourAsks, ...yourBids];
 
     const bids = [];
     const asks = [];
@@ -233,10 +255,10 @@ class App extends React.Component {
       yourOrderMap[yourOrder.id] = yourOrder;
     }
 
-    let orderBookIds = new Set();
+    let yourOrderBookIds = new Set();
 
-    for (let order of orders) {
-      orderBookIds.add(order.id);
+    for (let order of yourOrders) {
+      yourOrderBookIds.add(order.id);
       let existingOrder = yourOrderMap[order.id];
       if (!existingOrder || existingOrder.status === 'pending') {
         order.status = 'ready';
@@ -244,20 +266,22 @@ class App extends React.Component {
         order.status = existingOrder.status;
       }
       if (order.side === 'bid') {
+        yourOrderMap[order.id] = order;
+      } else if (order.side === 'ask') {
+        yourOrderMap[order.id] = order;
+      }
+    }
+
+    for (let order of orders) {
+      if (order.side === 'bid') {
         bids.push(order);
         if (order.value > maxSize.bid) {
           maxSize.bid = order.valueRemaining;
-        }
-        if (order.senderId === this.state.keys[this.state.activeAssets[1]]?.address) {
-          yourOrderMap[order.id] = order; // TODO 2 Use a separate call for my orders and for general order book data
         }
       } else if (order.side === 'ask') {
         asks.push(order);
         if (order.size > maxSize.ask) {
           maxSize.ask = order.sizeRemaining;
-        }
-        if (order.senderId === this.state.keys[this.state.activeAssets[0]]?.address) {
-          yourOrderMap[order.id] = order;
         }
       }
     }
@@ -321,7 +345,7 @@ class App extends React.Component {
           yourOrder.status = 'matching';
         }
       } else {
-        if (!orderBookIds.has(yourOrder.id)) {
+        if (!yourOrderBookIds.has(yourOrder.id)) {
           delete yourOrderMap[yourOrder.id];
           continue;
         }
@@ -354,7 +378,7 @@ class App extends React.Component {
     this.setState({ displaySigninModal: true, signInFailure: false });
   }
 
-  passphraseSubmit(payload) {
+  async passphraseSubmit(payload) {
     const keys = {};
     let atLeastOneKey = false;
     for (const asset in payload) {
@@ -372,7 +396,7 @@ class App extends React.Component {
       }
     }
     if (atLeastOneKey) {
-      this.setState({ keys, signedIn: true, displaySigninModal: false });
+      await this.setState({ keys, signedIn: true, displaySigninModal: false });
       this.refreshOrderbook();
     }
   }
