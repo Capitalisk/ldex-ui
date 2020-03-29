@@ -92,11 +92,18 @@ class App extends React.Component {
     let quoteAsset = this.state.activeAssets[0];
     let baseAsset = this.state.activeAssets[1];
 
-    const [orders, pendingBaseAssetTransfers, pendingQuoteAssetTransfers] = await Promise.all([
-      getOrderbook(dexClient),
-      getPendingTransfers(dexClient, baseAsset, this.state.keys[baseAsset].address),
-      getPendingTransfers(dexClient, quoteAsset, this.state.keys[quoteAsset].address),
-    ]);
+    let apiResults = [
+      getOrderbook(dexClient)
+    ];
+    if (this.state.keys[baseAsset] && this.state.keys[quoteAsset]) {
+      apiResults.push(getPendingTransfers(dexClient, baseAsset, this.state.keys[baseAsset].address));
+      apiResults.push(getPendingTransfers(dexClient, quoteAsset, this.state.keys[quoteAsset].address));
+    } else {
+      apiResults.push(Promise.resolve([]));
+      apiResults.push(Promise.resolve([]));
+    }
+
+    const [orders, pendingBaseAssetTransfers, pendingQuoteAssetTransfers] = await Promise.all(apiResults);
 
     const bids = [];
     const asks = [];
@@ -211,7 +218,7 @@ class App extends React.Component {
   }
 
   showSignIn() {
-    this.setState({ displaySigninModal: true, signInFailure: false, });
+    this.setState({ displaySigninModal: true, signInFailure: false });
   }
 
   passphraseSubmit(payload) {
