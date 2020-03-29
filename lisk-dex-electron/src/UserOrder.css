@@ -15,6 +15,10 @@
   text-decoration: underline;
 }
 
-.order-pending-chain {
+.order-pending {
   opacity: 0.5;
+}
+
+.order-processing {
+  opacity: 1;
 }

@@ -92,9 +92,10 @@ export default class PlaceOrder extends React.Component<any, any> {
     })
   }
 
-  handleTransactionSubmit = (tx, sourceChain, targetChain, side, price?) => {
+  handleTransactionSubmit = (tx, type, sourceChain, targetChain, side, price?) => {
     let order: any = {
       id: tx.id,
+      type,
       side,
       senderId: tx.senderId,
       recipientId: tx.recipientId,
@@ -149,7 +150,7 @@ export default class PlaceOrder extends React.Component<any, any> {
           });
           axios.post(`${broadcastURL}/transactions`, tx).then((data) => {
             //console.log(data);
-            this.handleTransactionSubmit(tx, sourceChain, targetChain, this.props.side);
+            this.handleTransactionSubmit(tx, 'market', sourceChain, targetChain, this.props.side);
             alert(data.data.data.message);
           });
         }
@@ -188,7 +189,7 @@ export default class PlaceOrder extends React.Component<any, any> {
           });
           axios.post(`${broadcastURL}/transactions`, tx).then((data) => {
             //console.log(data);
-            this.handleTransactionSubmit(tx, sourceChain, targetChain, this.props.side, parseFloat(this.state.price));
+            this.handleTransactionSubmit(tx, 'limit', sourceChain, targetChain, this.props.side, parseFloat(this.state.price));
             alert(data.data.data.message);
           });
         }

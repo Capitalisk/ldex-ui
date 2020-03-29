@@ -35,7 +35,6 @@ export default class Orderbook extends React.Component {
           decimals={4}
         ></OrderbookEntry>
       ));
-      orders.reverse();
       return <div className="bidOrderList">{orders}</div>;
     }
   }

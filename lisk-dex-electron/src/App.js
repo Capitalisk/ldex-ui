@@ -7,7 +7,7 @@ import PlaceOrder from "./PlaceOrder";
 import YourOrders from "./YourOrders";
 import SignInModal from "./SignInModal";
 import SignInState from "./SignInState";
-import { getOrderbook, getClient } from "./API";
+import { getOrderbook, getPendingTransfers, getClient } from "./API";
 import MarketList from "./MarketList";
 import { userContext } from './context';
 import * as cryptography from "@liskhq/lisk-cryptography";
@@ -26,7 +26,6 @@ class App extends React.Component {
     this.state = {
       configurationLoaded: false,
       configuration: {},
-      myPendingOrders: {},
       orderBookData: { orders: [], bids: [], asks: [], maxSize: { bid: 0, ask: 0 } },
       activeAssets: [],
       // new, activeMarket string for selecting the active market out of the configuration object.
@@ -75,70 +74,123 @@ class App extends React.Component {
   }
 
   orderSubmit = async (order) => {
-    order.status = 'pending-chain';
-    let myPendingOrders = {...this.state.myPendingOrders};
-    myPendingOrders[order.id] = order;
     let myOrderMap = {};
-    let myPendingOrderList = Object.values(myPendingOrders);
-    for (let myPendingOrder of myPendingOrderList) {
-      myOrderMap[myPendingOrder.id] = myPendingOrder;
-    }
     for (let myOrder of this.state.myOrders) {
       myOrderMap[myOrder.id] = myOrder;
     }
+    order.status = 'pending';
+    myOrderMap[order.id] = order;
     this.setState({
-      myPendingOrders,
       myOrders: Object.values(myOrderMap)
     });
   }
 
   refreshOrderbook = async () => {
     //console.log('refreshing orderbook');
-    getOrderbook(getClient(this.state.configuration.markets[this.state.activeMarket].dexApiUrl)).then(orders => {
-      const bids = [];
-      const asks = [];
-      let maxSize = { bid: 0, ask: 0 };
-      let myOrderMap = {};
-      let myPendingOrders = {...this.state.myPendingOrders};
-      let myPendingOrderList = Object.values(myPendingOrders);
-      for (let myPendingOrder of myPendingOrderList) {
-        myOrderMap[myPendingOrder.id] = myPendingOrder;
-      }
-      for (let order of orders) {
-        if (myPendingOrders[order.id]) {
-          delete myPendingOrders[order.id];
+    let dexClient = getClient(this.state.configuration.markets[this.state.activeMarket].dexApiUrl);
+
+    let quoteAsset = this.state.activeAssets[0];
+    let baseAsset = this.state.activeAssets[1];
+
+    const [orders, pendingBaseAssetTransfers, pendingQuoteAssetTransfers] = await Promise.all([
+      getOrderbook(dexClient),
+      getPendingTransfers(dexClient, baseAsset, this.state.keys[baseAsset].address),
+      getPendingTransfers(dexClient, quoteAsset, this.state.keys[quoteAsset].address),
+    ]);
+
+    const bids = [];
+    const asks = [];
+    let maxSize = { bid: 0, ask: 0 };
+    let myOrderMap = {};
+
+    for (let myOrder of this.state.myOrders) {
+      myOrderMap[myOrder.id] = myOrder;
+    }
+
+    let orderBookIds = new Set();
+
+    for (let order of orders) {
+      orderBookIds.add(order.id);
+      order.status = 'ready';
+      if (order.side === 'bid') {
+        bids.push(order);
+        if (order.value > maxSize.bid) {
+          maxSize.bid = order.valueRemaining;
         }
-        order.status = 'ready';
-        if (order.side === "bid") {
-          bids.push(order);
-          if (order.value > maxSize.bid) {
-            maxSize.bid = order.valueRemaining;
-          }
-          if (order.senderId === this.state.keys[this.state.activeAssets[1]]?.address) {
-            myOrderMap[order.id] = order;
-          }
-        } else if (order.side === "ask") {
-          asks.push(order);
-          if (order.size > maxSize.ask) {
-            maxSize.ask = order.sizeRemaining;
-          }
-          if (order.senderId === this.state.keys[this.state.activeAssets[0]]?.address) {
-            myOrderMap[order.id] = order;
-          }
+        if (order.senderId === this.state.keys[this.state.activeAssets[1]]?.address) {
+          myOrderMap[order.id] = order; // TODO 2 Use a separate call for my orders and for general order book data
+        }
+      } else if (order.side === 'ask') {
+        asks.push(order);
+        if (order.size > maxSize.ask) {
+          maxSize.ask = order.sizeRemaining;
+        }
+        if (order.senderId === this.state.keys[this.state.activeAssets[0]]?.address) {
+          myOrderMap[order.id] = order;
         }
       }
-      //console.log('my orders');
-      //console.log(myOrderMap);
-      let maxBid = 0;
-      let minAsk = 0;
-      if (bids.length > 0) {
-        maxBid = bids[bids.length - 1].price;
+    }
+
+    const getTransferType = (pendingTransfer) => {
+      let transactionData = pendingTransfer.transaction.asset.data || '';
+      return transactionData.charAt(0);
+    };
+
+    const originOrderIdRegexT1 = /,[0-9]+:/g;
+    const originOrderIdRegexT2 = /,[0-9]+,/g;
+
+    const getOriginOrderId = (pendingTransfer) => {
+      let transactionData = pendingTransfer.transaction.asset.data || '';
+      let regex = transactionData.slice(0, 2) === 't1' ? originOrderIdRegexT1 : originOrderIdRegexT2;
+      let matches = transactionData.match(regex);
+      if (matches) {
+        let match = matches[0];
+        return match.slice(1, match.length - 1);
       }
-      if (asks.length > 0) {
-        minAsk = asks[0].price;
-      }
-      this.setState({ orderBookData: { bids, asks, maxSize }, maxBid, minAsk, myOrders: Object.values(myOrderMap), myPendingOrders });
+      return null;
+    };
+
+    let pendingTransfers = [...pendingBaseAssetTransfers, ...pendingQuoteAssetTransfers];
+    let tradeTransfers = pendingTransfers.filter(transfer => getTransferType(transfer) === 't');
+    let tradeTransfersOriginOrderIds = new Set(tradeTransfers.map(transfer => getOriginOrderId(transfer)));
+    let uniqueRefundTransfers = pendingTransfers.filter((transfer) => {
+      return getTransferType(transfer) === 'r' && !tradeTransfersOriginOrderIds.has(getOriginOrderId(transfer));
     });
+    let uniquePendingTransfers = [...tradeTransfers, ...uniqueRefundTransfers];
+
+    let transferOrderIds = new Set();
+    for (let pendingTransfer of uniquePendingTransfers) {
+      let originOrderId = getOriginOrderId(pendingTransfer);
+      transferOrderIds.add(originOrderId);
+      let currentOrder = myOrderMap[originOrderId];
+      if (currentOrder) {
+        currentOrder.status = 'processing';
+      }
+    }
+
+    let myOrderList = Object.values(myOrderMap);
+
+    for (let myOrder of myOrderList) {
+      if (
+        (myOrder.status === 'processing' || myOrder.status === 'ready') &&
+        !orderBookIds.has(myOrder.id) &&
+        !transferOrderIds.has(myOrder.id)
+      ) {
+        delete myOrderMap[myOrder.id];
+      }
+    }
+
+    //console.log('my orders');
+    //console.log(myOrderMap);
+    let maxBid = 0;
+    let minAsk = 0;
+    if (bids.length > 0) {
+      maxBid = bids[0].price;
+    }
+    if (asks.length > 0) {
+      minAsk = asks[0].price;
+    }
+    this.setState({ orderBookData: { bids, asks, maxSize }, maxBid, minAsk, myOrders: Object.values(myOrderMap) });
   }
 
   componentDidMount() {

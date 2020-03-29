@@ -3,8 +3,8 @@ import "./PlaceOrder.css";
 import UserOrder from './UserOrder';
 
 const statusValues = {
-  'pending-chain': 0,
-  'pending-dex': 1,
+  'pending': 0,
+  'processing': 1,
   'ready': 2
 };
 

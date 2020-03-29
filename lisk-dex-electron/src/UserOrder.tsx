@@ -43,7 +43,7 @@ export default class UserOrder extends React.Component<any, any> {
       <div className={orderStatusClass} style={{ width: '100%', fontSize: '14px', backgroundColor: this.props.side === 'bid' ? '#286113' : '#700d0d', borderBottom: '1px solid black', padding: '2px', boxSizing: 'border-box' }}>
         {(amountRemaining / Math.pow(10, 8)).toFixed(4)}/{(amount / Math.pow(10, 8)).toFixed(4)}
         {this.props.order.status === 'ready' && <button className="cancel-order-button" onClick={this.cancelOrder}>Cancel</button>}
-        {(this.props.order.status === 'pending-chain' || this.props.order.status === 'pending-dex') && <div className="lds-dual-ring" style={{ float: 'right', marginRight: '20px' }}></div>}
+        {(this.props.order.status === 'pending' || this.props.order.status === 'processing') && <div className="lds-dual-ring" style={{ float: 'right', marginRight: '20px' }}></div>}
         <br></br>
         {this.props.order.price != null && <div>Price: {this.props.order.price.toFixed(4)}</div>}
         {this.props.order.price == null && <div>Market order</div>}

@@ -44,10 +44,6 @@ export interface DEXConfiguration {
             dexApiUrl: string,
             dexOptions: {
                 version: string,
-                orderBookHash: string,
-                processedHeights: {
-                  [symbol: string]: number
-                },
                 baseChain: string,
                 chainsWhitelist: Array<string>,
                 chains: {
