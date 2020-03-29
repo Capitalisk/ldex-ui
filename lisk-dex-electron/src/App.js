@@ -335,8 +335,8 @@ class App extends React.Component {
         let currentHeight = processedHeights[yourOrder.sourceChain];
         if (currentHeight >= yourOrder.submitExpiryHeight) {
           delete yourOrderMap[yourOrder.id];
+          continue;
         }
-        continue;
       }
       if (transferOrderIds.has(yourOrder.id)) {
         if (yourOrder.status === 'pending') {
@@ -345,7 +345,7 @@ class App extends React.Component {
           yourOrder.status = 'matching';
         }
       } else {
-        if (!yourOrderBookIds.has(yourOrder.id)) {
+        if (yourOrder.status !== 'pending' && !yourOrderBookIds.has(yourOrder.id)) {
           delete yourOrderMap[yourOrder.id];
           continue;
         }

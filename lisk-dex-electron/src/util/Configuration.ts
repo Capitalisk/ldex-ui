@@ -84,7 +84,7 @@ export const defaultConfiguration: UnprocessedDEXConfiguration = {
         },
         'lsh': {
             name: 'Leasehold testnet',
-            apiUrl: 'http://54.174.172.179:7010/api',
+            apiUrl: 'http://18.206.164.187:7010/api',
             unitValue: 100000000,
             processingHeightExpiry: 5
         }
@@ -94,7 +94,7 @@ export const defaultConfiguration: UnprocessedDEXConfiguration = {
         'lsh/lsk': {
             // API URL that serves orderbook information.
             // The addresses for the DEX are fetched from this endpoint.
-            dexApiUrl: 'http://54.174.172.179:7011',
+            dexApiUrl: 'http://18.206.164.187:7011',
             assets: ['lsh', 'lsk']
         }
     }
