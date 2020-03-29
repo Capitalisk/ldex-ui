@@ -25,7 +25,13 @@
   border: 0;
   padding: 5px 15px 5px 15px;
   outline: none;
+  width: 105px;
+  vertical-align: top;
   background: #008800;
+}
+
+.place-buy-order-button[disabled] {
+  cursor: default;
 }
 
 .place-sell-order-button {
@@ -35,5 +41,11 @@
   border: 0;
   padding: 5px 15px 5px 15px;
   outline: none;
+  width: 105px;
+  vertical-align: top;
   background: #880000;
+}
+
+.place-sell-order-button[disabled] {
+  cursor: default;
 }

@@ -13,6 +13,7 @@ export default class PlaceOrder extends React.Component<any, any> {
       price: 0,
       amount: 0,
       marketMode: true,
+      isSubmitting: false,
       errors: {},
     };
 
@@ -153,14 +154,17 @@ export default class PlaceOrder extends React.Component<any, any> {
             passphrase: passphrase,
           });
           (async () => {
+            this.setState({isSubmitting: true});
             try {
               await axios.post(`${broadcastURL}/transactions`, tx);
             } catch (err) {
               let error: any = new Error(`Failed to post market order because of error: ${err.message}`);
               error.order = this.generateOrder(tx, 'market', sourceChain, targetChain, this.props.side);
               this.props.orderSubmitError && this.props.orderSubmitError(error);
+              this.setState({isSubmitting: false});
               return;
             }
+            this.setState({isSubmitting: false});
             this.handleTransactionSubmit(tx, 'market', sourceChain, targetChain, this.props.side);
           })();
         }
@@ -197,14 +201,17 @@ export default class PlaceOrder extends React.Component<any, any> {
             passphrase: passphrase,
           });
           (async () => {
+            this.setState({isSubmitting: true});
             try {
               await axios.post(`${broadcastURL}/transactions`, tx);
             } catch (err) {
               let error: any = new Error(`Failed to post limit order because of error: ${err.message}`);
               error.order = this.generateOrder(tx, 'limit', sourceChain, targetChain, this.props.side, parseFloat(this.state.price));
               this.props.orderSubmitError && this.props.orderSubmitError(error);
+              this.setState({isSubmitting: false});
               return;
             }
+            this.setState({isSubmitting: false});
             this.handleTransactionSubmit(tx, 'limit', sourceChain, targetChain, this.props.side, parseFloat(this.state.price));
           })();
         }
@@ -263,12 +270,9 @@ export default class PlaceOrder extends React.Component<any, any> {
                 }
               </>
             }
-            {
-              this.props.side === 'bid' && <input className="place-buy-order-button" type="submit" value="Submit" />
-            }
-            {
-              this.props.side === 'ask' && <input className="place-sell-order-button" type="submit" value="Submit" />
-            }
+            {this.props.side === 'bid' && <input className="place-buy-order-button" type="submit" value={this.state.isSubmitting ? '' : 'Submit'} disabled={this.state.isSubmitting} />}
+            {this.props.side === 'ask' && <input className="place-sell-order-button" type="submit" value={this.state.isSubmitting ? '' : 'Submit'} disabled={this.state.isSubmitting} />}
+            {this.state.isSubmitting && <div className="lds-dual-ring" style={{ display: 'inline-block', position: 'absolute', left: '48px', marginTop: '2px', marginLeft: '5px' }}></div>}
           </form>
         }
         {
