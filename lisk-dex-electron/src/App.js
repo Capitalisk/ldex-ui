@@ -7,7 +7,7 @@ import PlaceOrder from "./PlaceOrder";
 import YourOrders from "./YourOrders";
 import SignInModal from "./SignInModal";
 import SignInState from "./SignInState";
-import { getOrderbook, getPendingTransfers, getClient } from "./API";
+import { getOrderbook, getPendingTransfers, getProcessedHeights, getClient } from "./API";
 import MarketList from "./MarketList";
 import { userContext } from './context';
 import * as cryptography from "@liskhq/lisk-cryptography";
@@ -74,10 +74,19 @@ class App extends React.Component {
   }
 
   orderSubmit = async (order) => {
+    let dexClient = getClient(this.state.configuration.markets[this.state.activeMarket].dexApiUrl);
+    let processedHeights = await getProcessedHeights(dexClient);
+
+    let heightSafetyMargin = this.state.configuration.assets[order.sourceChain].processingHeightExpiry;
+    order.submitHeight = processedHeights[order.sourceChain];
+    order.submitExpiryHeight = order.submitHeight + this.state.configuration
+    .markets[this.state.activeMarket].dexOptions.chains[order.sourceChain].requiredConfirmations + heightSafetyMargin;
+
     let myOrderMap = {};
     for (let myOrder of this.state.myOrders) {
       myOrderMap[myOrder.id] = myOrder;
     }
+
     order.status = 'pending';
     myOrderMap[order.id] = order;
     this.setState({
@@ -93,7 +102,8 @@ class App extends React.Component {
     let baseAsset = this.state.activeAssets[1];
 
     let apiResults = [
-      getOrderbook(dexClient)
+      getOrderbook(dexClient),
+      getProcessedHeights(dexClient)
     ];
     if (this.state.keys[baseAsset] && this.state.keys[quoteAsset]) {
       apiResults.push(getPendingTransfers(dexClient, baseAsset, this.state.keys[baseAsset].address));
@@ -103,7 +113,7 @@ class App extends React.Component {
       apiResults.push(Promise.resolve([]));
     }
 
-    const [orders, pendingBaseAssetTransfers, pendingQuoteAssetTransfers] = await Promise.all(apiResults);
+    const [orders, processedHeights, pendingBaseAssetTransfers, pendingQuoteAssetTransfers] = await Promise.all(apiResults);
 
     const bids = [];
     const asks = [];
@@ -136,6 +146,17 @@ class App extends React.Component {
           myOrderMap[order.id] = order;
         }
       }
+    }
+
+    //console.log('my orders');
+    //console.log(myOrderMap);
+    let maxBid = 0;
+    let minAsk = 0;
+    if (bids.length > 0) {
+      maxBid = bids[0].price;
+    }
+    if (asks.length > 0) {
+      minAsk = asks[0].price;
     }
 
     const getTransferType = (pendingTransfer) => {
@@ -178,25 +199,16 @@ class App extends React.Component {
     let myOrderList = Object.values(myOrderMap);
 
     for (let myOrder of myOrderList) {
-      if (
-        (myOrder.status === 'processing' || myOrder.status === 'ready') &&
-        !orderBookIds.has(myOrder.id) &&
-        !transferOrderIds.has(myOrder.id)
-      ) {
+      if (myOrder.status === 'pending') {
+        let currentHeight = processedHeights[myOrder.sourceChain];
+        if (currentHeight >= myOrder.submitExpiryHeight) {
+          delete myOrderMap[myOrder.id];
+        }
+      } else if (!orderBookIds.has(myOrder.id) && !transferOrderIds.has(myOrder.id)) {
         delete myOrderMap[myOrder.id];
       }
     }
 
-    //console.log('my orders');
-    //console.log(myOrderMap);
-    let maxBid = 0;
-    let minAsk = 0;
-    if (bids.length > 0) {
-      maxBid = bids[0].price;
-    }
-    if (asks.length > 0) {
-      minAsk = asks[0].price;
-    }
     this.setState({ orderBookData: { bids, asks, maxSize }, maxBid, minAsk, myOrders: Object.values(myOrderMap) });
   }
 

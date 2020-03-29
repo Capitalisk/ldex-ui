@@ -12,7 +12,8 @@ export interface UnprocessedDEXConfiguration {
         [symbol: string]: {
             name: string,
             apiUrl: string,
-            unitValue: number
+            unitValue: number,
+            processingHeightExpiry: number
         }
     },
     markets: {
@@ -35,7 +36,8 @@ export interface DEXConfiguration {
         [symbol: string]: {
             name: string,
             apiUrl: string,
-            unitValue: number
+            unitValue: number,
+            processingHeightExpiry: number
         }
     },
     markets: {
@@ -63,7 +65,6 @@ export interface DEXConfiguration {
     }
 }
 
-
 export const defaultConfiguration: UnprocessedDEXConfiguration = {
     appTitle: 'Lisk DEX',
     feedbackLink: {
@@ -75,12 +76,14 @@ export const defaultConfiguration: UnprocessedDEXConfiguration = {
         'lsk': {
             name: 'Lisk testnet',
             apiUrl: 'https://test-02.liskapi.io/api',
-            unitValue: 100000000
+            unitValue: 100000000,
+            processingHeightExpiry: 5
         },
         'lsh': {
             name: 'Leasehold testnet',
             apiUrl: 'http://54.174.172.179:7010/api',
-            unitValue: 100000000
+            unitValue: 100000000,
+            processingHeightExpiry: 5
         }
     },
     // lisk of markets.
@@ -92,8 +95,7 @@ export const defaultConfiguration: UnprocessedDEXConfiguration = {
             assets: ['lsh', 'lsk']
         }
     }
-}
-
+};
 
 export async function processConfiguration(config: UnprocessedDEXConfiguration) {
     const _config = config as DEXConfiguration

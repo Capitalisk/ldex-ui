@@ -20,3 +20,8 @@ export async function getPendingTransfers(instance: AxiosInstance, targetAssetSy
   const transfers: Array<any> = (await instance.get(`/transfers/pending?targetChain=${targetAssetSymbol}&sort=timestamp:desc`)).data; // TODO 22 use query params to filter by transfer recipientId
   return transfers.filter(transfer => transfer.transaction.recipientId === recipientId);
 }
+
+export async function getProcessedHeights(instance: AxiosInstance) {
+  const status: any = (await instance.get(`/status`)).data;
+  return status.processedHeights;
+}
