@@ -92,7 +92,7 @@ export default class PlaceOrder extends React.Component<any, any> {
     })
   }
 
-  handleTransactionSubmit = (tx, type, sourceChain, targetChain, side, price?) => {
+  generateOrder = (tx, type, sourceChain, targetChain, side, price?) => {
     let order: any = {
       id: tx.id,
       type,
@@ -112,6 +112,11 @@ export default class PlaceOrder extends React.Component<any, any> {
     if (price != null) {
       order.price = price;
     }
+    return order;
+  }
+
+  handleTransactionSubmit = (tx, type, sourceChain, targetChain, side, price?) => {
+    let order = this.generateOrder(tx, type, sourceChain, targetChain, side, price);
     this.props.orderSubmit(order);
   }
 
@@ -140,7 +145,6 @@ export default class PlaceOrder extends React.Component<any, any> {
       }
 
       if (dexAddress && destAddress && passphrase && targetChain && broadcastURL) {
-        console.log(broadcastURL);
         if (this.state.amount > 0) {
           const tx = transactions.transfer({
             amount: transactions.utils.convertLSKToBeddows(this.state.amount.toString()).toString(),
@@ -148,10 +152,17 @@ export default class PlaceOrder extends React.Component<any, any> {
             data: `${targetChain},market,${destAddress}`,
             passphrase: passphrase,
           });
-          axios.post(`${broadcastURL}/transactions`, tx).then((data) => {
-            //console.log(data);
+          (async () => {
+            try {
+              await axios.post(`${broadcastURL}/transactions`, tx);
+            } catch (err) {
+              let error: any = new Error(`Failed to post market order because of error: ${err.message}`);
+              error.order = this.generateOrder(tx, 'market', sourceChain, targetChain, this.props.side);
+              this.props.orderSubmitError && this.props.orderSubmitError(error);
+              return;
+            }
             this.handleTransactionSubmit(tx, 'market', sourceChain, targetChain, this.props.side);
-          });
+          })();
         }
       }
     } else {
@@ -178,7 +189,6 @@ export default class PlaceOrder extends React.Component<any, any> {
       }
 
       if (dexAddress && destAddress && passphrase && targetChain && broadcastURL) {
-        console.log(broadcastURL);
         if (this.state.amount > 0) {
           const tx = transactions.transfer({
             amount: transactions.utils.convertLSKToBeddows(this.state.amount.toString()).toString(),
@@ -186,20 +196,24 @@ export default class PlaceOrder extends React.Component<any, any> {
             data: `${targetChain},limit,${this.state.price},${destAddress}`,
             passphrase: passphrase,
           });
-          axios.post(`${broadcastURL}/transactions`, tx).then((data) => {
-            //console.log(data);
+          (async () => {
+            try {
+              await axios.post(`${broadcastURL}/transactions`, tx);
+            } catch (err) {
+              let error: any = new Error(`Failed to post limit order because of error: ${err.message}`);
+              error.order = this.generateOrder(tx, 'limit', sourceChain, targetChain, this.props.side, parseFloat(this.state.price));
+              this.props.orderSubmitError && this.props.orderSubmitError(error);
+              return;
+            }
             this.handleTransactionSubmit(tx, 'limit', sourceChain, targetChain, this.props.side, parseFloat(this.state.price));
-          });
+          })();
         }
       }
     }
   }
 
   render() {
-    let canTrade = false;
-    if (this.context.activeAssets[0] in this.context.keys && this.context.activeAssets[1] in this.context.keys) {
-      canTrade = true;
-    }
+    let canTrade = this.props.enabled;
     return (
       <div style={{ padding: "5px" }}>
         <div className="action-name">{this.props.side === 'bid' ? 'BUY' : 'SELL'}</div>

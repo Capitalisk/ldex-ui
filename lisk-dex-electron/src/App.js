@@ -40,7 +40,7 @@ class App extends React.Component {
       displayLeaveWarning: false,
       maxBid: 0,
       minAsk: 0,
-      myOrders: [],
+      yourOrders: [],
       // to prevent cross-chain replay attacks, the user can specify a key for each chain that they are trading on.
       // the address will be used when the asset is being used as the destination chain.
       notifications: [],
@@ -58,6 +58,7 @@ class App extends React.Component {
       }
     };
 
+    this.notificationId = 0;
     this.showSignIn = this.showSignIn.bind(this);
     this.intervalRegistered = false;
     this.passphraseSubmit = this.passphraseSubmit.bind(this);
@@ -98,8 +99,28 @@ class App extends React.Component {
     this.notify(message);
 
     this.setState({
-      myOrders: this.state.myOrders
+      yourOrders: this.state.yourOrders
     });
+  }
+
+  orderSubmitError = async (error) => {
+    let order = error.order;
+    let unitValue = this.state.configuration.assets[order.sourceChain].unitValue;
+    let chainSymbol = order.sourceChain.toUpperCase();
+
+    let message;
+    if (order.type === 'limit') {
+      message = `Failed to submit the limit order with amount ${
+        Math.round((order.value || order.size) * 100 / unitValue) / 100
+      } ${chainSymbol} at price ${
+        order.price
+      } - Check your connection.`;
+    } else {
+      message = `Failed to submit the market order with amount ${
+        Math.round((order.value || order.size) * 100 / unitValue) / 100
+      } ${chainSymbol} - Check your connection.`;
+    }
+    this.notify(message, true);
   }
 
   orderSubmit = async (order) => {
@@ -111,13 +132,13 @@ class App extends React.Component {
     order.submitExpiryHeight = order.submitHeight + this.state.configuration
     .markets[this.state.activeMarket].dexOptions.chains[order.sourceChain].requiredConfirmations + heightSafetyMargin;
 
-    let myOrderMap = {};
-    for (let myOrder of this.state.myOrders) {
-      myOrderMap[myOrder.id] = myOrder;
+    let yourOrderMap = {};
+    for (let yourOrder of this.state.yourOrders) {
+      yourOrderMap[yourOrder.id] = yourOrder;
     }
 
     order.status = 'pending';
-    myOrderMap[order.id] = order;
+    yourOrderMap[order.id] = order;
 
     let orderDexAddress = this.state.configuration.markets[this.state.activeMarket].dexOptions.chains[order.sourceChain].walletAddress;
     let unitValue = this.state.configuration.assets[order.sourceChain].unitValue;
@@ -143,12 +164,17 @@ class App extends React.Component {
     this.notify(message);
 
     this.setState({
-      myOrders: Object.values(myOrderMap)
+      yourOrders: Object.values(yourOrderMap)
     });
   }
 
-  notify = (message) => {
-    let newNotification = {message, isActive: true};
+  notify = (message, isError) => {
+    let newNotification = {
+      id: this.notificationId++,
+      message,
+      isActive: true,
+      isError: isError || false
+    };
 
     let updatedNotifications = this.state.notifications.map(notification => ({...notification, isActive: false}));
     updatedNotifications.push(newNotification);
@@ -170,7 +196,15 @@ class App extends React.Component {
   }
 
   refreshOrderbook = async () => {
-    //console.log('refreshing orderbook');
+    try {
+      await this._refreshOrderbook();
+    } catch (error) {
+      console.error(error);
+      this.notify('Failed to refresh the order book - Check your connection.', true);
+    }
+  }
+
+  _refreshOrderbook = async () => {
     let dexClient = getClient(this.state.configuration.markets[this.state.activeMarket].dexApiUrl);
 
     let quoteAsset = this.state.activeAssets[0];
@@ -193,17 +227,17 @@ class App extends React.Component {
     const bids = [];
     const asks = [];
     let maxSize = { bid: 0, ask: 0 };
-    let myOrderMap = {};
+    let yourOrderMap = {};
 
-    for (let myOrder of this.state.myOrders) {
-      myOrderMap[myOrder.id] = myOrder;
+    for (let yourOrder of this.state.yourOrders) {
+      yourOrderMap[yourOrder.id] = yourOrder;
     }
 
     let orderBookIds = new Set();
 
     for (let order of orders) {
       orderBookIds.add(order.id);
-      let existingOrder = myOrderMap[order.id];
+      let existingOrder = yourOrderMap[order.id];
       if (!existingOrder || existingOrder.status === 'pending') {
         order.status = 'ready';
       } else {
@@ -215,7 +249,7 @@ class App extends React.Component {
           maxSize.bid = order.valueRemaining;
         }
         if (order.senderId === this.state.keys[this.state.activeAssets[1]]?.address) {
-          myOrderMap[order.id] = order; // TODO 2 Use a separate call for my orders and for general order book data
+          yourOrderMap[order.id] = order; // TODO 2 Use a separate call for my orders and for general order book data
         }
       } else if (order.side === 'ask') {
         asks.push(order);
@@ -223,7 +257,7 @@ class App extends React.Component {
           maxSize.ask = order.sizeRemaining;
         }
         if (order.senderId === this.state.keys[this.state.activeAssets[0]]?.address) {
-          myOrderMap[order.id] = order;
+          yourOrderMap[order.id] = order;
         }
       }
     }
@@ -270,29 +304,29 @@ class App extends React.Component {
       transferOrderIds.add(originOrderId);
     }
 
-    let myOrderList = Object.values(myOrderMap);
+    let yourOrderList = Object.values(yourOrderMap);
 
-    for (let myOrder of myOrderList) {
-      if (myOrder.status === 'pending') {
-        let currentHeight = processedHeights[myOrder.sourceChain];
-        if (currentHeight >= myOrder.submitExpiryHeight) {
-          delete myOrderMap[myOrder.id];
+    for (let yourOrder of yourOrderList) {
+      if (yourOrder.status === 'pending') {
+        let currentHeight = processedHeights[yourOrder.sourceChain];
+        if (currentHeight >= yourOrder.submitExpiryHeight) {
+          delete yourOrderMap[yourOrder.id];
         }
         continue;
       }
-      if (transferOrderIds.has(myOrder.id)) {
-        if (myOrder.status === 'pending') {
-          myOrder.status = 'processing';
-        } else if (myOrder.status === 'ready') {
-          myOrder.status = 'matching';
+      if (transferOrderIds.has(yourOrder.id)) {
+        if (yourOrder.status === 'pending') {
+          yourOrder.status = 'processing';
+        } else if (yourOrder.status === 'ready') {
+          yourOrder.status = 'matching';
         }
       } else {
-        if (!orderBookIds.has(myOrder.id)) {
-          delete myOrderMap[myOrder.id];
+        if (!orderBookIds.has(yourOrder.id)) {
+          delete yourOrderMap[yourOrder.id];
           continue;
         }
-        if (myOrder.status === 'matching') {
-          myOrder.status = 'ready';
+        if (yourOrder.status === 'matching') {
+          yourOrder.status = 'ready';
         }
       }
     }
@@ -300,25 +334,18 @@ class App extends React.Component {
     let newState = {
       orderBookData: { bids, asks, maxSize },
       maxBid, minAsk,
-      myOrders: Object.values(myOrderMap)
+      yourOrders: Object.values(yourOrderMap)
     };
 
     this.setState(newState);
   }
 
-  componentDidMount() {
-    // Enable navigation prompt
-    window.onbeforeunload = (e) => {
-      //this.setDisplayLeaveWarning(true);
-      //e.preventDefault();
-      //return true;
-    };
-  }
-
   componentDidUpdate() {
     if (this.state.configurationLoaded && !this.intervalRegistered) {
       this.refreshOrderbook();
-      setInterval(this.refreshOrderbook, this.state.configuration.refreshInterval);
+      setInterval(async () => {
+        this.refreshOrderbook();
+      }, this.state.configuration.refreshInterval);
       this.intervalRegistered = true;
     }
   }
@@ -331,11 +358,11 @@ class App extends React.Component {
     const keys = {};
     let atLeastOneKey = false;
     for (const asset in payload) {
-      console.log(payload);
       if (payload[asset] !== undefined) {
         atLeastOneKey = true;
         const passphrase = payload[asset].trim();
         if (!Mnemonic.validateMnemonic(passphrase, Mnemonic.wordlists.english)) {
+          delete keys[asset];
           this.setState({ signInFailure: true });
           return;
         } else {
@@ -355,7 +382,7 @@ class App extends React.Component {
   }
 
   signOut = () => {
-    this.setState({ signedIn: false, keys: {} });
+    this.setState({ signedIn: false, keys: {}, yourOrders: [] });
   }
 
   setDisplayLeaveWarning = (val) => {
@@ -381,13 +408,13 @@ class App extends React.Component {
         </div>
         <div className="container">
           <div className="notifications">
-            {this.state.notifications.map((data, i) => <Notification key={i} data={data}></Notification>)}
+            {this.state.notifications.map(data => <Notification key={data.id} data={data}></Notification>)}
           </div>
           <div className="sell-panel">
-            <PlaceOrder side="ask" orderSubmit={this.orderSubmit}></PlaceOrder>
+            <PlaceOrder side="ask" orderSubmit={this.orderSubmit} orderSubmitError={this.orderSubmitError} enabled={this.state.keys[this.state.activeAssets[0]] && this.state.keys[this.state.activeAssets[1]]}></PlaceOrder>
           </div>
           <div className="buy-panel">
-            <PlaceOrder side="bid" orderSubmit={this.orderSubmit}></PlaceOrder>
+            <PlaceOrder side="bid" orderSubmit={this.orderSubmit} orderSubmitError={this.orderSubmitError} enabled={this.state.keys[this.state.activeAssets[0]] && this.state.keys[this.state.activeAssets[1]]}></PlaceOrder>
           </div>
           <div className="orderbook-container">
             <div className="sell-orders">
@@ -404,7 +431,7 @@ class App extends React.Component {
             <Chart whole={Math.pow(10, 8)} activeAssets={this.state.activeAssets}></Chart>
           </div>
           <div className="your-orders">
-            <YourOrders orders={this.state.myOrders} orderCanceled={this.orderCancel}></YourOrders>
+            <YourOrders orders={this.state.yourOrders} orderCanceled={this.orderCancel}></YourOrders>
           </div>
           <div className="market-name-and-stats">
             <MarketList markets={this.state.configuration.markets} refreshInterval={this.state.configuration.refreshInterval}></MarketList>

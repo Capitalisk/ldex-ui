@@ -11,7 +11,7 @@ export default class Notification extends React.Component {
 
   render() {
     return (
-      <div className={`notification-container ${this.props.data.isActive ? 'active': 'inactive'}`}>
+      <div className={`notification-container ${this.props.data.isActive ? 'active': 'inactive'} ${this.props.data.isError ? 'error': 'info'}`}>
         {this.props.data.message}
       </div>
     );
