@@ -445,7 +445,7 @@ class App extends React.Component {
               <Orderbook orderBookData={this.state.orderBookData} side="asks"></Orderbook>
             </div>
             <div className="price-display">
-              Price: {this.state.maxBid} {this.state.activeAssets[1].toUpperCase()}
+              Price: {this.state.minAsk} {this.state.activeAssets[1].toUpperCase()}
             </div>
             <div className="buy-orders">
               <Orderbook orderBookData={this.state.orderBookData} side="bids"></Orderbook>
