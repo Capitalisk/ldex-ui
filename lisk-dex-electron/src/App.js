@@ -390,7 +390,7 @@ class App extends React.Component {
           this.setState({ signInFailure: true });
           return;
         } else {
-          const address = (cryptography.getAddressAndPublicKeyFromPassphrase(passphrase)).address;
+          const address = cryptography.getAddressAndPublicKeyFromPassphrase(passphrase).address;
           keys[asset] = { address, passphrase };
         }
       }
@@ -399,6 +399,10 @@ class App extends React.Component {
       await this.setState({ keys, signedIn: true, displaySigninModal: false });
       this.refreshOrderbook();
     }
+  }
+
+  walletGenerated = (address) => {
+    this.notify(`Created wallet ${address}! Please store the passphrase in a safe place!`);
   }
 
   closeSignInModal = () => {
@@ -419,7 +423,7 @@ class App extends React.Component {
     }
     return <>
       <userContext.Provider value={{ ...this.state }}>
-        {this.state.displaySigninModal && <SignInModal failure={this.state.signInFailure} passphraseSubmit={this.passphraseSubmit} enabledAssets={this.state.enabledAssets} close={this.closeSignInModal}></SignInModal>}
+        {this.state.displaySigninModal && <SignInModal failure={this.state.signInFailure} passphraseSubmit={this.passphraseSubmit} enabledAssets={this.state.enabledAssets} close={this.closeSignInModal} walletGenerated={this.walletGenerated}></SignInModal>}
         {this.state.displayLeaveWarning && <LeaveWarning setDisplayLeaveWarning={this.setDisplayLeaveWarning}></LeaveWarning>}
         <div className="top-bar">
           <div>
