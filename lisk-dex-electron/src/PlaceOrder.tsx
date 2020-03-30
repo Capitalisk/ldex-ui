@@ -1,5 +1,5 @@
-import React from "react";
-import "./PlaceOrder.css";
+import React from 'react';
+import './PlaceOrder.css';
 import BalanceDisplay from './BalanceDisplay';
 import { userContext } from './context';
 import * as transactions from '@liskhq/lisk-transactions';
@@ -222,9 +222,9 @@ export default class PlaceOrder extends React.Component<any, any> {
   render() {
     let canTrade = this.props.enabled;
     return (
-      <div style={{ padding: "5px" }}>
+      <div style={{ padding: '5px' }}>
         <div className="action-name">{this.props.side === 'bid' ? 'BUY' : 'SELL'}</div>
-        <div style={{ marginBottom: "10px" }}>
+        <div style={{ marginBottom: '10px' }}>
           <button className="tab-button" disabled={this.state.marketMode} onClick={this.switchMode}>Market</button>
           <button className="tab-button" disabled={!this.state.marketMode} onClick={this.switchMode}>Limit</button>
         </div>

@@ -1,5 +1,5 @@
-import React from "react";
-import "./SignInModal.css";
+import React from 'react';
+import './SignInModal.css';
 
 export default class PlaceOrder extends React.Component {
   constructor(props) {

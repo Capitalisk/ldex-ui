@@ -1,7 +1,7 @@
-import React from "react";
+import React from 'react';
 import axios from 'axios';
 import { userContext } from './context';
-import "./App.css";
+import './App.css';
 
 export default class BalanceDisplay extends React.Component<any, any> {
   static contextType = userContext;
@@ -22,7 +22,6 @@ export default class BalanceDisplay extends React.Component<any, any> {
       const targetEndpoint = this.context.configuration.assets[this.props.asset].apiUrl;
       c.get(`${targetEndpoint}/accounts?address=${this.context.keys[this.props.asset].address}`)
         .then((data) => {
-          // "data" :))
           if (data.data.data.length > 0) {
             this.setState({ 'balance': data.data.data[0].balance });
           }

@@ -1,12 +1,12 @@
-import React from "react";
-import "./App.css";
+import React from 'react';
+import './App.css';
 
-import Orderbook from "./Orderbook";
-import Chart from "./Chart";
-import PlaceOrder from "./PlaceOrder";
-import YourOrders from "./YourOrders";
-import SignInModal from "./SignInModal";
-import SignInState from "./SignInState";
+import Orderbook from './Orderbook';
+import Chart from './Chart';
+import PlaceOrder from './PlaceOrder';
+import YourOrders from './YourOrders';
+import SignInModal from './SignInModal';
+import SignInState from './SignInState';
 import {
   getOrderbook,
   getAsksFromWallet,
@@ -14,14 +14,14 @@ import {
   getPendingTransfers,
   getProcessedHeights,
   getClient
-} from "./API";
-import MarketList from "./MarketList";
-import Notification from "./Notification";
+} from './API';
+import MarketList from './MarketList';
+import Notification from './Notification';
 import { userContext } from './context';
-import * as cryptography from "@liskhq/lisk-cryptography";
-import * as passphrase from "@liskhq/lisk-passphrase";
-import LeaveWarning from "./LeaveWarning";
-import { processConfiguration, defaultConfiguration } from "./util/Configuration";
+import * as cryptography from '@liskhq/lisk-cryptography';
+import * as passphrase from '@liskhq/lisk-passphrase';
+import LeaveWarning from './LeaveWarning';
+import { processConfiguration, defaultConfiguration } from './util/Configuration';
 
 // get what we're actually using from the passphrase library.
 const { Mnemonic } = passphrase;

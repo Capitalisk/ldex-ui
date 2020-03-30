@@ -1,5 +1,5 @@
-import React from "react";
-import "./PlaceOrder.css";
+import React from 'react';
+import './PlaceOrder.css';
 import UserOrder from './UserOrder';
 
 const statusValues = {
@@ -23,7 +23,7 @@ export default class YourOrders extends React.Component {
 
   handleChange(event) {
     const target = event.target;
-    const value = target.type === "checkbox" ? target.checked : target.value;
+    const value = target.type === 'checkbox' ? target.checked : target.value;
     const name = target.name;
 
     this.setState({
@@ -64,7 +64,7 @@ export default class YourOrders extends React.Component {
     let asks = orders.filter(order => order.side === 'ask');
     return (
       <>
-        <div style={{ padding: "5px" }}>
+        <div style={{ padding: '5px' }}>
           <div className="action-name">YOUR ORDERS</div>
         </div>
         <div style={{ width: '100%', margin: 0, padding: 0, display: 'flex' }}>

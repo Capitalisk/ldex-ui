@@ -1,5 +1,5 @@
-import React from "react";
-import "./PlaceOrder.css";
+import React from 'react';
+import './PlaceOrder.css';
 
 export default class MarketList extends React.Component {
   constructor(props) {
@@ -13,7 +13,7 @@ export default class MarketList extends React.Component {
 
   handleChange(event) {
     const target = event.target;
-    const value = target.type === "checkbox" ? target.checked : target.value;
+    const value = target.type === 'checkbox' ? target.checked : target.value;
     const name = target.name;
 
     this.setState({
@@ -28,7 +28,7 @@ export default class MarketList extends React.Component {
   render() {
     return (
       <>
-        <div style={{ padding: "10px" }}>
+        <div style={{ padding: '10px' }}>
           <div className="action-name">MARKETS</div>
           {Object.keys(this.props.markets).map(marketSymbol => {
             return (
