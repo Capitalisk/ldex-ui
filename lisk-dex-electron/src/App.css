@@ -32,12 +32,14 @@
   grid-row: 2 / 3;
   background-color: #1a1c1c;
   border-bottom: 1px dashed black;
+  overflow-y: auto;
 }
 
 .sell-panel {
   grid-column: 1;
   grid-row: 1 / 2;
   background-color: #1a1c1c;
+  overflow-y: auto;
 }
 
 .sell-orders {

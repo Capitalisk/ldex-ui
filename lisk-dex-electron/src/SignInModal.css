@@ -1,13 +1,12 @@
 #sign-in-modal {
     position: absolute;
     z-index: 2;
-    top: 100px;
+    top: calc(50% - 310px);
     left: 25%;
     width: 50%;
-    box-shadow: 10px 10px 5px black;
     padding: 45px;
     background-color: rgb(27, 27, 27);
-    height: 550px;
+    height: 530px;
 }
 
 #sign-in-textarea {
