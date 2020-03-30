@@ -452,7 +452,7 @@ class App extends React.Component {
             </div>
           </div>
           <div className="depth-chart">
-            <Chart whole={Math.pow(10, 8)} activeAssets={this.state.activeAssets}></Chart>
+            <Chart whole={Math.pow(10, 8)} activeAssets={this.state.activeAssets} orderBookData={this.state.orderBookData}></Chart>
           </div>
           <div className="your-orders">
             <YourOrders orders={this.state.yourOrders} orderCanceled={this.orderCancel}></YourOrders>
