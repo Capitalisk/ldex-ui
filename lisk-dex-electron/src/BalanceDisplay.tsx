@@ -29,6 +29,10 @@ export default class BalanceDisplay extends React.Component<any, any> {
     }
   }
 
+  componentWillUnmount() {
+    clearInterval(this.interval);
+  }
+
   render() {
     // Note: don't use context for dynamic or frequently changed content.
     // This implementation is a mistake, but I am keeping it as lesson on what not to do.

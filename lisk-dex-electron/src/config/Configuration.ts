@@ -49,6 +49,7 @@ export interface DEXConfiguration {
             dexOptions: {
                 version: string,
                 baseChain: string,
+                priceDecimalPrecision: number,
                 chainsWhitelist: Array<string>,
                 chains: {
                     [symbol: string]: {

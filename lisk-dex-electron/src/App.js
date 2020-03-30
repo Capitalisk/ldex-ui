@@ -21,7 +21,7 @@ import { userContext } from './context';
 import * as cryptography from '@liskhq/lisk-cryptography';
 import * as passphrase from '@liskhq/lisk-passphrase';
 import LeaveWarning from './LeaveWarning';
-import { processConfiguration, defaultConfiguration } from './util/Configuration';
+import { processConfiguration, defaultConfiguration } from './config/Configuration';
 
 // get what we're actually using from the passphrase library.
 const { Mnemonic } = passphrase;
@@ -112,20 +112,30 @@ class App extends React.Component {
 
   orderSubmitError = async (error) => {
     let order = error.order;
+    let errorDetails;
+    if (
+      error.response.data &&
+      error.response.data.errors &&
+      error.response.data.errors.length &&
+      error.response.data.errors[0].message
+    ) {
+      errorDetails = error.response.data.errors[0].message;
+    } else {
+      errorDetails = 'Check your connection';
+    }
     let unitValue = this.state.configuration.assets[order.sourceChain].unitValue;
     let chainSymbol = order.sourceChain.toUpperCase();
-
     let message;
     if (order.type === 'limit') {
       message = `Failed to submit the limit order with amount ${
         Math.round((order.value || order.size) * 100 / unitValue) / 100
       } ${chainSymbol} at price ${
         order.price
-      } - Check your connection.`;
+      } - ${errorDetails}.`;
     } else {
       message = `Failed to submit the market order with amount ${
         Math.round((order.value || order.size) * 100 / unitValue) / 100
-      } ${chainSymbol} - Check your connection.`;
+      } ${chainSymbol} - ${errorDetails}.`;
     }
     this.notify(message, true);
   }
@@ -221,16 +231,19 @@ class App extends React.Component {
       getOrderbook(dexClient),
       getProcessedHeights(dexClient)
     ];
-    if (this.state.keys[baseAsset] && this.state.keys[quoteAsset]) {
-      let baseWalletAddress = this.state.keys[baseAsset].address;
+    if (this.state.keys[quoteAsset]) {
       let quoteWalletAddress = this.state.keys[quoteAsset].address;
       apiResults.push(getAsksFromWallet(dexClient, quoteWalletAddress));
-      apiResults.push(getBidsFromWallet(dexClient, baseWalletAddress));
       apiResults.push(getPendingTransfers(dexClient, quoteAsset, quoteWalletAddress));
-      apiResults.push(getPendingTransfers(dexClient, baseAsset, baseWalletAddress));
     } else {
       apiResults.push(Promise.resolve([]));
       apiResults.push(Promise.resolve([]));
+    }
+    if (this.state.keys[baseAsset]) {
+      let baseWalletAddress = this.state.keys[baseAsset].address;
+      apiResults.push(getBidsFromWallet(dexClient, baseWalletAddress));
+      apiResults.push(getPendingTransfers(dexClient, baseAsset, baseWalletAddress));
+    } else {
       apiResults.push(Promise.resolve([]));
       apiResults.push(Promise.resolve([]));
     }
@@ -239,8 +252,8 @@ class App extends React.Component {
       orders,
       processedHeights,
       yourAsks,
-      yourBids,
       pendingQuoteAssetTransfers,
+      yourBids,
       pendingBaseAssetTransfers
     ] = await Promise.all(apiResults);
 
@@ -439,10 +452,10 @@ class App extends React.Component {
             {this.state.notifications.map(data => <Notification key={data.id} data={data}></Notification>)}
           </div>
           <div className="sell-panel">
-            <PlaceOrder side="ask" orderSubmit={this.orderSubmit} orderSubmitError={this.orderSubmitError} enabled={this.state.keys[this.state.activeAssets[0]] && this.state.keys[this.state.activeAssets[1]]}></PlaceOrder>
+            <PlaceOrder side="ask" orderSubmit={this.orderSubmit} orderSubmitError={this.orderSubmitError}></PlaceOrder>
           </div>
           <div className="buy-panel">
-            <PlaceOrder side="bid" orderSubmit={this.orderSubmit} orderSubmitError={this.orderSubmitError} enabled={this.state.keys[this.state.activeAssets[0]] && this.state.keys[this.state.activeAssets[1]]}></PlaceOrder>
+            <PlaceOrder side="bid" orderSubmit={this.orderSubmit} orderSubmitError={this.orderSubmitError}></PlaceOrder>
           </div>
           <div className="orderbook-container">
             <div className="sell-orders">

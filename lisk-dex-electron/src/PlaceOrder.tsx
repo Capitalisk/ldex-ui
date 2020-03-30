@@ -47,6 +47,7 @@ export default class PlaceOrder extends React.Component<any, any> {
   validateOrder = () => {
     let success = true;
     let dexOptions = this.context.configuration.markets[this.context.activeMarket].dexOptions;
+    let priceDecimalPrecision = dexOptions.priceDecimalPrecision;
     let sourceAsset = this.props.side === 'bid' ? this.context.activeAssets[1] : this.context.activeAssets[0];
     let unitValue = this.context.configuration.assets[sourceAsset].unitValue;
     let minOrderAmount = dexOptions.chains[sourceAsset].minOrderAmount / unitValue;
@@ -56,25 +57,28 @@ export default class PlaceOrder extends React.Component<any, any> {
     };
     if (!this.state.marketMode) {
       if (isNaN(this.state.price) || this.state.price === '') {
-        errors.price = 'The order price must be a number';
+        errors.price = 'The order price must be a number.';
         success = false;
       } else {
         let price = parseFloat(this.state.price);
         if (price === 0) {
-          errors.price = 'The order price cannot be 0';
+          errors.price = 'The order price cannot be 0.';
+          success = false;
+        } else if (priceDecimalPrecision != null && (this.state.price.toString().split('.')[1] || '').length > priceDecimalPrecision) {
+          errors.price = `The order price for this DEX market cannot have more than ${priceDecimalPrecision} decimal place${priceDecimalPrecision === 1 ? '' : 's'}.`;
           success = false;
         }
       }
     }
     if (isNaN(this.state.amount) || this.state.amount === '') {
-      errors.amount = 'The order amount must be a number';
+      errors.amount = 'The order amount must be a number.';
       success = false;
     } else {
       let amount = parseFloat(this.state.amount);
       if (amount < minOrderAmount) {
         errors.amount = `The specified amount was less than the minimum order amount allowed by this DEX market which is ${
           minOrderAmount
-        } ${sourceAsset.toUpperCase()}`;
+        } ${sourceAsset.toUpperCase()}.`;
         success = false;
       }
     }
@@ -159,6 +163,7 @@ export default class PlaceOrder extends React.Component<any, any> {
               await axios.post(`${broadcastURL}/transactions`, tx);
             } catch (err) {
               let error: any = new Error(`Failed to post market order because of error: ${err.message}`);
+              error.response = err.response;
               error.order = this.generateOrder(tx, 'market', sourceChain, targetChain, this.props.side);
               this.props.orderSubmitError && this.props.orderSubmitError(error);
               this.setState({isSubmitting: false});
@@ -206,6 +211,7 @@ export default class PlaceOrder extends React.Component<any, any> {
               await axios.post(`${broadcastURL}/transactions`, tx);
             } catch (err) {
               let error: any = new Error(`Failed to post limit order because of error: ${err.message}`);
+              error.response = err.response;
               error.order = this.generateOrder(tx, 'limit', sourceChain, targetChain, this.props.side, parseFloat(this.state.price));
               this.props.orderSubmitError && this.props.orderSubmitError(error);
               this.setState({isSubmitting: false});
@@ -220,7 +226,7 @@ export default class PlaceOrder extends React.Component<any, any> {
   }
 
   render() {
-    let canTrade = this.props.enabled;
+    let canTrade = this.context.keys[this.context.activeAssets[0]] && this.context.keys[this.context.activeAssets[1]];
     return (
       <div style={{ padding: '5px' }}>
         <div className="action-name">{this.props.side === 'bid' ? 'BUY' : 'SELL'}</div>
@@ -228,10 +234,10 @@ export default class PlaceOrder extends React.Component<any, any> {
           <button className="tab-button" disabled={this.state.marketMode} onClick={this.switchMode}>Market</button>
           <button className="tab-button" disabled={!this.state.marketMode} onClick={this.switchMode}>Limit</button>
         </div>
-        {(this.props.side === 'bid') &&
+        {this.props.side === 'bid' && this.context.keys[this.context.activeAssets[1]] &&
           <BalanceDisplay whole={Math.pow(10, 8)} asset={this.context.activeAssets[1]}></BalanceDisplay>
         }
-        {(this.props.side === 'ask') &&
+        {this.props.side === 'ask' && this.context.keys[this.context.activeAssets[0]] &&
           <BalanceDisplay whole={Math.pow(10, 8)} asset={this.context.activeAssets[0]}></BalanceDisplay>
         }
         {canTrade &&
