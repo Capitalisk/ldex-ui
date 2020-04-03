@@ -70,7 +70,7 @@ export default class PlaceOrder extends React.Component {
   }
 
   render() {
-    const styles = { border: '1px solid red', height: '46px' };
+    const styles = { border: '1px solid red' };
     if (!this.props.failure) {
       styles.border = '1px solid grey';
     }
@@ -79,8 +79,8 @@ export default class PlaceOrder extends React.Component {
       passphraseTextareas.push(
         <div key={asset} style={{ marginBottom: '20px' }}>
           <span>Passphrase for {asset.toUpperCase()}: </span>
-          <textarea style={styles} rows={4} name={asset} id="sign-in-textarea" value={this.state[asset]} onChange={this.handleChange} />
-          <button className="button-secondary" name={asset} onClick={this.handleWalletCreate} style={{ marginRight: '10px' }}>Generate wallet</button> {this.state.addresses[asset] && <span>Wallet address: {this.state.addresses[asset]}</span>}
+          <textarea style={styles} rows={4} name={asset} className="sign-in-textarea" value={this.state[asset]} onChange={this.handleChange} />
+          <button className="button-secondary" name={asset} onClick={this.handleWalletCreate} style={{ marginRight: '10px' }}>Generate wallet</button> {this.state.addresses[asset] && <span className="generated-wallet-address">Wallet address: {this.state.addresses[asset]}</span>}
         </div>
       );
     }

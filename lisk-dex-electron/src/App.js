@@ -441,10 +441,10 @@ class App extends React.Component {
         <div className="top-bar">
           <div>
             <b style={{ fontSize: '21px' }}>{this.state.configuration.appTitle}</b> &nbsp;
-            <a style={{ color: '#34cfeb', fontSize: '14px' }} href={this.state.configuration.feedbackLink.url} rel="noopener noreferrer" target="_blank">{this.state.configuration.feedbackLink.text}</a>
+            <a className="feedback-link" style={{ color: '#34cfeb', fontSize: '14px' }} href={this.state.configuration.feedbackLink.url} rel="noopener noreferrer" target="_blank">{this.state.configuration.feedbackLink.text}</a>
           </div>
           <div>
-            <SignInState showSignIn={this.showSignIn} keys={this.state.keys} signedIn={this.state.signedIn} signOut={this.signOut}></SignInState>
+            <SignInState className="sign-in-state" showSignIn={this.showSignIn} keys={this.state.keys} signedIn={this.state.signedIn} signOut={this.signOut}></SignInState>
           </div>
         </div>
         <div className="container">

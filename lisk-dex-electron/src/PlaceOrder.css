@@ -49,3 +49,11 @@
 .place-sell-order-button[disabled] {
   cursor: default;
 }
+
+@media only screen and (max-width: 400px) {
+  .market-limit-tabs {
+    display: flex;
+    flex-direction: column;
+    margin-right: 10px;
+  }
+}

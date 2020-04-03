@@ -230,7 +230,7 @@ export default class PlaceOrder extends React.Component<any, any> {
     return (
       <div style={{ padding: '5px' }}>
         <div className="action-name">{this.props.side === 'bid' ? 'BUY' : 'SELL'}</div>
-        <div style={{ marginBottom: '10px' }}>
+        <div className="market-limit-tabs" style={{ marginBottom: '10px' }}>
           <button className="tab-button" disabled={this.state.marketMode} onClick={this.switchMode}>Market</button>
           <button className="tab-button" disabled={!this.state.marketMode} onClick={this.switchMode}>Limit</button>
         </div>

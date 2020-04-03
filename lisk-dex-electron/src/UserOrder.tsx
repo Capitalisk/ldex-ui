@@ -36,7 +36,7 @@ export default class UserOrder extends React.Component<any, any> {
     let orderStatusClass = `order-${this.props.order.status || 'default'}`;
 
     return (
-      <div className={orderStatusClass} style={{ width: '100%', fontSize: '14px', backgroundColor: this.props.side === 'bid' ? '#286113' : '#700d0d', borderBottom: '1px solid black', padding: '2px', boxSizing: 'border-box' }}>
+      <div className={`your-order-entry ${orderStatusClass}`} style={{ width: '100%', fontSize: '14px', backgroundColor: this.props.side === 'bid' ? '#286113' : '#700d0d', borderBottom: '1px solid black', padding: '2px', boxSizing: 'border-box' }}>
         {(amountRemaining / Math.pow(10, 8)).toFixed(4)}/{(amount / Math.pow(10, 8)).toFixed(4)}
         {(this.props.order.status === 'ready' || this.props.order.status === 'matching') && <button className="cancel-order-button" onClick={this.cancelOrder}>Cancel</button>}
         {this.props.order.status !== 'ready' && <div className="lds-dual-ring" style={{ float: 'right', marginRight: '10px' }}></div>}

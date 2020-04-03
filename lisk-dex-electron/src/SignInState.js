@@ -21,7 +21,7 @@ export default class SignInState extends React.Component {
           </button>
         }
         {this.props.signedIn &&
-          <span style={{ fontSize: '12px', marginRight: '10px' }}>Signed in as {addressesInfo}</span>
+          <span style={{ fontSize: '12px', marginRight: '10px' }}>Signed in<span className="sign-in-state-address"> as {addressesInfo}</span></span>
         }
         {this.props.signedIn &&
           <button onClick={this.props.signOut} className="button-primary">
