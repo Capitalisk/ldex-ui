@@ -21,7 +21,7 @@
 }
 
 .notification-container {
-  position: absolute;
+  position: fixed;
   z-index: 1000;
   top: 4px;
   color: #000000;
