@@ -13,6 +13,7 @@ export interface UnprocessedDEXConfiguration {
         [symbol: string]: {
             name: string,
             apiUrl: string,
+            apiMaxPageSize?: number,
             unitValue: number,
             processingHeightExpiry: number
         }
@@ -38,6 +39,7 @@ export interface DEXConfiguration {
         [symbol: string]: {
             name: string,
             apiUrl: string,
+            apiMaxPageSize?: number,
             unitValue: number,
             processingHeightExpiry: number
         }
@@ -81,12 +83,14 @@ export const defaultConfiguration: UnprocessedDEXConfiguration = {
             name: 'Lisk testnet',
             apiUrl: 'https://test-02.liskapi.io/api',
             unitValue: 100000000,
+            apiMaxPageSize: 100,
             processingHeightExpiry: 5
         },
         'lsh': {
             name: 'Leasehold testnet',
             apiUrl: 'http://18.206.164.187:7010/api',
             unitValue: 100000000,
+            apiMaxPageSize: 100,
             processingHeightExpiry: 5
         }
     },

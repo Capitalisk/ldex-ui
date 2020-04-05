@@ -2,7 +2,7 @@ import React from 'react';
 import './App.css';
 
 import Orderbook from './Orderbook';
-import Chart from './Chart';
+import PriceHistoryChart from './PriceHistoryChart';
 import PlaceOrder from './PlaceOrder';
 import YourOrders from './YourOrders';
 import SignInModal from './SignInModal';
@@ -21,12 +21,15 @@ import { userContext } from './context';
 import * as cryptography from '@liskhq/lisk-cryptography';
 import * as passphrase from '@liskhq/lisk-passphrase';
 import LeaveWarning from './LeaveWarning';
+import axios from 'axios';
 import { processConfiguration, defaultConfiguration } from './config/Configuration';
 
 // get what we're actually using from the passphrase library.
 const { Mnemonic } = passphrase;
 
 const NOTIFICATIONS_MAX_QUEUE_LENGTH = 3;
+const DEFAULT_API_MAX_PAGE_SIZE = 100;
+const DEFAULT_PRICE_DECIMAL_PRECISION = 4;
 
 class App extends React.Component {
   constructor(props) {
@@ -41,6 +44,7 @@ class App extends React.Component {
       // new, activeMarket string for selecting the active market out of the configuration object.
       activeMarket: '',
       enabledAssets: [],
+      priceHistory: [],
       displaySigninModal: false,
       signedIn: false,
       signInFailure: false,
@@ -62,13 +66,16 @@ class App extends React.Component {
           address: ''
         },
         */
-      }
+      },
+      windowWidth: 0,
+      windowHeight: 0
     };
 
     this.notificationId = 0;
     this.showSignIn = this.showSignIn.bind(this);
     this.intervalRegistered = false;
     this.passphraseSubmit = this.passphraseSubmit.bind(this);
+    this.updateWindowDimensions = this.updateWindowDimensions.bind(this);
     this.loadConfiguration();
   }
 
@@ -82,6 +89,103 @@ class App extends React.Component {
       activeAssets: configuration.markets[defaultMarketKey].assets,
       enabledAssets: Object.keys(configuration.assets),
       configurationLoaded: true
+    });
+  }
+
+  getCounterpartyOrderIdFromTransaction(transaction) {
+    // TODO: Match order id based on position in protocol argument list instead of regex.
+    const counterpartyOrderIdRegex = /,[0-9]+:/g;
+
+    let transactionData = transaction.asset.data || '';
+    let matches = transactionData.match(counterpartyOrderIdRegex);
+    if (matches) {
+      let match = matches[0];
+      return match.slice(1, match.length - 1);
+    }
+    return null;
+  }
+
+  refreshPriceHistory = async () => {
+    try {
+      await this._refreshPriceHistory();
+    } catch (error) {
+      console.error(error);
+      this.notify('Failed to refresh the market price history - Check your connection.', true);
+    }
+  }
+
+  _refreshPriceHistory = async () => {
+    let [quoteChainTxns, baseChainTxns] = await Promise.all(
+      this.state.activeAssets.map(async (assetSymbol) => {
+        let asset = this.state.configuration.assets[assetSymbol];
+        let client = axios.create();
+        let targetEndpoint = asset.apiUrl;
+        let dexOptions =  this.state.configuration.markets[this.state.activeMarket].dexOptions;
+        let dexWalletAddress = dexOptions.chains[assetSymbol].walletAddress
+        let result = await client.get(
+          `${targetEndpoint}/transactions?senderId=${
+            dexWalletAddress
+          }&limit=${
+            asset.apiMaxPageSize || DEFAULT_API_MAX_PAGE_SIZE
+          }&sort=timestamp:desc`
+        );
+        return result.data.data;
+      })
+    );
+
+    let quoteChainTxnMap = {};
+
+    for (let txn of quoteChainTxns) {
+      let counterPartyOrderId = this.getCounterpartyOrderIdFromTransaction(txn);
+      quoteChainTxnMap[counterPartyOrderId] = txn;
+    }
+
+    let txnPairsMap = {};
+
+    for (let txn of baseChainTxns) {
+      let counterPartyOrderId = this.getCounterpartyOrderIdFromTransaction(txn);
+      let counterPartyTxn = quoteChainTxnMap[counterPartyOrderId];
+      if (counterPartyTxn) {
+        // Group base chain orders which were matched with the same counterparty order together.
+        if (!txnPairsMap[counterPartyOrderId]) {
+          txnPairsMap[counterPartyOrderId] = {
+            base: [],
+            quote: counterPartyTxn
+          };
+        }
+        let txnPair = txnPairsMap[counterPartyOrderId];
+        txnPair.base.push(txn)
+      }
+    }
+    let priceHistory = [];
+    let txnPairsList = Object.values(txnPairsMap);
+    for (let txnPair of txnPairsList) {
+      let dexOptions =  this.state.configuration.markets[this.state.activeMarket].dexOptions;
+      let priceDecimalPrecision = dexOptions.priceDecimalPrecision == null ? DEFAULT_PRICE_DECIMAL_PRECISION : dexOptions.priceDecimalPrecision;
+      let baseChainOptions = dexOptions.chains[this.state.activeAssets[1]];
+      let baseChainFeeBase = baseChainOptions.exchangeFeeBase;
+      let baseChainFeeRate = baseChainOptions.exchangeFeeRate;
+      let baseTotalAmount = txnPair.base.reduce((accumulator, txn) => accumulator + Number(txn.amount) / (1 - baseChainFeeRate), 0);
+      let baseTotalFee = txnPair.base.reduce((accumulator, txn) => accumulator + Number(baseChainFeeBase), 0);
+      let fullBaseAmount = baseTotalAmount + baseTotalFee;
+
+      let quoteChainOptions = dexOptions.chains[this.state.activeAssets[0]];
+      let quoteChainFeeBase = quoteChainOptions.exchangeFeeBase;
+      let quoteChainFeeRate = quoteChainOptions.exchangeFeeRate;
+
+      let fullQuoteAmount = Number(txnPair.quote.amount) / (1 - quoteChainFeeRate) + Number(quoteChainFeeBase);
+      let price = Number((fullBaseAmount / fullQuoteAmount).toFixed(priceDecimalPrecision));
+      priceHistory.push({
+        timestamp: txnPair.base[txnPair.base.length - 1].timestamp,
+        price,
+        volume: Math.round(fullBaseAmount / 1000000) / 100
+      });
+    }
+
+    priceHistory.reverse();
+
+    this.setState({
+      priceHistory
     });
   }
 
@@ -313,12 +417,13 @@ class App extends React.Component {
       return transactionData.charAt(0);
     };
 
+    // TODO: Match order id based on position in protocol argument list instead of regex.
     const originOrderIdRegexT1 = /,[0-9]+:/g;
-    const originOrderIdRegexT2 = /,[0-9]+,/g;
+    const originOrderIdRegexOthers = /,[0-9]+,/g;
 
     const getOriginOrderId = (pendingTransfer) => {
       let transactionData = pendingTransfer.transaction.asset.data || '';
-      let regex = transactionData.slice(0, 2) === 't1' ? originOrderIdRegexT1 : originOrderIdRegexT2;
+      let regex = transactionData.slice(0, 2) === 't1' ? originOrderIdRegexT1 : originOrderIdRegexOthers;
       let matches = transactionData.match(regex);
       if (matches) {
         let match = matches[0];
@@ -380,8 +485,10 @@ class App extends React.Component {
   componentDidUpdate() {
     if (this.state.configurationLoaded && !this.intervalRegistered) {
       this.refreshOrderbook();
+      this.refreshPriceHistory();
       setInterval(async () => {
         this.refreshOrderbook();
+        this.refreshPriceHistory();
       }, this.state.configuration.refreshInterval);
       this.intervalRegistered = true;
     }
@@ -430,6 +537,19 @@ class App extends React.Component {
     this.setState({ displayLeaveWarning: val });
   }
 
+  componentDidMount() {
+    this.updateWindowDimensions();
+    window.addEventListener('resize', this.updateWindowDimensions);
+  }
+
+  componentWillUnmount() {
+    window.removeEventListener('resize', this.updateWindowDimensions);
+  }
+
+  updateWindowDimensions() {
+    this.setState({ windowWidth: window.innerWidth, windowHeight: window.innerHeight });
+  }
+
   render() {
     if (!this.state.configurationLoaded) {
       return <div style={{ padding: '10px' }}>Loading...</div>
@@ -468,8 +588,17 @@ class App extends React.Component {
               <Orderbook orderBookData={this.state.orderBookData} side="bids"></Orderbook>
             </div>
           </div>
-          <div className="depth-chart">
-            <Chart whole={Math.pow(10, 8)} activeAssets={this.state.activeAssets} orderBookData={this.state.orderBookData}></Chart>
+          <div className="price-chart">
+            <PriceHistoryChart
+              key="price-history-chart"
+              type="hybrid"
+              market={this.state.activeMarket}
+              assets={this.state.activeAssets}
+              data={this.state.priceHistory}
+              windowWidth={this.state.windowWidth}
+              windowHeight={this.state.windowHeight}
+            >
+            </PriceHistoryChart>
           </div>
           <div className="your-orders">
             <YourOrders orders={this.state.yourOrders} orderCanceled={this.orderCancel}></YourOrders>

@@ -7,7 +7,7 @@ import am4themes_animated from '@amcharts/amcharts4/themes/animated';
 import am4themes_dark from '@amcharts/amcharts4/themes/dark';
 import { userContext } from './context';
 
-class Chart extends React.Component<any, any> {
+class OrderBookChart extends React.Component<any, any> {
   static contextType = userContext;
   chart = null;
   constructor(props, context) {
@@ -122,4 +122,4 @@ class Chart extends React.Component<any, any> {
   }
 }
 
-export default Chart;
+export default OrderBookChart;

@@ -29,6 +29,7 @@
     "react": "^16.10.2",
     "react-dom": "^16.10.2",
     "react-scripts": "^3.3.0",
+    "recharts": "^1.8.5",
     "sodium-native": "^2.4.9",
     "typescript": "^3.8.3"
   },

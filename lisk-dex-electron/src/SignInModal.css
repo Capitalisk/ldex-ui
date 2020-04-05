@@ -1,7 +1,7 @@
 #sign-in-modal {
     position: fixed;
     box-sizing: border-box;
-    z-index: 2;
+    z-index: 200;
     top: calc(50% - 321px);
     left: 25%;
     width: 50%;
@@ -22,7 +22,7 @@
     margin-bottom: 8px;
 }
 
-@media only screen and (max-width: 768px) {
+@media only screen and (max-width: 95px) {
   #sign-in-modal {
     padding: 20px;
     border: 0;
