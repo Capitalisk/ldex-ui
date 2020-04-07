@@ -22,7 +22,7 @@
     margin-bottom: 8px;
 }
 
-@media only screen and (max-width: 95px) {
+@media only screen and (max-width: 950px) {
   #sign-in-modal {
     padding: 20px;
     border: 0;
