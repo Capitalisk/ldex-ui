@@ -92,17 +92,24 @@ class App extends React.Component {
     });
   }
 
-  getCounterpartyOrderIdFromTransaction(transaction) {
+  getTakerOrderIdFromTransaction(transaction) {
     // TODO: Match order id based on position in protocol argument list instead of regex.
-    const counterpartyOrderIdRegex = /,[0-9]+:/g;
+    const takerOrderIdRegex = /,[0-9]+:/g;
 
     let transactionData = transaction.asset.data || '';
-    let matches = transactionData.match(counterpartyOrderIdRegex);
+    let matches = transactionData.match(takerOrderIdRegex);
     if (matches) {
       let match = matches[0];
       return match.slice(1, match.length - 1);
     }
     return null;
+  }
+
+  isMakerTransaction(transaction) {
+    const makerRegex = /^t2,/g;
+
+    let transactionData = transaction.asset.data || '';
+    return makerRegex.test(transactionData);
   }
 
   refreshPriceHistory = async () => {
@@ -133,47 +140,65 @@ class App extends React.Component {
       })
     );
 
-    let quoteChainTxnMap = {};
+    let quoteChainMakers = {};
+    let quoteChainTakers = {};
 
     for (let txn of quoteChainTxns) {
-      let counterPartyOrderId = this.getCounterpartyOrderIdFromTransaction(txn);
-      quoteChainTxnMap[counterPartyOrderId] = txn;
+      let isMaker = this.isMakerTransaction(txn);
+      let takerOrderId = this.getTakerOrderIdFromTransaction(txn);
+      if (isMaker) {
+        if (!quoteChainMakers[takerOrderId]) {
+          quoteChainMakers[takerOrderId] = [];
+        }
+        quoteChainMakers[takerOrderId].push(txn);
+      } else if (takerOrderId) {
+        quoteChainTakers[takerOrderId] = [txn];
+      }
     }
 
     let txnPairsMap = {};
 
     for (let txn of baseChainTxns) {
-      let counterPartyOrderId = this.getCounterpartyOrderIdFromTransaction(txn);
-      let counterPartyTxn = quoteChainTxnMap[counterPartyOrderId];
-      if (counterPartyTxn) {
+      let counterpartyTakerId = this.getTakerOrderIdFromTransaction(txn);
+      let counterpartyTxns = quoteChainMakers[counterpartyTakerId] || quoteChainTakers[counterpartyTakerId] || [];
         // Group base chain orders which were matched with the same counterparty order together.
-        if (!txnPairsMap[counterPartyOrderId]) {
-          txnPairsMap[counterPartyOrderId] = {
-            base: [],
-            quote: counterPartyTxn
-          };
-        }
-        let txnPair = txnPairsMap[counterPartyOrderId];
-        txnPair.base.push(txn)
+      if (!txnPairsMap[counterpartyTakerId]) {
+        txnPairsMap[counterpartyTakerId] = {
+          base: [],
+          quote: counterpartyTxns
+        };
       }
+      let txnPair = txnPairsMap[counterpartyTakerId];
+      txnPair.base.push(txn)
     }
+
     let priceHistory = [];
     let txnPairsList = Object.values(txnPairsMap);
+
+    // Pop out all entries which are definitely incompete or possibly incompete due to result limit.
+    while (txnPairsList.length) {
+      let lastPair = txnPairsList.pop();
+      if (lastPair.base.length > 0 && lastPair.quote.length > 0) {
+        break;
+      }
+    }
+
     for (let txnPair of txnPairsList) {
       let dexOptions =  this.state.configuration.markets[this.state.activeMarket].dexOptions;
       let priceDecimalPrecision = dexOptions.priceDecimalPrecision == null ? DEFAULT_PRICE_DECIMAL_PRECISION : dexOptions.priceDecimalPrecision;
+
       let baseChainOptions = dexOptions.chains[this.state.activeAssets[1]];
       let baseChainFeeBase = baseChainOptions.exchangeFeeBase;
       let baseChainFeeRate = baseChainOptions.exchangeFeeRate;
-      let baseTotalAmount = txnPair.base.reduce((accumulator, txn) => accumulator + Number(txn.amount) / (1 - baseChainFeeRate), 0);
-      let baseTotalFee = txnPair.base.reduce((accumulator, txn) => accumulator + Number(baseChainFeeBase), 0);
-      let fullBaseAmount = baseTotalAmount + baseTotalFee;
+      let baseTotalFee = baseChainFeeBase * txnPair.base.length;
+      let fullBaseAmount = txnPair.base.reduce((accumulator, txn) => accumulator + Number(txn.amount) / (1 - baseChainFeeRate), 0) + baseTotalFee;
 
       let quoteChainOptions = dexOptions.chains[this.state.activeAssets[0]];
       let quoteChainFeeBase = quoteChainOptions.exchangeFeeBase;
       let quoteChainFeeRate = quoteChainOptions.exchangeFeeRate;
+      let quoteTotalFee = quoteChainFeeBase * txnPair.quote.length;
+      let fullQuoteAmount = txnPair.quote.reduce((accumulator, txn) => accumulator + Number(txn.amount) / (1 - quoteChainFeeRate), 0) + quoteTotalFee;
 
-      let fullQuoteAmount = Number(txnPair.quote.amount) / (1 - quoteChainFeeRate) + Number(quoteChainFeeBase);
       let price = Number((fullBaseAmount / fullQuoteAmount).toFixed(priceDecimalPrecision));
       priceHistory.push({
         timestamp: txnPair.base[txnPair.base.length - 1].timestamp,
