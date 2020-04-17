@@ -105,6 +105,13 @@ class App extends React.Component {
     return null;
   }
 
+  isTakerTransaction(transaction) {
+    const takerRegex = /^t1,/g;
+
+    let transactionData = transaction.asset.data || '';
+    return takerRegex.test(transactionData);
+  }
+
   isMakerTransaction(transaction) {
     const makerRegex = /^t2,/g;
 
@@ -145,13 +152,14 @@ class App extends React.Component {
 
     for (let txn of quoteChainTxns) {
       let isMaker = this.isMakerTransaction(txn);
+      let isTaker = this.isTakerTransaction(txn);
       let takerOrderId = this.getTakerOrderIdFromTransaction(txn);
       if (isMaker) {
         if (!quoteChainMakers[takerOrderId]) {
           quoteChainMakers[takerOrderId] = [];
         }
         quoteChainMakers[takerOrderId].push(txn);
-      } else if (takerOrderId) {
+      } else if (isTaker) {
         quoteChainTakers[takerOrderId] = [txn];
       }
     }
@@ -159,6 +167,13 @@ class App extends React.Component {
     let txnPairsMap = {};
 
     for (let txn of baseChainTxns) {
+      let isMaker = this.isMakerTransaction(txn);
+      let isTaker = this.isTakerTransaction(txn);
+
+      if (!isMaker && !isTaker) {
+        continue;
+      }
+
       let counterpartyTakerId = this.getTakerOrderIdFromTransaction(txn);
       let counterpartyTxns = quoteChainMakers[counterpartyTakerId] || quoteChainTakers[counterpartyTakerId] || [];
         // Group base chain orders which were matched with the same counterparty order together.
