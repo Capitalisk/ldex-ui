@@ -1,6 +1,7 @@
 import React from 'react';
 import axios from 'axios';
 import { userContext } from './context';
+import formatThousands from './Utils'
 import './App.css';
 
 export default class BalanceDisplay extends React.Component<any, any> {
@@ -23,7 +24,7 @@ export default class BalanceDisplay extends React.Component<any, any> {
       c.get(`${targetEndpoint}/accounts?address=${this.context.keys[this.props.asset].address}`)
         .then((data) => {
           if (data.data.data.length > 0) {
-            this.setState({ 'balance': data.data.data[0].balance });
+            this.setState({ balance: data.data.data[0].balance });
           }
         });
     }
@@ -45,7 +46,9 @@ export default class BalanceDisplay extends React.Component<any, any> {
       return <div></div>;
     }
     return (
-      <div style={{ color: '#FFFFFF', marginBottom: '10px' }}>Balance: <span style={{ fontWeight: 'bold' }}>{Math.round(this.state.balance * 100 / this.props.whole) / 100} {this.props.asset.toUpperCase()}</span></div>
+      <div style={{ color: '#FFFFFF', marginBottom: '10px' }}>
+        Balance: <span style={{ fontWeight: 'bold' }}>{formatThousands(Math.round(this.state.balance * 100 / this.props.whole) / 100)} {this.props.asset.toUpperCase()}</span>
+      </div>
     );
   }
 }

@@ -46,8 +46,8 @@ export default class PlaceOrder extends React.Component<any, any> {
 
   validateOrder = () => {
     let success = true;
-    let dexOptions = this.context.configuration.markets[this.context.activeMarket].dexOptions;
-    let priceDecimalPrecision = dexOptions.priceDecimalPrecision;
+    let { dexOptions } = this.context.configuration.markets[this.context.activeMarket];
+    let { priceDecimalPrecision } = dexOptions;
     let sourceAsset = this.props.side === 'bid' ? this.context.activeAssets[1] : this.context.activeAssets[0];
     let unitValue = this.context.configuration.assets[sourceAsset].unitValue;
     let minOrderAmount = dexOptions.chains[sourceAsset].minOrderAmount / unitValue;

@@ -198,10 +198,10 @@ class App extends React.Component {
       }
     }
 
-    for (let txnPair of txnPairsList) {
-      let dexOptions =  this.state.configuration.markets[this.state.activeMarket].dexOptions;
-      let priceDecimalPrecision = dexOptions.priceDecimalPrecision == null ? DEFAULT_PRICE_DECIMAL_PRECISION : dexOptions.priceDecimalPrecision;
+    let dexOptions =  this.state.configuration.markets[this.state.activeMarket].dexOptions;
+    let priceDecimalPrecision = this.getPriceDecimalPrecision();
 
+    for (let txnPair of txnPairsList) {
       let baseChainOptions = dexOptions.chains[this.state.activeAssets[1]];
       let baseChainFeeBase = baseChainOptions.exchangeFeeBase;
       let baseChainFeeRate = baseChainOptions.exchangeFeeRate;
@@ -225,7 +225,8 @@ class App extends React.Component {
     priceHistory.reverse();
 
     this.setState({
-      priceHistory
+      priceHistory,
+      priceDecimalPrecision
     });
   }
 
@@ -513,13 +514,20 @@ class App extends React.Component {
       }
     }
 
+
     let newState = {
       orderBookData: { bids, asks, maxSize },
+      priceDecimalPrecision: this.getPriceDecimalPrecision(),
       maxBid, minAsk,
       yourOrders: Object.values(yourOrderMap)
     };
 
     this.setState(newState);
+  }
+
+  getPriceDecimalPrecision() {
+    let { dexOptions } =  this.state.configuration.markets[this.state.activeMarket];
+    return dexOptions.priceDecimalPrecision == null ? DEFAULT_PRICE_DECIMAL_PRECISION : dexOptions.priceDecimalPrecision;
   }
 
   componentDidUpdate() {
@@ -619,13 +627,13 @@ class App extends React.Component {
           </div>
           <div className="orderbook-container">
             <div className="sell-orders">
-              <Orderbook orderBookData={this.state.orderBookData} side="asks"></Orderbook>
+              <Orderbook side="asks" orderBookData={this.state.orderBookData} priceDecimalPrecision={this.state.priceDecimalPrecision}></Orderbook>
             </div>
             <div className="price-display">
               Price: {this.state.minAsk} {this.state.activeAssets[1].toUpperCase()}
             </div>
             <div className="buy-orders">
-              <Orderbook orderBookData={this.state.orderBookData} side="bids"></Orderbook>
+              <Orderbook side="bids" orderBookData={this.state.orderBookData} priceDecimalPrecision={this.state.priceDecimalPrecision}></Orderbook>
             </div>
           </div>
           <div className="price-chart">

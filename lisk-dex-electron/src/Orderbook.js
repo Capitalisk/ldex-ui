@@ -19,7 +19,7 @@ export default class Orderbook extends React.Component {
           maxSize={this.props.orderBookData.maxSize}
           side={this.props.side}
           sizeDecimals={4}
-          priceDecimals={2}
+          priceDecimals={this.props.priceDecimalPrecision}
         ></OrderbookEntry>
       ));
       return <div className="askOrderList">{orders}</div>;
@@ -34,7 +34,7 @@ export default class Orderbook extends React.Component {
           maxSize={this.props.orderBookData.maxSize}
           side={this.props.side}
           sizeDecimals={4}
-          priceDecimals={2}
+          priceDecimals={this.props.priceDecimalPrecision}
         ></OrderbookEntry>
       ));
       return <div className="bidOrderList">{orders}</div>;

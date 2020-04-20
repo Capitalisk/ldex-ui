@@ -14,8 +14,8 @@ const PriceTooltip = ({ active, payload, label }) => {
 	return (
 		<div className="price-tooltip">
 			<p className="time"><b>Chain time:</b> {formatThousands(`${label}`)}</p>
-			<p className="price"><b>Price:</b> {`${payload[0].payload.price}`}</p>
-			<p className="volume"><b>Volume:</b> {`${payload[0].payload.volume}`}</p>
+			<p className="price"><b>Price:</b> {`${formatThousands(payload[0].payload.price)}`}</p>
+			<p className="volume"><b>Volume:</b> {`${formatThousands(payload[0].payload.volume)}`}</p>
 		</div>
 	);
 };
