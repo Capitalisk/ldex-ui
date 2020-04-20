@@ -121,7 +121,3 @@ export async function processConfiguration(config: UnprocessedDEXConfiguration) 
     console.log(_config);
     return _config;
 }
-
-export function processConfigurationString(config: string) {
-
-}

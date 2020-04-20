@@ -412,10 +412,10 @@ class App extends React.Component {
       yourOrderMap[yourOrder.id] = yourOrder;
     }
 
-    let yourOrderBookIds = new Set();
+    let yourOrderbookIds = new Set();
 
     for (let order of yourOrders) {
-      yourOrderBookIds.add(order.id);
+      yourOrderbookIds.add(order.id);
       let existingOrder = yourOrderMap[order.id];
       if (!existingOrder || existingOrder.status === 'pending') {
         order.status = 'ready';
@@ -503,7 +503,7 @@ class App extends React.Component {
           yourOrder.status = 'matching';
         }
       } else {
-        if (yourOrder.status !== 'pending' && !yourOrderBookIds.has(yourOrder.id)) {
+        if (yourOrder.status !== 'pending' && !yourOrderbookIds.has(yourOrder.id)) {
           delete yourOrderMap[yourOrder.id];
           continue;
         }
