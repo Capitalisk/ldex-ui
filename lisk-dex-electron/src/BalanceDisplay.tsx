@@ -1,7 +1,7 @@
 import React from 'react';
 import axios from 'axios';
 import { userContext } from './context';
-import formatThousands from './Utils'
+import {formatThousands} from './Utils'
 import './App.css';
 
 export default class BalanceDisplay extends React.Component<any, any> {
