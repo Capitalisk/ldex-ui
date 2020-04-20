@@ -40,6 +40,6 @@ const groupByKey = function (array, groupByKey, sumKey) {
 
 const Keys = (dict) => Object.keys(dict)
 
-const Values = (dict) => Object.keys(dict)
+const Values = (dict) => Object.values(dict)
 
 export {formatThousands, groupByKey, Keys, Values}
