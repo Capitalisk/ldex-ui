@@ -16,9 +16,9 @@ const formatThousands = function (num, separator) {
 	while (remaining !== 0) {
 		lastDigits = (remaining % 1000).toString();
 		remaining = Math.floor(remaining / 1000);
-	}
 		if (remaining !== 0) {
 			lastDigits =  lastDigits + paddingZero.repeat(3 - lastDigits.length);
+		}
 		numParts.push(lastDigits);
 	}
 	return numParts.reverse().join(separator) + fractionDecimals;
