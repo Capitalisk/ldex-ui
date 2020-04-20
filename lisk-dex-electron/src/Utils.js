@@ -16,12 +16,30 @@ const formatThousands = function (num, separator) {
 	while (remaining !== 0) {
 		lastDigits = (remaining % 1000).toString();
 		remaining = Math.floor(remaining / 1000);
+	}
 		if (remaining !== 0) {
 			lastDigits =  lastDigits + paddingZero.repeat(3 - lastDigits.length);
-		}
 		numParts.push(lastDigits);
 	}
 	return numParts.reverse().join(separator) + fractionDecimals;
 }
 
-export default formatThousands;
+const groupByKey = function (array, groupByKey, sumKey) {
+	return array.reduce((accumulator, newItem) => {
+        const groupByKeyValue = newItem[groupByKey];
+        if (groupByKeyValue in accumulator) {
+          const prevItem = accumulator[groupByKeyValue]
+          prevItem[sumKey] = prevItem[sumKey] + newItem[sumKey]
+          accumulator[groupByKeyValue] = prevItem;
+        } else {
+          accumulator[groupByKeyValue] = newItem;
+        }
+        return accumulator
+      }, {});
+}
+
+const Keys = (dict) => Object.keys(dict)
+
+const Values = (dict) => Object.keys(dict)
+
+export {formatThousands, groupByKey, Keys, Values}

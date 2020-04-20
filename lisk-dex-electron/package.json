@@ -55,7 +55,8 @@
     ]
   },
   "devDependencies": {
-    "electron-builder": "^21.2.0",
-    "electron": "^6.0.12"
+    "@testing-library/jest-dom": "^5.5.0",
+    "electron": "^6.0.12",
+    "electron-builder": "^21.2.0"
   }
 }
