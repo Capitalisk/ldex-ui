@@ -1,6 +1,6 @@
 import React from 'react';
 import './OrderbookEntry.css';
-import {formatThousands} from './Utils'
+import { formatThousands } from './Utils'
 
 export default class OrderbookEntry extends React.Component {
   constructor(props) {

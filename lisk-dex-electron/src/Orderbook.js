@@ -1,7 +1,7 @@
 import React from 'react';
 import OrderbookEntry from './OrderbookEntry';
 import './Orderbook.css';
-import {groupByKey, Values} from './Utils'
+import { groupByKey, Values } from './Utils'
 
 export default class Orderbook extends React.Component {
   constructor(props) {
@@ -12,7 +12,7 @@ export default class Orderbook extends React.Component {
   render() {
     
     if (this.props.side === 'asks') {
-      const groupedAskOrders = Values(groupByKey(this.props.orderBookData.asks, "price", "sizeRemaining"))
+      const groupedAskOrders = Values(groupByKey(this.props.orderBookData.asks, 'price', 'sizeRemaining'));
       const orders = groupedAskOrders.map(order => (
         <OrderbookEntry
           whole={Math.pow(10, 8)} // 10 ** 8 beddow in one LSK
@@ -28,7 +28,7 @@ export default class Orderbook extends React.Component {
       return <div className="askOrderList">{orders}</div>;
     }
     if (this.props.side === 'bids') {
-      const groupedBidsOrders = Values(groupByKey(this.props.orderBookData.bids, "price", "valueRemaining"))
+      const groupedBidsOrders = Values(groupByKey(this.props.orderBookData.bids, 'price', 'valueRemaining'));
       const orders = groupedBidsOrders.map(order => (
         <OrderbookEntry
           whole={Math.pow(10, 8)} // 10 ** 8 beddow in one LSK

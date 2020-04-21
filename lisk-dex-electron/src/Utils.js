@@ -42,4 +42,4 @@ const Keys = (dict) => Object.keys(dict)
 
 const Values = (dict) => Object.values(dict)
 
-export {formatThousands, groupByKey, Keys, Values}
+export { formatThousands, groupByKey, Keys, Values }

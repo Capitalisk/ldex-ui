@@ -2,7 +2,7 @@ import React from 'react';
 import {
   ComposedChart, Bar, Line, XAxis, YAxis, CartesianGrid, Tooltip
 } from 'recharts';
-import {formatThousands} from './Utils'
+import { formatThousands } from './Utils'
 
 const DEFAULT_VOLUME_DISPLAY_HEIGHT_RATIO = .2;
 
