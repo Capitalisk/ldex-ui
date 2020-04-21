@@ -3,16 +3,16 @@ import { groupByKey, Keys, Values, formatThousands } from '../Utils';
 describe('Utils tests => ', () => {
   test.each`
     largeNumber               |           expectedFormattedLargeNumber
-    ${344332234.9789999}      |           ${"344,332,234.9789999"}
-    ${43311223.099009000}     |           ${"43,311,223.099009"}
-    ${122323421313.000}       |           ${"122,323,421,313"}
-    ${23.0000}                |           ${"23"}  
-    ${7.00000}                |           ${"7"}     
-    ${232.000978393434}       |           ${"232.000978393434"}
-    ${6764.000978393434}      |           ${"6,764.000978393434"}
+    ${344332234.9789999}      |           ${'344,332,234.9789999'}
+    ${43311223.099009000}     |           ${'43,311,223.099009'}
+    ${122323421313.000}       |           ${'122,323,421,313'}
+    ${23.0000}                |           ${'23'}  
+    ${7.00000}                |           ${'7'}     
+    ${232.000978393434}       |           ${'232.000978393434'}
+    ${6764.000978393434}      |           ${'6,764.000978393434'}
   `('Should format $largeNumber to $expectedFormattedLargeNumber', ({largeNumber, expectedFormattedLargeNumber}) => {
-      const actualResult = formatThousands(largeNumber, ',')
-      expect(actualResult).toEqual(expectedFormattedLargeNumber)
+      const actualFormattedLargeNumber = formatThousands(largeNumber, ',')
+      expect(actualFormattedLargeNumber).toEqual(expectedFormattedLargeNumber)
   });
 
   it('Reduces an array with group by query', () => {
