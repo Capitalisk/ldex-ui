@@ -5,9 +5,10 @@ jobs:
   build-and-test:
     executor:
       name: node/default
-    working_directory: $CIRCLE_WORKING_DIRECTORY/lisk-dex-electron  
+    working_directory: ~/repo/lisk-dex-electron  
     steps:
       - checkout  
+          path: ~/repo
       - node/with-cache:
           steps:
             - run: npm install
