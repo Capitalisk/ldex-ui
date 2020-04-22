@@ -13,7 +13,8 @@ import {
   getBidsFromWallet,
   getPendingTransfers,
   getProcessedHeights,
-  getClient
+  getClient,
+  getConfig
 } from './API';
 import MarketList from './MarketList';
 import Notification from './Notification';
@@ -22,7 +23,7 @@ import * as cryptography from '@liskhq/lisk-cryptography';
 import * as passphrase from '@liskhq/lisk-passphrase';
 import LeaveWarning from './LeaveWarning';
 import axios from 'axios';
-import { processConfiguration, defaultConfiguration } from './config/Configuration';
+import { processConfiguration } from './config/Configuration';
 
 // get what we're actually using from the passphrase library.
 const { Mnemonic } = passphrase;
@@ -79,7 +80,11 @@ class App extends React.Component {
     this.loadConfiguration();
   }
 
+  getDexClient = () => getClient(this.state.configuration.markets[this.state.activeMarket].dexApiUrl);
+
   loadConfiguration = async () => {
+    const localClient = getClient('');
+    const defaultConfiguration = await getConfig(localClient);
     const configuration = await processConfiguration(defaultConfiguration);
     const marketSymbols = Object.keys(configuration.markets);
     const defaultMarketKey = marketSymbols[0];
@@ -286,7 +291,7 @@ class App extends React.Component {
   }
 
   orderSubmit = async (order) => {
-    let dexClient = getClient(this.state.configuration.markets[this.state.activeMarket].dexApiUrl);
+    let dexClient = this.getDexClient();
     let processedHeights = await getProcessedHeights(dexClient);
 
     let heightSafetyMargin = this.state.configuration.assets[order.sourceChain].processingHeightExpiry;
@@ -367,7 +372,7 @@ class App extends React.Component {
   }
 
   _refreshOrderbook = async () => {
-    let dexClient = getClient(this.state.configuration.markets[this.state.activeMarket].dexApiUrl);
+    let dexClient = this.getDexClient();
 
     let quoteAsset = this.state.activeAssets[0];
     let baseAsset = this.state.activeAssets[1];

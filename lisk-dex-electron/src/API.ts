@@ -32,3 +32,7 @@ export async function getProcessedHeights(instance: AxiosInstance) {
   const status: any = (await instance.get(`/status`)).data;
   return status.processedHeights;
 }
+
+export async function getConfig(instance: AxiosInstance) {
+  return (await instance.get(`/config.json`)).data;
+}

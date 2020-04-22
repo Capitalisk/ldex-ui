@@ -18,7 +18,10 @@ export interface UnprocessedDEXConfiguration {
             processingHeightExpiry: number
         }
     },
+    // lisk of markets.
     markets: {
+        // API URL that serves orderbook information.
+        // The addresses for the DEX are fetched from this endpoint.
         [key: string]: {
             assets: Array<string>,
             dexApiUrl: string
@@ -69,41 +72,6 @@ export interface DEXConfiguration {
         }
     }
 }
-
-export const defaultConfiguration: UnprocessedDEXConfiguration = {
-    appTitle: 'Lisk DEX',
-    feedbackLink: {
-      text: 'Report bug / send feedback',
-      url: 'https://github.com/Jaxkr/lisk-dex-ui/issues/new'
-    },
-    notificationDuration: 10000,
-    refreshInterval: 15000,
-    assets: {
-        'lsk': {
-            name: 'Lisk testnet',
-            apiUrl: 'https://test-02.liskapi.io/api',
-            unitValue: 100000000,
-            apiMaxPageSize: 100,
-            processingHeightExpiry: 5
-        },
-        'lsh': {
-            name: 'Leasehold testnet',
-            apiUrl: 'http://18.206.164.187:7010/api',
-            unitValue: 100000000,
-            apiMaxPageSize: 100,
-            processingHeightExpiry: 5
-        }
-    },
-    // lisk of markets.
-    markets: {
-        'lsh/lsk': {
-            // API URL that serves orderbook information.
-            // The addresses for the DEX are fetched from this endpoint.
-            dexApiUrl: 'http://18.206.164.187:7011',
-            assets: ['lsh', 'lsk']
-        }
-    }
-};
 
 export async function processConfiguration(config: UnprocessedDEXConfiguration) {
     const _config = config as DEXConfiguration
