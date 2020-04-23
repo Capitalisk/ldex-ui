@@ -1,6 +1,6 @@
-import axios, { AxiosInstance } from 'axios';
+import axios from 'axios';
 
-export function getClient(api_base_url: string) {
+export function getClient(api_base_url) {
   return axios.create({
     baseURL: api_base_url,
     timeout: 10000,
@@ -8,7 +8,7 @@ export function getClient(api_base_url: string) {
   });
 }
 
-export async function getOrderbook(instance: AxiosInstance) {
+export async function getOrderbook(instance) {
   const [{data: bids}, {data: asks}] = await Promise.all([
     instance.get('/orders/bids?sort=price:desc'),
     instance.get('/orders/asks?sort=price:asc')
@@ -16,23 +16,23 @@ export async function getOrderbook(instance: AxiosInstance) {
   return bids.concat(asks);
 }
 
-export async function getBidsFromWallet(instance: AxiosInstance, sourceWalletAddress: string) {
+export async function getBidsFromWallet(instance, sourceWalletAddress) {
   return (await instance.get(`/orders/bids?sourceWalletAddress=${sourceWalletAddress}&sort=price:desc`)).data;
 }
 
-export async function getAsksFromWallet(instance: AxiosInstance, sourceWalletAddress: string) {
+export async function getAsksFromWallet(instance, sourceWalletAddress) {
   return (await instance.get(`/orders/asks?sourceWalletAddress=${sourceWalletAddress}&sort=price:asc`)).data;
 }
 
-export async function getPendingTransfers(instance: AxiosInstance, targetAssetSymbol: string, recipientId: string) {
+export async function getPendingTransfers(instance, targetAssetSymbol, recipientId) {
   return (await instance.get(`/transfers/pending?targetChain=${targetAssetSymbol}&recipientId=${recipientId}&sort=timestamp:desc`)).data;
 }
 
-export async function getProcessedHeights(instance: AxiosInstance) {
-  const status: any = (await instance.get(`/status`)).data;
+export async function getProcessedHeights(instance) {
+  const status = (await instance.get(`/status`)).data;
   return status.processedHeights;
 }
 
-export async function getConfig(instance: AxiosInstance) {
+export async function getConfig(instance) {
   return (await instance.get(`/config.json`)).data;
 }
