@@ -3,11 +3,11 @@ import './PlaceOrder.css';
 import UserOrder from './UserOrder';
 
 const statusValues = {
-  'pending': 0,
-  'processing': 1,
-  'canceling': 2,
-  'matching': 2,
-  'ready': 2
+  pending: 0,
+  processing: 1,
+  canceling: 2,
+  matching: 2,
+  ready: 2,
 };
 
 export default class YourOrders extends React.Component {
@@ -22,16 +22,16 @@ export default class YourOrders extends React.Component {
   }
 
   handleChange(event) {
-    const target = event.target;
+    const { target } = event;
     const value = target.type === 'checkbox' ? target.checked : target.value;
-    const name = target.name;
+    const { name } = target;
 
     this.setState({
-      [name]: value
+      [name]: value,
     });
   }
 
-  handleSubmit(event) {
+  handleSubmit = (event) => {
     event.preventDefault();
   }
 
@@ -40,18 +40,18 @@ export default class YourOrders extends React.Component {
   }
 
   render() {
-    let orders = [...this.props.orders];
+    const orders = [...this.props.orders];
     orders.sort((a, b) => {
-      let statusA = statusValues[a.status];
-      let statusB = statusValues[b.status];
+      const statusA = statusValues[a.status];
+      const statusB = statusValues[b.status];
       if (statusA < statusB) {
         return -1;
       }
       if (statusA > statusB) {
         return 1;
       }
-      let timeA = a.timestamp;
-      let timeB = b.timestamp;
+      const timeA = a.timestamp;
+      const timeB = b.timestamp;
       if (timeA > timeB) {
         return -1;
       }
@@ -60,19 +60,28 @@ export default class YourOrders extends React.Component {
       }
       return 0;
     });
-    let bids = orders.filter(order => order.side === 'bid').slice().reverse();
-    let asks = orders.filter(order => order.side === 'ask');
+    const bids = orders.filter((order) => order.side === 'bid').slice().reverse();
+    const asks = orders.filter((order) => order.side === 'ask');
     return (
       <>
         <div style={{ padding: '5px' }}>
           <div className="action-name">YOUR ORDERS</div>
         </div>
-        <div style={{ width: '100%', margin: 0, padding: 0, display: 'flex' }}>
-          <div style={{ width: '50%', margin: 0, padding: 0, overflowY: 'scroll' }}>
-            {bids.slice().reverse().map(order => <UserOrder key={order.id} side='bid' order={order} orderCanceled={this.handleCancel}></UserOrder>)}
+        <div style={{
+          width: '100%', margin: 0, padding: 0, display: 'flex',
+        }}
+        >
+          <div style={{
+            width: '50%', margin: 0, padding: 0, overflowY: 'scroll',
+          }}
+          >
+            {bids.slice().reverse().map((order) => <UserOrder key={order.id} side="bid" order={order} orderCanceled={this.handleCancel} />)}
           </div>
-          <div style={{ width: '50%', margin: 0, padding: 0, overflowY: 'scroll' }}>
-            {asks.map(order => <UserOrder key={order.id} side='ask' order={order} orderCanceled={this.handleCancel}></UserOrder>)}
+          <div style={{
+            width: '50%', margin: 0, padding: 0, overflowY: 'scroll',
+          }}
+          >
+            {asks.map((order) => <UserOrder key={order.id} side="ask" order={order} orderCanceled={this.handleCancel} />)}
           </div>
         </div>
       </>

@@ -1,6 +1,9 @@
 import React from 'react';
 import './App.css';
 
+import * as cryptography from '@liskhq/lisk-cryptography';
+import { Mnemonic } from '@liskhq/lisk-passphrase';
+import axios from 'axios';
 import Orderbook from './Orderbook';
 import PriceHistoryChart from './PriceHistoryChart';
 import PlaceOrder from './PlaceOrder';
@@ -14,19 +17,13 @@ import {
   getPendingTransfers,
   getProcessedHeights,
   getClient,
-  getConfig
+  getConfig,
 } from './API';
 import MarketList from './MarketList';
 import Notification from './Notification';
-import { userContext } from './context';
-import * as cryptography from '@liskhq/lisk-cryptography';
-import * as passphrase from '@liskhq/lisk-passphrase';
+import userContext from './context';
 import LeaveWarning from './LeaveWarning';
-import axios from 'axios';
-import { processConfiguration } from './config/Configuration';
-
-// get what we're actually using from the passphrase library.
-const { Mnemonic } = passphrase;
+import processConfiguration from './config/Configuration';
 
 const NOTIFICATIONS_MAX_QUEUE_LENGTH = 3;
 const DEFAULT_API_MAX_PAGE_SIZE = 100;
@@ -40,7 +37,9 @@ class App extends React.Component {
     this.state = {
       configurationLoaded: false,
       configuration: {},
-      orderBookData: { orders: [], bids: [], asks: [], maxSize: { bid: 0, ask: 0 } },
+      orderBookData: {
+        orders: [], bids: [], asks: [], maxSize: { bid: 0, ask: 0 },
+      },
       activeAssets: [],
       // new, activeMarket string for selecting the active market out of the configuration object.
       activeMarket: '',
@@ -69,7 +68,7 @@ class App extends React.Component {
         */
       },
       windowWidth: 0,
-      windowHeight: 0
+      windowHeight: 0,
     };
 
     this.notificationId = 0;
@@ -93,34 +92,34 @@ class App extends React.Component {
       activeMarket: defaultMarketKey,
       activeAssets: configuration.markets[defaultMarketKey].assets,
       enabledAssets: Object.keys(configuration.assets),
-      configurationLoaded: true
+      configurationLoaded: true,
     });
   }
 
-  getTakerOrderIdFromTransaction(transaction) {
+  getTakerOrderIdFromTransaction= (transaction) => {
     // TODO: Match order id based on position in protocol argument list instead of regex.
     const takerOrderIdRegex = /,[0-9]+:/g;
 
-    let transactionData = transaction.asset.data || '';
-    let matches = transactionData.match(takerOrderIdRegex);
+    const transactionData = transaction.asset.data || '';
+    const matches = transactionData.match(takerOrderIdRegex);
     if (matches) {
-      let match = matches[0];
+      const match = matches[0];
       return match.slice(1, match.length - 1);
     }
     return null;
   }
 
-  isTakerTransaction(transaction) {
+  isTakerTransaction = (transaction) => {
     const takerRegex = /^t1,/g;
 
-    let transactionData = transaction.asset.data || '';
+    const transactionData = transaction.asset.data || '';
     return takerRegex.test(transactionData);
   }
 
-  isMakerTransaction(transaction) {
+  isMakerTransaction = (transaction) => {
     const makerRegex = /^t2,/g;
 
-    let transactionData = transaction.asset.data || '';
+    const transactionData = transaction.asset.data || '';
     return makerRegex.test(transactionData);
   }
 
@@ -134,31 +133,31 @@ class App extends React.Component {
   }
 
   _refreshPriceHistory = async () => {
-    let [quoteChainTxns, baseChainTxns] = await Promise.all(
+    const [quoteChainTxns, baseChainTxns] = await Promise.all(
       this.state.activeAssets.map(async (assetSymbol) => {
-        let asset = this.state.configuration.assets[assetSymbol];
-        let client = axios.create();
-        let targetEndpoint = asset.apiUrl;
-        let dexOptions =  this.state.configuration.markets[this.state.activeMarket].dexOptions;
-        let dexWalletAddress = dexOptions.chains[assetSymbol].walletAddress
-        let result = await client.get(
+        const asset = this.state.configuration.assets[assetSymbol];
+        const client = axios.create();
+        const targetEndpoint = asset.apiUrl;
+        const { dexOptions } = this.state.configuration.markets[this.state.activeMarket];
+        const dexWalletAddress = dexOptions.chains[assetSymbol].walletAddress;
+        const result = await client.get(
           `${targetEndpoint}/transactions?senderId=${
             dexWalletAddress
           }&limit=${
             asset.apiMaxPageSize || DEFAULT_API_MAX_PAGE_SIZE
-          }&sort=timestamp:desc`
+          }&sort=timestamp:desc`,
         );
         return result.data.data;
-      })
+      }),
     );
 
-    let quoteChainMakers = {};
-    let quoteChainTakers = {};
+    const quoteChainMakers = {};
+    const quoteChainTakers = {};
 
-    for (let txn of quoteChainTxns) {
-      let isMaker = this.isMakerTransaction(txn);
-      let isTaker = this.isTakerTransaction(txn);
-      let takerOrderId = this.getTakerOrderIdFromTransaction(txn);
+    for (const txn of quoteChainTxns) {
+      const isMaker = this.isMakerTransaction(txn);
+      const isTaker = this.isTakerTransaction(txn);
+      const takerOrderId = this.getTakerOrderIdFromTransaction(txn);
       if (isMaker) {
         if (!quoteChainMakers[takerOrderId]) {
           quoteChainMakers[takerOrderId] = [];
@@ -169,61 +168,61 @@ class App extends React.Component {
       }
     }
 
-    let txnPairsMap = {};
+    const txnPairsMap = {};
 
-    for (let txn of baseChainTxns) {
-      let isMaker = this.isMakerTransaction(txn);
-      let isTaker = this.isTakerTransaction(txn);
+    for (const txn of baseChainTxns) {
+      const isMaker = this.isMakerTransaction(txn);
+      const isTaker = this.isTakerTransaction(txn);
 
       if (!isMaker && !isTaker) {
         continue;
       }
 
-      let counterpartyTakerId = this.getTakerOrderIdFromTransaction(txn);
-      let counterpartyTxns = quoteChainMakers[counterpartyTakerId] || quoteChainTakers[counterpartyTakerId] || [];
-        // Group base chain orders which were matched with the same counterparty order together.
+      const counterpartyTakerId = this.getTakerOrderIdFromTransaction(txn);
+      const counterpartyTxns = quoteChainMakers[counterpartyTakerId] || quoteChainTakers[counterpartyTakerId] || [];
+      // Group base chain orders which were matched with the same counterparty order together.
       if (!txnPairsMap[counterpartyTakerId]) {
         txnPairsMap[counterpartyTakerId] = {
           base: [],
-          quote: counterpartyTxns
+          quote: counterpartyTxns,
         };
       }
-      let txnPair = txnPairsMap[counterpartyTakerId];
-      txnPair.base.push(txn)
+      const txnPair = txnPairsMap[counterpartyTakerId];
+      txnPair.base.push(txn);
     }
 
-    let priceHistory = [];
-    let txnPairsList = Object.values(txnPairsMap);
+    const priceHistory = [];
+    const txnPairsList = Object.values(txnPairsMap);
 
     // Pop out all entries which are definitely incompete or possibly incompete due to result limit.
     while (txnPairsList.length) {
-      let lastPair = txnPairsList.pop();
+      const lastPair = txnPairsList.pop();
       if (lastPair.base.length > 0 && lastPair.quote.length > 0) {
         break;
       }
     }
 
-    let dexOptions =  this.state.configuration.markets[this.state.activeMarket].dexOptions;
-    let priceDecimalPrecision = this.getPriceDecimalPrecision();
+    const { dexOptions } = this.state.configuration.markets[this.state.activeMarket];
+    const priceDecimalPrecision = this.getPriceDecimalPrecision();
 
-    for (let txnPair of txnPairsList) {
-      let baseChainOptions = dexOptions.chains[this.state.activeAssets[1]];
-      let baseChainFeeBase = baseChainOptions.exchangeFeeBase;
-      let baseChainFeeRate = baseChainOptions.exchangeFeeRate;
-      let baseTotalFee = baseChainFeeBase * txnPair.base.length;
-      let fullBaseAmount = txnPair.base.reduce((accumulator, txn) => accumulator + Number(txn.amount) / (1 - baseChainFeeRate), 0) + baseTotalFee;
+    for (const txnPair of txnPairsList) {
+      const baseChainOptions = dexOptions.chains[this.state.activeAssets[1]];
+      const baseChainFeeBase = baseChainOptions.exchangeFeeBase;
+      const baseChainFeeRate = baseChainOptions.exchangeFeeRate;
+      const baseTotalFee = baseChainFeeBase * txnPair.base.length;
+      const fullBaseAmount = txnPair.base.reduce((accumulator, txn) => accumulator + Number(txn.amount) / (1 - baseChainFeeRate), 0) + baseTotalFee;
 
-      let quoteChainOptions = dexOptions.chains[this.state.activeAssets[0]];
-      let quoteChainFeeBase = quoteChainOptions.exchangeFeeBase;
-      let quoteChainFeeRate = quoteChainOptions.exchangeFeeRate;
-      let quoteTotalFee = quoteChainFeeBase * txnPair.quote.length;
-      let fullQuoteAmount = txnPair.quote.reduce((accumulator, txn) => accumulator + Number(txn.amount) / (1 - quoteChainFeeRate), 0) + quoteTotalFee;
+      const quoteChainOptions = dexOptions.chains[this.state.activeAssets[0]];
+      const quoteChainFeeBase = quoteChainOptions.exchangeFeeBase;
+      const quoteChainFeeRate = quoteChainOptions.exchangeFeeRate;
+      const quoteTotalFee = quoteChainFeeBase * txnPair.quote.length;
+      const fullQuoteAmount = txnPair.quote.reduce((accumulator, txn) => accumulator + Number(txn.amount) / (1 - quoteChainFeeRate), 0) + quoteTotalFee;
 
-      let price = Number((fullBaseAmount / fullQuoteAmount).toFixed(priceDecimalPrecision));
+      const price = Number((fullBaseAmount / fullQuoteAmount).toFixed(priceDecimalPrecision));
       priceHistory.push({
         timestamp: txnPair.base[txnPair.base.length - 1].timestamp,
         price,
-        volume: Math.round(fullBaseAmount / 1000000) / 100
+        volume: Math.round(fullBaseAmount / 1000000) / 100,
       });
     }
 
@@ -231,90 +230,90 @@ class App extends React.Component {
 
     this.setState({
       priceHistory,
-      priceDecimalPrecision
+      priceDecimalPrecision,
     });
   }
 
   orderCancel = async (order) => {
-    let unitValue = this.state.configuration.assets[order.sourceChain].unitValue;
-    let chainSymbol = order.sourceChain.toUpperCase();
+    const { unitValue } = this.state.configuration.assets[order.sourceChain];
+    const chainSymbol = order.sourceChain.toUpperCase();
 
     order.status = 'canceling';
 
     let message;
     if (order.type === 'limit') {
       message = `A cancel order was submitted for the limit order with amount ${
-        Math.round((order.value || order.size) * 100 / unitValue) / 100
+        Math.round(((order.value || order.size) * 100) / unitValue) / 100
       } ${chainSymbol} at price ${
         order.price
       }`;
     } else {
       message = `A cancel order was submitted for the market order with amount ${
-        Math.round((order.value || order.size) * 100 / unitValue) / 100
+        Math.round(((order.value || order.size) * 100) / unitValue) / 100
       } ${chainSymbol}`;
     }
     this.notify(message);
 
-    this.setState({
-      yourOrders: this.state.yourOrders
-    });
+    this.setState((prevState) => ({
+      yourOrders: prevState.yourOrders,
+    }));
   }
 
   orderSubmitError = async (error) => {
-    let order = error.order;
+    const { order } = error;
     let errorDetails;
     if (
-      error.response.data &&
-      error.response.data.errors &&
-      error.response.data.errors.length &&
-      error.response.data.errors[0].message
+      error.response.data
+      && error.response.data.errors
+      && error.response.data.errors.length
+      && error.response.data.errors[0].message
     ) {
       errorDetails = error.response.data.errors[0].message;
     } else {
       errorDetails = 'Check your connection';
     }
-    let unitValue = this.state.configuration.assets[order.sourceChain].unitValue;
-    let chainSymbol = order.sourceChain.toUpperCase();
+    const { unitValue } = this.state.configuration.assets[order.sourceChain];
+    const chainSymbol = order.sourceChain.toUpperCase();
     let message;
     if (order.type === 'limit') {
       message = `Failed to submit the limit order with amount ${
-        Math.round((order.value || order.size) * 100 / unitValue) / 100
+        Math.round(((order.value || order.size) * 100) / unitValue) / 100
       } ${chainSymbol} at price ${
         order.price
       } - ${errorDetails}.`;
     } else {
       message = `Failed to submit the market order with amount ${
-        Math.round((order.value || order.size) * 100 / unitValue) / 100
+        Math.round(((order.value || order.size) * 100) / unitValue) / 100
       } ${chainSymbol} - ${errorDetails}.`;
     }
     this.notify(message, true);
   }
 
   orderSubmit = async (order) => {
-    let dexClient = this.getDexClient();
-    let processedHeights = await getProcessedHeights(dexClient);
+    const dexClient = this.getDexClient();
+    const processedHeights = await getProcessedHeights(dexClient);
 
-    let heightSafetyMargin = this.state.configuration.assets[order.sourceChain].processingHeightExpiry;
+    const heightSafetyMargin = this.state.configuration.assets[order.sourceChain].processingHeightExpiry;
     order.submitHeight = processedHeights[order.sourceChain];
     order.submitExpiryHeight = order.submitHeight + this.state.configuration
-    .markets[this.state.activeMarket].dexOptions.chains[order.sourceChain].requiredConfirmations + heightSafetyMargin;
+      .markets[this.state.activeMarket].dexOptions.chains[order.sourceChain].requiredConfirmations + heightSafetyMargin;
 
-    let yourOrderMap = {};
-    for (let yourOrder of this.state.yourOrders) {
+    const yourOrderMap = {};
+    for (const yourOrder of this.state.yourOrders) {
       yourOrderMap[yourOrder.id] = yourOrder;
     }
 
     order.status = 'pending';
     yourOrderMap[order.id] = order;
 
-    let orderDexAddress = this.state.configuration.markets[this.state.activeMarket].dexOptions.chains[order.sourceChain].walletAddress;
-    let unitValue = this.state.configuration.assets[order.sourceChain].unitValue;
-    let chainSymbol = order.sourceChain.toUpperCase();
+    const orderDexAddress = this.state.configuration.markets[this.state.activeMarket].dexOptions.chains[order.sourceChain].walletAddress;
+    const { unitValue } = this.state.configuration.assets[order.sourceChain];
+    const chainSymbol = order.sourceChain.toUpperCase();
 
     let message;
     if (order.type === 'limit') {
       message = `A limit order with amount ${
-        Math.round((order.value || order.size) * 100 / unitValue) / 100
+        Math.round(((order.value || order.size) * 100) / unitValue) / 100
       } ${chainSymbol} at price ${
         order.price
       } was submitted to the DEX address ${
@@ -322,7 +321,7 @@ class App extends React.Component {
       } on the ${chainSymbol} blockchain`;
     } else {
       message = `A market order with amount ${
-        Math.round((order.value || order.size) * 100 / unitValue) / 100
+        Math.round(((order.value || order.size) * 100) / unitValue) / 100
       } ${chainSymbol} was submitted to the DEX address ${
         orderDexAddress
       } on the ${chainSymbol} blockchain`;
@@ -331,19 +330,20 @@ class App extends React.Component {
     this.notify(message);
 
     this.setState({
-      yourOrders: Object.values(yourOrderMap)
+      yourOrders: Object.values(yourOrderMap),
     });
   }
 
   notify = (message, isError) => {
-    let newNotification = {
-      id: this.notificationId++,
+    const newNotification = {
+      id: this.notificationId += 1,
       message,
       isActive: true,
-      isError: isError || false
+      isError: isError || false,
     };
 
-    let updatedNotifications = this.state.notifications.map(notification => ({...notification, isActive: false}));
+    // eslint-disable-next-line react/no-access-state-in-setstate
+    const updatedNotifications = this.state.notifications.map((notification) => ({ ...notification, isActive: false }));
     updatedNotifications.push(newNotification);
 
     if (updatedNotifications.length >= NOTIFICATIONS_MAX_QUEUE_LENGTH) {
@@ -352,13 +352,13 @@ class App extends React.Component {
 
     setTimeout(() => {
       newNotification.isActive = false;
-      this.setState({
-        notifications: this.state.notifications
-      });
+      this.setState((prevState) => ({
+        notifications: prevState.notifications,
+      }));
     }, this.state.configuration.notificationDuration);
 
     this.setState({
-      notifications: updatedNotifications
+      notifications: updatedNotifications,
     });
   }
 
@@ -372,17 +372,17 @@ class App extends React.Component {
   }
 
   _refreshOrderbook = async () => {
-    let dexClient = this.getDexClient();
+    const dexClient = this.getDexClient();
 
-    let quoteAsset = this.state.activeAssets[0];
-    let baseAsset = this.state.activeAssets[1];
+    const quoteAsset = this.state.activeAssets[0];
+    const baseAsset = this.state.activeAssets[1];
 
-    let apiResults = [
+    const apiResults = [
       getOrderbook(dexClient),
-      getProcessedHeights(dexClient)
+      getProcessedHeights(dexClient),
     ];
     if (this.state.keys[quoteAsset]) {
-      let quoteWalletAddress = this.state.keys[quoteAsset].address;
+      const quoteWalletAddress = this.state.keys[quoteAsset].address;
       apiResults.push(getAsksFromWallet(dexClient, quoteWalletAddress));
       apiResults.push(getPendingTransfers(dexClient, quoteAsset, quoteWalletAddress));
     } else {
@@ -390,7 +390,7 @@ class App extends React.Component {
       apiResults.push(Promise.resolve([]));
     }
     if (this.state.keys[baseAsset]) {
-      let baseWalletAddress = this.state.keys[baseAsset].address;
+      const baseWalletAddress = this.state.keys[baseAsset].address;
       apiResults.push(getBidsFromWallet(dexClient, baseWalletAddress));
       apiResults.push(getPendingTransfers(dexClient, baseAsset, baseWalletAddress));
     } else {
@@ -404,25 +404,25 @@ class App extends React.Component {
       yourAsks,
       pendingQuoteAssetTransfers,
       yourBids,
-      pendingBaseAssetTransfers
+      pendingBaseAssetTransfers,
     ] = await Promise.all(apiResults);
 
-    let yourOrders = [...yourAsks, ...yourBids];
+    const yourOrders = [...yourAsks, ...yourBids];
 
     const bids = [];
     const asks = [];
-    let maxSize = { bid: 0, ask: 0 };
-    let yourOrderMap = {};
+    const maxSize = { bid: 0, ask: 0 };
+    const yourOrderMap = {};
 
-    for (let yourOrder of this.state.yourOrders) {
+    for (const yourOrder of this.state.yourOrders) {
       yourOrderMap[yourOrder.id] = yourOrder;
     }
 
-    let yourOrderbookIds = new Set();
+    const yourOrderbookIds = new Set();
 
-    for (let order of yourOrders) {
+    for (const order of yourOrders) {
       yourOrderbookIds.add(order.id);
-      let existingOrder = yourOrderMap[order.id];
+      const existingOrder = yourOrderMap[order.id];
       if (!existingOrder || existingOrder.status === 'pending') {
         order.status = 'ready';
       } else {
@@ -435,7 +435,7 @@ class App extends React.Component {
       }
     }
 
-    for (let order of orders) {
+    for (const order of orders) {
       if (order.side === 'bid') {
         bids.push(order);
         if (order.value > maxSize.bid) {
@@ -459,7 +459,7 @@ class App extends React.Component {
     }
 
     const getTransferType = (pendingTransfer) => {
-      let transactionData = pendingTransfer.transaction.asset.data || '';
+      const transactionData = pendingTransfer.transaction.asset.data || '';
       return transactionData.charAt(0);
     };
 
@@ -468,35 +468,33 @@ class App extends React.Component {
     const originOrderIdRegexOthers = /,[0-9]+,/g;
 
     const getOriginOrderId = (pendingTransfer) => {
-      let transactionData = pendingTransfer.transaction.asset.data || '';
-      let regex = transactionData.slice(0, 2) === 't1' ? originOrderIdRegexT1 : originOrderIdRegexOthers;
-      let matches = transactionData.match(regex);
+      const transactionData = pendingTransfer.transaction.asset.data || '';
+      const regex = transactionData.slice(0, 2) === 't1' ? originOrderIdRegexT1 : originOrderIdRegexOthers;
+      const matches = transactionData.match(regex);
       if (matches) {
-        let match = matches[0];
+        const match = matches[0];
         return match.slice(1, match.length - 1);
       }
       return null;
     };
 
-    let pendingTransfers = [...pendingBaseAssetTransfers, ...pendingQuoteAssetTransfers];
-    let tradeTransfers = pendingTransfers.filter(transfer => getTransferType(transfer) === 't');
-    let tradeTransfersOriginOrderIds = new Set(tradeTransfers.map(transfer => getOriginOrderId(transfer)));
-    let uniqueRefundTransfers = pendingTransfers.filter((transfer) => {
-      return getTransferType(transfer) === 'r' && !tradeTransfersOriginOrderIds.has(getOriginOrderId(transfer));
-    });
-    let uniquePendingTransfers = [...tradeTransfers, ...uniqueRefundTransfers];
+    const pendingTransfers = [...pendingBaseAssetTransfers, ...pendingQuoteAssetTransfers];
+    const tradeTransfers = pendingTransfers.filter((transfer) => getTransferType(transfer) === 't');
+    const tradeTransfersOriginOrderIds = new Set(tradeTransfers.map((transfer) => getOriginOrderId(transfer)));
+    const uniqueRefundTransfers = pendingTransfers.filter((transfer) => getTransferType(transfer) === 'r' && !tradeTransfersOriginOrderIds.has(getOriginOrderId(transfer)));
+    const uniquePendingTransfers = [...tradeTransfers, ...uniqueRefundTransfers];
 
-    let transferOrderIds = new Set();
-    for (let pendingTransfer of uniquePendingTransfers) {
-      let originOrderId = getOriginOrderId(pendingTransfer);
+    const transferOrderIds = new Set();
+    for (const pendingTransfer of uniquePendingTransfers) {
+      const originOrderId = getOriginOrderId(pendingTransfer);
       transferOrderIds.add(originOrderId);
     }
 
-    let yourOrderList = Object.values(yourOrderMap);
+    const yourOrderList = Object.values(yourOrderMap);
 
-    for (let yourOrder of yourOrderList) {
+    for (const yourOrder of yourOrderList) {
       if (yourOrder.status === 'pending') {
-        let currentHeight = processedHeights[yourOrder.sourceChain];
+        const currentHeight = processedHeights[yourOrder.sourceChain];
         if (currentHeight >= yourOrder.submitExpiryHeight) {
           delete yourOrderMap[yourOrder.id];
           continue;
@@ -520,18 +518,19 @@ class App extends React.Component {
     }
 
 
-    let newState = {
+    const newState = {
       orderBookData: { bids, asks, maxSize },
       priceDecimalPrecision: this.getPriceDecimalPrecision(),
-      maxBid, minAsk,
-      yourOrders: Object.values(yourOrderMap)
+      maxBid,
+      minAsk,
+      yourOrders: Object.values(yourOrderMap),
     };
 
     this.setState(newState);
   }
 
   getPriceDecimalPrecision() {
-    let { dexOptions } =  this.state.configuration.markets[this.state.activeMarket];
+    const { dexOptions } = this.state.configuration.markets[this.state.activeMarket];
     return dexOptions.priceDecimalPrecision == null ? DEFAULT_PRICE_DECIMAL_PRECISION : dexOptions.priceDecimalPrecision;
   }
 
@@ -562,10 +561,9 @@ class App extends React.Component {
           delete keys[asset];
           this.setState({ signInFailure: true });
           return;
-        } else {
-          const address = cryptography.getAddressAndPublicKeyFromPassphrase(passphrase).address;
-          keys[asset] = { address, passphrase };
         }
+        const { address } = cryptography.getAddressAndPublicKeyFromPassphrase(passphrase);
+        keys[asset] = { address, passphrase };
       }
     }
     if (atLeastOneKey) {
@@ -605,63 +603,70 @@ class App extends React.Component {
 
   render() {
     if (!this.state.configurationLoaded) {
-      return <div style={{ padding: '10px' }}>Loading...</div>
+      return <div style={{ padding: '10px' }}>Loading...</div>;
     }
-    return <>
-      <userContext.Provider value={{ ...this.state }}>
-        {this.state.displaySigninModal && <SignInModal failure={this.state.signInFailure} passphraseSubmit={this.passphraseSubmit} enabledAssets={this.state.enabledAssets} close={this.closeSignInModal} walletGenerated={this.walletGenerated}></SignInModal>}
-        {this.state.displayLeaveWarning && <LeaveWarning setDisplayLeaveWarning={this.setDisplayLeaveWarning}></LeaveWarning>}
-        <div className="top-bar">
-          <div>
-            <b style={{ fontSize: '21px' }}>{this.state.configuration.appTitle}</b> &nbsp;
-            <a className="feedback-link" style={{ color: '#34cfeb', fontSize: '14px' }} href={this.state.configuration.feedbackLink.url} rel="noopener noreferrer" target="_blank">{this.state.configuration.feedbackLink.text}</a>
-          </div>
-          <div>
-            <SignInState className="sign-in-state" showSignIn={this.showSignIn} keys={this.state.keys} signedIn={this.state.signedIn} signOut={this.signOut}></SignInState>
-          </div>
-        </div>
-        <div className="container">
-          <div className="notifications">
-            {this.state.notifications.map(data => <Notification key={data.id} data={data}></Notification>)}
-          </div>
-          <div className="sell-panel">
-            <PlaceOrder side="ask" orderSubmit={this.orderSubmit} orderSubmitError={this.orderSubmitError}></PlaceOrder>
-          </div>
-          <div className="buy-panel">
-            <PlaceOrder side="bid" orderSubmit={this.orderSubmit} orderSubmitError={this.orderSubmitError}></PlaceOrder>
-          </div>
-          <div className="orderbook-container">
-            <div className="sell-orders">
-              <Orderbook side="asks" orderBookData={this.state.orderBookData} priceDecimalPrecision={this.state.priceDecimalPrecision}></Orderbook>
+    return (
+      <>
+        <userContext.Provider value={{ ...this.state }}>
+          {this.state.displaySigninModal && <SignInModal failure={this.state.signInFailure} passphraseSubmit={this.passphraseSubmit} enabledAssets={this.state.enabledAssets} close={this.closeSignInModal} walletGenerated={this.walletGenerated} />}
+          {this.state.displayLeaveWarning && <LeaveWarning setDisplayLeaveWarning={this.setDisplayLeaveWarning} />}
+          <div className="top-bar">
+            <div>
+              <b style={{ fontSize: '21px' }}>{this.state.configuration.appTitle}</b>
+              {' '}
+&nbsp;
+              <a className="feedback-link" style={{ color: '#34cfeb', fontSize: '14px' }} href={this.state.configuration.feedbackLink.url} rel="noopener noreferrer" target="_blank">{this.state.configuration.feedbackLink.text}</a>
             </div>
-            <div className="price-display">
-              Price: {this.state.minAsk} {this.state.activeAssets[1].toUpperCase()}
-            </div>
-            <div className="buy-orders">
-              <Orderbook side="bids" orderBookData={this.state.orderBookData} priceDecimalPrecision={this.state.priceDecimalPrecision}></Orderbook>
+            <div>
+              <SignInState className="sign-in-state" showSignIn={this.showSignIn} keys={this.state.keys} signedIn={this.state.signedIn} signOut={this.signOut} />
             </div>
           </div>
-          <div className="price-chart">
-            <PriceHistoryChart
-              key="price-history-chart"
-              type="hybrid"
-              market={this.state.activeMarket}
-              assets={this.state.activeAssets}
-              data={this.state.priceHistory}
-              windowWidth={this.state.windowWidth}
-              windowHeight={this.state.windowHeight}
-            >
-            </PriceHistoryChart>
+          <div className="container">
+            <div className="notifications">
+              {this.state.notifications.map((data) => <Notification key={data.id} data={data} />)}
+            </div>
+            <div className="sell-panel">
+              <PlaceOrder side="ask" orderSubmit={this.orderSubmit} orderSubmitError={this.orderSubmitError} />
+            </div>
+            <div className="buy-panel">
+              <PlaceOrder side="bid" orderSubmit={this.orderSubmit} orderSubmitError={this.orderSubmitError} />
+            </div>
+            <div className="orderbook-container">
+              <div className="sell-orders">
+                <Orderbook side="asks" orderBookData={this.state.orderBookData} priceDecimalPrecision={this.state.priceDecimalPrecision} />
+              </div>
+              <div className="price-display">
+                Price:
+                {' '}
+                {this.state.minAsk}
+                {' '}
+                {this.state.activeAssets[1].toUpperCase()}
+              </div>
+              <div className="buy-orders">
+                <Orderbook side="bids" orderBookData={this.state.orderBookData} priceDecimalPrecision={this.state.priceDecimalPrecision} />
+              </div>
+            </div>
+            <div className="price-chart">
+              <PriceHistoryChart
+                key="price-history-chart"
+                type="hybrid"
+                market={this.state.activeMarket}
+                assets={this.state.activeAssets}
+                data={this.state.priceHistory}
+                windowWidth={this.state.windowWidth}
+                windowHeight={this.state.windowHeight}
+              />
+            </div>
+            <div className="your-orders">
+              <YourOrders orders={this.state.yourOrders} orderCanceled={this.orderCancel} />
+            </div>
+            <div className="market-name-and-stats">
+              <MarketList markets={this.state.configuration.markets} refreshInterval={this.state.configuration.refreshInterval} />
+            </div>
           </div>
-          <div className="your-orders">
-            <YourOrders orders={this.state.yourOrders} orderCanceled={this.orderCancel}></YourOrders>
-          </div>
-          <div className="market-name-and-stats">
-            <MarketList markets={this.state.configuration.markets} refreshInterval={this.state.configuration.refreshInterval}></MarketList>
-          </div>
-        </div>
-      </userContext.Provider>
-    </>;
+        </userContext.Provider>
+      </>
+    );
   }
 }
 
