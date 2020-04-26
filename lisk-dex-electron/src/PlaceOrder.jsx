@@ -5,7 +5,7 @@ import { userContext } from './context';
 import * as transactions from '@liskhq/lisk-transactions';
 import axios from 'axios';
 
-export default class PlaceOrder extends React.Component{
+export default class PlaceOrder extends React.Component {
   static contextType = userContext;
   constructor(props, context) {
     super(props, context);

@@ -16,7 +16,7 @@ const markets = Dictionary(Record({
     'dexApiUrl': String
 }))
 
-const UnprocessedDEXConfiguration = Record ({
+const UnprocessedDEXConfiguration = Record({
     'appTitle': String,
     'feedbackLink': Record({
       'text': String,
@@ -30,7 +30,7 @@ const UnprocessedDEXConfiguration = Record ({
 
 // A ready-to-use DEX configuration with the dexOptions (which is fetched from the dexApiUrl) populated.
 // eslint-disable-next-line no-unused-vars
-const DEXConfiguration = Record( {
+const DEXConfiguration = Record({
     'appTitle': String,
     'feedbackLink': Record({
       'text': String,
@@ -68,8 +68,6 @@ const DEXConfiguration = Record( {
     })
 
 export async function processConfiguration(config) {
-    console.dir(config)
-
     // Throws an exception if check fails for given config object
     const _config = UnprocessedDEXConfiguration.check(config);
 
