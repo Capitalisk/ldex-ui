@@ -31,11 +31,18 @@ export default class PlaceOrder extends React.Component {
     });
   }
 
+  getOrderType = () => this.state.marketMode ? "market" : "limit";
+
   handleSubmit(event) {
     event.preventDefault();
     this.clearErrors();
     if (this.validateOrder()) {
-      this.placeOrder();
+      const confirmed = window.confirm(`Are you sure, you want to place this ${this.getOrderType()} order?`);
+      if (confirmed) {
+        this.clearErrors();
+        this.clearValues();
+        this.placeOrder();
+      }
     }
   }
 
@@ -96,6 +103,15 @@ export default class PlaceOrder extends React.Component {
       errors: {}
     })
   }
+
+  // todo : need to check at what other places this can be used
+  clearValues = () => {
+    this.setState({
+      price: 0,
+      amount: 0,
+    })
+  };
+
 
   generateOrder = (tx, type, sourceChain, targetChain, side, price) => {
     let order = {
