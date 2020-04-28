@@ -4,7 +4,7 @@ import { userContext } from './context';
 import { formatThousands } from './Utils'
 import './App.css';
 
-export default class BalanceDisplay extends React.Component<any, any> {
+export default class BalanceDisplay extends React.Component {
   static contextType = userContext;
   interval = undefined;
   constructor(props, context) {

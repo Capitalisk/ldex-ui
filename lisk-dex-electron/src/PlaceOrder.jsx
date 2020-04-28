@@ -1,11 +1,11 @@
 import React from 'react';
 import './PlaceOrder.css';
-import BalanceDisplay from './BalanceDisplay';
+import BalanceDisplay from './BalanceDisplay.jsx';
 import { userContext } from './context';
 import * as transactions from '@liskhq/lisk-transactions';
 import axios from 'axios';
 
-export default class PlaceOrder extends React.Component<any, any> {
+export default class PlaceOrder extends React.Component {
   static contextType = userContext;
   constructor(props, context) {
     super(props, context);
@@ -97,8 +97,8 @@ export default class PlaceOrder extends React.Component<any, any> {
     })
   }
 
-  generateOrder = (tx, type, sourceChain, targetChain, side, price?) => {
-    let order: any = {
+  generateOrder = (tx, type, sourceChain, targetChain, side, price) => {
+    let order = {
       id: tx.id,
       type,
       side,
@@ -120,7 +120,7 @@ export default class PlaceOrder extends React.Component<any, any> {
     return order;
   }
 
-  handleTransactionSubmit = (tx, type, sourceChain, targetChain, side, price?) => {
+  handleTransactionSubmit = (tx, type, sourceChain, targetChain, side, price) => {
     let order = this.generateOrder(tx, type, sourceChain, targetChain, side, price);
     this.props.orderSubmit(order);
   }
@@ -162,7 +162,7 @@ export default class PlaceOrder extends React.Component<any, any> {
             try {
               await axios.post(`${broadcastURL}/transactions`, tx);
             } catch (err) {
-              let error: any = new Error(`Failed to post market order because of error: ${err.message}`);
+              let error = new Error(`Failed to post market order because of error: ${err.message}`);
               error.response = err.response;
               error.order = this.generateOrder(tx, 'market', sourceChain, targetChain, this.props.side);
               this.props.orderSubmitError && this.props.orderSubmitError(error);
@@ -210,7 +210,7 @@ export default class PlaceOrder extends React.Component<any, any> {
             try {
               await axios.post(`${broadcastURL}/transactions`, tx);
             } catch (err) {
-              let error: any = new Error(`Failed to post limit order because of error: ${err.message}`);
+              let error = new Error(`Failed to post limit order because of error: ${err.message}`);
               error.response = err.response;
               error.order = this.generateOrder(tx, 'limit', sourceChain, targetChain, this.props.side, parseFloat(this.state.price));
               this.props.orderSubmitError && this.props.orderSubmitError(error);
