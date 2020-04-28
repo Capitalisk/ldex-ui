@@ -79,7 +79,7 @@ export default class PlaceOrder extends React.Component {
       passphraseTextareas.push(
         <div key={asset} style={{ marginBottom: '20px' }}>
           <span>Passphrase for {asset.toUpperCase()}: </span>
-          <textarea style={styles} rows={4} name={asset} className="sign-in-textarea" value={this.state[asset]} onChange={this.handleChange} />
+          <textarea style={styles} rows={4} data-gramm={false} name={asset} className="sign-in-textarea" value={this.state[asset]} onChange={this.handleChange} />
           <button className="button-secondary" name={asset} onClick={this.handleWalletCreate} style={{ marginRight: '10px' }}>Generate wallet</button> {this.state.addresses[asset] && <span className="generated-wallet-address">Wallet address: {this.state.addresses[asset]}</span>}
         </div>
       );
