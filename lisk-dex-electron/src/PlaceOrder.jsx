@@ -38,7 +38,7 @@ export default class PlaceOrder extends React.Component {
     event.preventDefault();
     this.clearErrors();
     if (this.validateOrder()) {
-      const confirmed = window.confirm(`Are you sure, you want to place this ${this.getOrderType()} order?`);
+      const confirmed = window.confirm(`Are you sure you want to place this ${this.getOrderType()} order?`);
       if (confirmed) {
         this.placeOrder();
         this.clearValues();
