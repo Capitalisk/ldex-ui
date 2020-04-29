@@ -83,7 +83,7 @@ export default class PlaceOrder extends React.Component {
             :
             {' '}
           </span>
-          <textarea style={styles} rows={4} name={asset} className="sign-in-textarea" value={this.state[asset]} onChange={this.handleChange} />
+          <textarea style={styles} rows={4} name={asset} data-gramm={false} className="sign-in-textarea" value={this.state[asset]} onChange={this.handleChange} />
           <button type="button" className="button-secondary" name={asset} onClick={this.handleWalletCreate} style={{ marginRight: '10px' }}>Generate wallet</button>
           {' '}
           {this.state.addresses[asset] && (
