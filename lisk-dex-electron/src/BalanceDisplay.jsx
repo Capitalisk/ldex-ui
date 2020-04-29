@@ -1,12 +1,14 @@
 import React from 'react';
 import axios from 'axios';
-import { userContext } from './context';
-import { formatThousands } from './Utils'
+import userContext from './context';
+import { formatThousands } from './Utils';
 import './App.css';
 
 export default class BalanceDisplay extends React.Component {
   static contextType = userContext;
+
   interval = undefined;
+
   constructor(props, context) {
     super(props, context);
     // included in props:
@@ -37,17 +39,24 @@ export default class BalanceDisplay extends React.Component {
   render() {
     // Note: don't use context for dynamic or frequently changed content.
     // This implementation is a mistake, but I am keeping it as lesson on what not to do.
+
     if (this.context.signedIn === true && this.props.asset in this.context.keys) {
       if (this.interval === undefined) {
         this.update();
         this.interval = setInterval(this.update, this.context.configuration.refreshInterval);
       }
     } else {
-      return <div></div>;
+      return <div />;
     }
     return (
       <div style={{ color: '#FFFFFF', marginBottom: '10px' }}>
-        Balance: <span style={{ fontWeight: 'bold' }}>{formatThousands(Math.round(this.state.balance * 100 / this.props.whole) / 100)} {this.props.asset.toUpperCase()}</span>
+        Balance:
+        {' '}
+        <span style={{ fontWeight: 'bold' }}>
+          {formatThousands(Math.round((this.state.balance * 100) / this.props.whole) / 100)}
+          {' '}
+          {this.props.asset.toUpperCase()}
+        </span>
       </div>
     );
   }

@@ -1,0 +1,22 @@
+{
+  "extends": "airbnb",
+  "env": {
+    "browser": true,
+    "jest": true,
+    "es6": true
+  },
+  "parser": "babel-eslint",
+  "rules": {
+    "max-len": "off",
+    "no-underscore-dangle": "off",
+    "no-await-in-loop": "off",
+    "react/sort-comp": "off",
+    "react/destructuring-assignment": "off",
+    "no-param-reassign": "off",
+    "no-continue": "off",
+    "no-restricted-syntax": "off",
+    "react/static-property-placement": "off",
+    "react/prop-types": "off",
+    "consistent-return": "warn"
+  }
+}

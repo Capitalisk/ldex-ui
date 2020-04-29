@@ -1,17 +1,17 @@
 import axios from 'axios';
 
-export function getClient(api_base_url) {
+export function getClient(apiBaseUrl) {
   return axios.create({
-    baseURL: api_base_url,
+    baseURL: apiBaseUrl,
     timeout: 10000,
-    headers: { 'X-LiskDexUI-Version': '0.2' }
+    headers: { 'X-LiskDexUI-Version': '0.2' },
   });
 }
 
 export async function getOrderbook(instance) {
-  const [{data: bids}, {data: asks}] = await Promise.all([
+  const [{ data: bids }, { data: asks }] = await Promise.all([
     instance.get('/orders/bids?sort=price:desc'),
-    instance.get('/orders/asks?sort=price:asc')
+    instance.get('/orders/asks?sort=price:asc'),
   ]);
   return bids.concat(asks);
 }
@@ -29,10 +29,10 @@ export async function getPendingTransfers(instance, targetAssetSymbol, recipient
 }
 
 export async function getProcessedHeights(instance) {
-  const status = (await instance.get(`/status`)).data;
+  const status = (await instance.get('/status')).data;
   return status.processedHeights;
 }
 
 export async function getConfig(instance) {
-  return (await instance.get(`/config.json`)).data;
+  return (await instance.get('/config.json')).data;
 }
