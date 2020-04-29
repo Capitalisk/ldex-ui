@@ -12,16 +12,16 @@ export default class MarketList extends React.Component {
   }
 
   handleChange(event) {
-    const target = event.target;
+    const { target } = event;
     const value = target.type === 'checkbox' ? target.checked : target.value;
-    const name = target.name;
+    const { name } = target;
 
     this.setState({
-      [name]: value
+      [name]: value,
     });
   }
 
-  handleSubmit(event) {
+  handleSubmit = (event) => {
     event.preventDefault();
   }
 
@@ -30,16 +30,22 @@ export default class MarketList extends React.Component {
       <>
         <div style={{ padding: '10px' }}>
           <div className="action-name">MARKETS</div>
-          {Object.keys(this.props.markets).map(marketSymbol => {
-            return (
-              <div key={marketSymbol}>
-                <p>Current market: <b>{marketSymbol.toUpperCase()}</b></p>
-                <p>More markets coming soon!</p>
-              </div>
-            );
-          })}
+          {Object.keys(this.props.markets).map((marketSymbol) => (
+            <div key={marketSymbol}>
+              <p>
+                Current market:
+                <b>{marketSymbol.toUpperCase()}</b>
+              </p>
+              <p>More markets coming soon!</p>
+            </div>
+          ))}
           <small>
-            <br></br>Data refreshed every {Math.round(this.props.refreshInterval / 1000)} seconds.
+            <br />
+            Data refreshed every
+            {' '}
+            {Math.round(this.props.refreshInterval / 1000)}
+            {' '}
+            seconds.
           </small>
         </div>
       </>

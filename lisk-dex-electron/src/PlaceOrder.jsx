@@ -1,12 +1,13 @@
 import React from 'react';
 import './PlaceOrder.css';
-import BalanceDisplay from './BalanceDisplay.jsx';
-import { userContext } from './context';
 import * as transactions from '@liskhq/lisk-transactions';
 import axios from 'axios';
+import BalanceDisplay from './BalanceDisplay';
+import userContext from './context';
 
 export default class PlaceOrder extends React.Component {
   static contextType = userContext;
+
   constructor(props, context) {
     super(props, context);
     this.state = {
@@ -22,16 +23,16 @@ export default class PlaceOrder extends React.Component {
   }
 
   handleChange(event) {
-    const target = event.target;
+    const { target } = event;
     const value = target.type === 'checkbox' ? target.checked : target.value;
-    const name = target.name;
+    const { name } = target;
 
     this.setState({
-      [name]: value
+      [name]: value,
     });
   }
 
-  getOrderType = () => this.state.marketMode ? "market" : "limit";
+  getOrderType = () => (this.state.marketMode ? 'market' : 'limit');
 
   handleSubmit(event) {
     event.preventDefault();
@@ -47,26 +48,26 @@ export default class PlaceOrder extends React.Component {
 
   switchMode = () => {
     this.clearErrors();
-    this.setState({ marketMode: !this.state.marketMode });
+    this.setState((prevState) => ({ marketMode: !prevState.marketMode }));
   }
 
   validateOrder = () => {
     let success = true;
-    let { dexOptions } = this.context.configuration.markets[this.context.activeMarket];
-    let { priceDecimalPrecision } = dexOptions;
-    let sourceAsset = this.props.side === 'bid' ? this.context.activeAssets[1] : this.context.activeAssets[0];
-    let unitValue = this.context.configuration.assets[sourceAsset].unitValue;
-    let minOrderAmount = dexOptions.chains[sourceAsset].minOrderAmount / unitValue;
-    let errors = {
+    const { dexOptions } = this.context.configuration.markets[this.context.activeMarket];
+    const { priceDecimalPrecision } = dexOptions;
+    const sourceAsset = this.props.side === 'bid' ? this.context.activeAssets[1] : this.context.activeAssets[0];
+    const { unitValue } = this.context.configuration.assets[sourceAsset];
+    const minOrderAmount = dexOptions.chains[sourceAsset].minOrderAmount / unitValue;
+    const errors = {
       price: null,
-      amount: null
+      amount: null,
     };
     if (!this.state.marketMode) {
-      if (isNaN(this.state.price) || this.state.price === '') {
+      if (Number.isNaN(this.state.price) || this.state.price === '') {
         errors.price = 'The order price must be a number.';
         success = false;
       } else {
-        let price = parseFloat(this.state.price);
+        const price = parseFloat(this.state.price);
         if (price === 0) {
           errors.price = 'The order price cannot be 0.';
           success = false;
@@ -76,11 +77,11 @@ export default class PlaceOrder extends React.Component {
         }
       }
     }
-    if (isNaN(this.state.amount) || this.state.amount === '') {
+    if (Number.isNaN(this.state.amount) || this.state.amount === '') {
       errors.amount = 'The order amount must be a number.';
       success = false;
     } else {
-      let amount = parseFloat(this.state.amount);
+      const amount = parseFloat(this.state.amount);
       if (amount < minOrderAmount) {
         errors.amount = `The specified amount was less than the minimum order amount allowed by this DEX market which is ${
           minOrderAmount
@@ -91,7 +92,7 @@ export default class PlaceOrder extends React.Component {
 
     if (!success) {
       this.setState({
-        errors
+        errors,
       });
     }
     return success;
@@ -99,8 +100,8 @@ export default class PlaceOrder extends React.Component {
 
   clearErrors = () => {
     this.setState({
-      errors: {}
-    })
+      errors: {},
+    });
   }
 
   // todo : need to check at what other places this can be used
@@ -108,19 +109,19 @@ export default class PlaceOrder extends React.Component {
     this.setState({
       price: 0,
       amount: 0,
-    })
+    });
   };
 
 
   generateOrder = (tx, type, sourceChain, targetChain, side, price) => {
-    let order = {
+    const order = {
       id: tx.id,
       type,
       side,
       senderId: tx.senderId,
       recipientId: tx.recipientId,
       sourceChain,
-      targetChain
+      targetChain,
     };
     if (side === 'bid') {
       order.value = tx.amount;
@@ -136,31 +137,29 @@ export default class PlaceOrder extends React.Component {
   }
 
   handleTransactionSubmit = (tx, type, sourceChain, targetChain, side, price) => {
-    let order = this.generateOrder(tx, type, sourceChain, targetChain, side, price);
+    const order = this.generateOrder(tx, type, sourceChain, targetChain, side, price);
     this.props.orderSubmit(order);
   }
 
   placeOrder = () => {
     if (this.state.marketMode) {
-      let dexAddress = undefined;
-      let destAddress = undefined;
-      let passphrase = undefined;
-      let sourceChain = undefined;
-      let targetChain = undefined;
-      let broadcastURL = undefined;
+      let dexAddress;
+      let destAddress;
+      let passphrase;
+      let sourceChain;
+      let targetChain;
+      let broadcastURL;
       if (this.props.side === 'bid') {
         dexAddress = this.context.configuration.markets[this.context.activeMarket].dexOptions.chains[this.context.activeAssets[1]].walletAddress;
         destAddress = this.context.keys[this.context.activeAssets[0]].address;
         passphrase = this.context.keys[this.context.activeAssets[1]].passphrase;
-        sourceChain = this.context.activeAssets[1];
-        targetChain = this.context.activeAssets[0];
+        [targetChain, sourceChain] = this.context.activeAssets;
         broadcastURL = this.context.configuration.assets[this.context.activeAssets[1]].apiUrl;
       } else if (this.props.side === 'ask') {
         dexAddress = this.context.configuration.markets[this.context.activeMarket].dexOptions.chains[this.context.activeAssets[0]].walletAddress;
         destAddress = this.context.keys[this.context.activeAssets[1]].address;
         passphrase = this.context.keys[this.context.activeAssets[0]].passphrase;
-        sourceChain = this.context.activeAssets[0];
-        targetChain = this.context.activeAssets[1];
+        [sourceChain, targetChain] = this.context.activeAssets;
         broadcastURL = this.context.configuration.assets[this.context.activeAssets[0]].apiUrl;
       }
 
@@ -170,45 +169,43 @@ export default class PlaceOrder extends React.Component {
             amount: transactions.utils.convertLSKToBeddows(this.state.amount.toString()).toString(),
             recipientId: dexAddress,
             data: `${targetChain},market,${destAddress}`,
-            passphrase: passphrase,
+            passphrase,
           });
           (async () => {
-            this.setState({isSubmitting: true});
+            this.setState({ isSubmitting: true });
             try {
               await axios.post(`${broadcastURL}/transactions`, tx);
             } catch (err) {
-              let error = new Error(`Failed to post market order because of error: ${err.message}`);
+              const error = new Error(`Failed to post market order because of error: ${err.message}`);
               error.response = err.response;
               error.order = this.generateOrder(tx, 'market', sourceChain, targetChain, this.props.side);
-              this.props.orderSubmitError && this.props.orderSubmitError(error);
-              this.setState({isSubmitting: false});
+              // this.props.orderSubmitError && this.props.orderSubmitError(error);
+              this.setState({ isSubmitting: false });
               return;
             }
-            this.setState({isSubmitting: false});
+            this.setState({ isSubmitting: false });
             this.handleTransactionSubmit(tx, 'market', sourceChain, targetChain, this.props.side);
           })();
         }
       }
     } else {
-      let dexAddress = undefined;
-      let destAddress = undefined;
-      let passphrase = undefined;
-      let sourceChain = undefined;
-      let targetChain = undefined;
-      let broadcastURL = undefined;
+      let dexAddress;
+      let destAddress;
+      let passphrase;
+      let sourceChain;
+      let targetChain;
+      let broadcastURL;
       if (this.props.side === 'bid') {
         dexAddress = this.context.configuration.markets[this.context.activeMarket].dexOptions.chains[this.context.activeAssets[1]].walletAddress;
         destAddress = this.context.keys[this.context.activeAssets[0]].address;
         passphrase = this.context.keys[this.context.activeAssets[1]].passphrase;
-        sourceChain = this.context.activeAssets[1];
-        targetChain = this.context.activeAssets[0];
+        [targetChain, sourceChain] = this.context.activeAssets;
         broadcastURL = this.context.configuration.assets[this.context.activeAssets[1]].apiUrl;
       } else if (this.props.side === 'ask') {
         dexAddress = this.context.configuration.markets[this.context.activeMarket].dexOptions.chains[this.context.activeAssets[0]].walletAddress;
         destAddress = this.context.keys[this.context.activeAssets[1]].address;
         passphrase = this.context.keys[this.context.activeAssets[0]].passphrase;
-        sourceChain = this.context.activeAssets[0];
-        targetChain = this.context.activeAssets[1];
+        [sourceChain, targetChain] = this.context.activeAssets;
         broadcastURL = this.context.configuration.assets[this.context.activeAssets[0]].apiUrl;
       }
 
@@ -218,21 +215,21 @@ export default class PlaceOrder extends React.Component {
             amount: transactions.utils.convertLSKToBeddows(this.state.amount.toString()).toString(),
             recipientId: dexAddress,
             data: `${targetChain},limit,${this.state.price},${destAddress}`,
-            passphrase: passphrase,
+            passphrase,
           });
           (async () => {
-            this.setState({isSubmitting: true});
+            this.setState({ isSubmitting: true });
             try {
               await axios.post(`${broadcastURL}/transactions`, tx);
             } catch (err) {
-              let error = new Error(`Failed to post limit order because of error: ${err.message}`);
+              const error = new Error(`Failed to post limit order because of error: ${err.message}`);
               error.response = err.response;
               error.order = this.generateOrder(tx, 'limit', sourceChain, targetChain, this.props.side, parseFloat(this.state.price));
-              this.props.orderSubmitError && this.props.orderSubmitError(error);
-              this.setState({isSubmitting: false});
+              // this.props.orderSubmitError && this.props.orderSubmitError(error);
+              this.setState({ isSubmitting: false });
               return;
             }
-            this.setState({isSubmitting: false});
+            this.setState({ isSubmitting: false });
             this.handleTransactionSubmit(tx, 'limit', sourceChain, targetChain, this.props.side, parseFloat(this.state.price));
           })();
         }
@@ -241,68 +238,119 @@ export default class PlaceOrder extends React.Component {
   }
 
   render() {
-    let canTrade = this.context.keys[this.context.activeAssets[0]] && this.context.keys[this.context.activeAssets[1]];
+    const canTrade = this.context.keys[this.context.activeAssets[0]] && this.context.keys[this.context.activeAssets[1]];
     return (
       <div style={{ padding: '5px' }}>
         <div className="action-name">{this.props.side === 'bid' ? 'BUY' : 'SELL'}</div>
         <div className="market-limit-tabs" style={{ marginBottom: '10px' }}>
-          <button className="tab-button" disabled={this.state.marketMode} onClick={this.switchMode}>Market</button>
-          <button className="tab-button" disabled={!this.state.marketMode} onClick={this.switchMode}>Limit</button>
+          <button type="button" className="tab-button" disabled={this.state.marketMode} onClick={this.switchMode}>Market</button>
+          <button type="button" className="tab-button" disabled={!this.state.marketMode} onClick={this.switchMode}>Limit</button>
         </div>
-        {this.props.side === 'bid' && this.context.keys[this.context.activeAssets[1]] &&
-          <BalanceDisplay whole={Math.pow(10, 8)} asset={this.context.activeAssets[1]}></BalanceDisplay>
-        }
-        {this.props.side === 'ask' && this.context.keys[this.context.activeAssets[0]] &&
-          <BalanceDisplay whole={Math.pow(10, 8)} asset={this.context.activeAssets[0]}></BalanceDisplay>
-        }
-        {canTrade &&
+        {this.props.side === 'bid' && this.context.keys[this.context.activeAssets[1]]
+          && <BalanceDisplay whole={10 ** 8} asset={this.context.activeAssets[1]} />}
+        {this.props.side === 'ask' && this.context.keys[this.context.activeAssets[0]]
+          && <BalanceDisplay whole={10 ** 8} asset={this.context.activeAssets[0]} />}
+        {canTrade
+          && (
           <form onSubmit={this.handleSubmit}>
-            {!this.state.marketMode &&
+            {!this.state.marketMode
+              && (
               <>
-                Price: <br></br>
+                Price:
+                {' '}
+                <br />
                 {this.state.errors.price && <div className="error-message">{this.state.errors.price}</div>}
                 <input name="price" className="order-val-input" type="text" title="Decimal number" value={this.state.price} onChange={this.handleChange} />
               </>
-            }
-            Amount: <br></br>
+              )}
+            Amount:
+            {' '}
+            <br />
             {this.state.errors.amount && <div className="error-message">{this.state.errors.amount}</div>}
             <input name="amount" className="order-val-input" type="text" title="Decimal number" value={this.state.amount} onChange={this.handleChange} />
-            {this.state.marketMode &&
+            {this.state.marketMode
+              && (
               <>
                 {
-                  this.props.side === 'bid' &&
-                  <div style={{ color: 'grey', fontSize: '15px', marginBottom: '10px' }}>≈ {(this.state.amount / this.context.minAsk).toFixed(4)} {this.context.activeAssets[0].toUpperCase()}</div>
+                  this.props.side === 'bid'
+                  && (
+                  <div style={{ color: 'grey', fontSize: '15px', marginBottom: '10px' }}>
+                    ≈
+                    {(this.state.amount / this.context.minAsk).toFixed(4)}
+                    {' '}
+                    {this.context.activeAssets[0].toUpperCase()}
+                  </div>
+                  )
                 }
                 {
-                  this.props.side === 'ask' &&
-                  <div style={{ color: 'grey', fontSize: '15px', marginBottom: '10px' }}>≈ {(this.state.amount * this.context.maxBid).toFixed(4)} {this.context.activeAssets[1].toUpperCase()}</div>
+                  this.props.side === 'ask'
+                  && (
+                  <div style={{ color: 'grey', fontSize: '15px', marginBottom: '10px' }}>
+                    ≈
+                    {(this.state.amount * this.context.maxBid).toFixed(4)}
+                    {' '}
+                    {this.context.activeAssets[1].toUpperCase()}
+                  </div>
+                  )
                 }
               </>
-            }
-            {!this.state.marketMode &&
+              )}
+            {!this.state.marketMode
+              && (
               <>
                 {
-                  this.props.side === 'bid' &&
-                  <div style={{ color: 'grey', fontSize: '15px', marginBottom: '10px' }}>≈ {(this.state.amount / this.state.price).toFixed(4)} {this.context.activeAssets[0].toUpperCase()}</div>
+                  this.props.side === 'bid'
+                  && (
+                  <div style={{ color: 'grey', fontSize: '15px', marginBottom: '10px' }}>
+                    ≈
+                    {(this.state.amount / this.state.price).toFixed(4)}
+                    {' '}
+                    {this.context.activeAssets[0].toUpperCase()}
+                  </div>
+                  )
                 }
                 {
-                  this.props.side === 'ask' &&
-                  <div style={{ color: 'grey', fontSize: '15px', marginBottom: '10px' }}>≈ {(this.state.amount * this.state.price).toFixed(4)} {this.context.activeAssets[1].toUpperCase()}</div>
+                  this.props.side === 'ask'
+                  && (
+                  <div style={{ color: 'grey', fontSize: '15px', marginBottom: '10px' }}>
+                    ≈
+                    {(this.state.amount * this.state.price).toFixed(4)}
+                    {' '}
+                    {this.context.activeAssets[1].toUpperCase()}
+                  </div>
+                  )
                 }
               </>
-            }
+              )}
             {this.props.side === 'bid' && <input className="place-buy-order-button" type="submit" value={this.state.isSubmitting ? '' : 'Submit'} disabled={this.state.isSubmitting} />}
             {this.props.side === 'ask' && <input className="place-sell-order-button" type="submit" value={this.state.isSubmitting ? '' : 'Submit'} disabled={this.state.isSubmitting} />}
-            {this.state.isSubmitting && <div className="lds-dual-ring" style={{ display: 'inline-block', position: 'absolute', left: '48px', marginTop: '2px', marginLeft: '5px' }}></div>}
+            {this.state.isSubmitting && (
+            <div
+              className="lds-dual-ring"
+              style={{
+                display: 'inline-block', position: 'absolute', left: '48px', marginTop: '2px', marginLeft: '5px',
+              }}
+            />
+            )}
           </form>
-        }
+          )}
         {
-          !canTrade &&
+          !canTrade
+          && (
           <p style={{ color: 'grey' }}>
-            Please sign in with your {this.context.activeAssets[0].toUpperCase()} <b>and</b> {this.context.activeAssets[1].toUpperCase()} passphrase to trade.
+            Please sign in with your
+            {' '}
+            {this.context.activeAssets[0].toUpperCase()}
+            {' '}
+            <b>and</b>
+            {' '}
+            {this.context.activeAssets[1].toUpperCase()}
+            {' '}
+            passphrase to trade.
           </p>
+          )
         }
-      </div >
+      </div>
     );
   }
 }
