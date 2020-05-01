@@ -37,10 +37,10 @@
     "electron": "electron .",
     "start": "BROWSER=none react-scripts start",
     "build": "react-scripts build",
-    "test": "react-scripts test",
+    "test": "react-scripts test src/tests",
     "eject": "react-scripts eject",
-    "lint": "eslint  --ext=js --ext=jsx src",
-    "lint-fix": "eslint  --ext=js --ext=jsx --fix src"
+    "lint": "eslint --ext=js --ext=jsx src",
+    "lint-fix": "eslint --ext=js --ext=jsx --fix src"
   },
   "eslintConfig": {
     "extends": "airbnb",
