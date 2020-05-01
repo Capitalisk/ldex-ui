@@ -2,6 +2,8 @@ import {
   groupByKey, Keys, Values, formatThousands,
 } from '../Utils';
 
+import * as orderbook from './fixtures/orderbook1';
+
 describe('Utils tests => ', () => {
   test.each`
     largeNumber               |           expectedFormattedLargeNumber
@@ -57,4 +59,13 @@ describe('Utils tests => ', () => {
     const expectedValues = [{ price: 0.8, value: 7 }, { price: 0.85, value: 1 }, { price: 0.86, value: 1 }, { price: 0.9, value: 1 }, { price: 0.92, value: 6 }];
     expect(Values(actualDict)).toEqual(expectedValues);
   });
+
+  test.each`
+    testOrderBook                 |           amountInLsk                 |             rate
+    ${orderbook}                  |           ${'2000'}        |             ${0.32}
+  `('Should estimate $amountInLsk based on $rate', ({ testOrderBook, amountInLsk, rate }) => {
+  console.log(`orderbook is ${testOrderBook}`);
+  console.log(`amount in lsk is ${amountInLsk}`);
+  console.log(`rate is ${rate}`);
+});
 });
