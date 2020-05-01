@@ -2,7 +2,7 @@ import {
   groupByKey, Keys, Values, formatThousands,
 } from '../Utils';
 
-import * as orderbook from './fixtures/orderbook1';
+import { asks, bids } from './fixtures/orderbook1';
 
 describe('Utils tests => ', () => {
   test.each`
@@ -61,11 +61,20 @@ describe('Utils tests => ', () => {
   });
 
   test.each`
-    testOrderBook                 |           amountInLsk                 |             rate
-    ${orderbook}                  |           ${'2000'}        |             ${0.32}
-  `('Should estimate $amountInLsk based on $rate', ({ testOrderBook, amountInLsk, rate }) => {
-  console.log(`orderbook is ${testOrderBook}`);
-  console.log(`amount in lsk is ${amountInLsk}`);
-  console.log(`rate is ${rate}`);
+    amountInLshForSell      |         estimatedReturnsInLsk      |        lshPaidPerLsk           |        buyerOrders            
+    ${150}                  |         ${120}                     |        ${1.29}                 |        ${bids}               
+  `('Should estimate $amountInLshForSell based on $rate to $estimatedReturnsInLsk', ({ buyerOrders, amountInLshForSell, lshPaidPerLsk }) => {
+  console.log(`orderbook is ${buyerOrders}`);
+  console.log(`amount in lsk is ${amountInLshForSell}`);
+  console.log(`rate is ${lshPaidPerLsk}`);
+});
+
+  test.each`
+    amountInLskForSell       |          estimatedReturnsInLsh     |         lskPaidPerLsh           |        sellerOrders       
+    ${2000}                  |                  ${2300}           |         ${0.77}                 |        ${asks}        
+  `('Should estimate $amountInLskForSell based on $rate to $estimatedReturnsInLsh', ({ sellerOrders, amountInLskForSell, lskPaidPerLsh }) => {
+  console.log(`orderbook is ${sellerOrders}`);
+  console.log(`amount in lsk is ${amountInLskForSell}`);
+  console.log(`rate is ${lskPaidPerLsh}`);
 });
 });
