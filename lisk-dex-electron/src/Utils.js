@@ -40,6 +40,15 @@ const Keys = (dict) => Object.keys(dict);
 
 const Values = (dict) => Object.values(dict);
 
+// considering price unit is same for both buyer and seller, for current application it's in terms of lsk per lsh
+const estimatedPriceForSeller = (Amount, price, bids) => {
+
+};
+
+const estimatedPriceForBuyer = (amount, price, asks) => {
+
+};
+
 export {
   formatThousands, groupByKey, Keys, Values,
 };
