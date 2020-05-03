@@ -61,20 +61,20 @@ describe('Utils tests => ', () => {
   });
 
   test.each`
-    amountInLshForSell      |         estimatedReturnsInLsk      |        lshPaidPerLsk           |        buyerOrders            
-    ${150}                  |         ${120}                     |        ${1.29}                 |        ${bids}               
-  `('Should estimate $amountInLshForSell based on $lshPaidPerLsk to $estimatedReturnsInLsk', ({ buyerOrders, amountInLshForSell, lshPaidPerLsk }) => {
+    sellerAmountInLshForSell      |        marketPriceInLsk            |     estimatedReturnsInLsk      |        buyerOrders            
+    ${150}                        |        ${0.78}                     |         ${120}                 |        ${bids}               
+  `('Should estimate $amountInLshForSell based on $lshPaidPerLsk to $estimatedReturnsInLsk', ({ buyerOrders, sellerAmountInLshForSell, marketPriceInLsk }) => {
   console.log(`orderbook is ${buyerOrders}`);
-  console.log(`amount in lsk is ${amountInLshForSell}`);
-  console.log(`rate is ${lshPaidPerLsk}`);
+  console.log(`amount in lsh is ${sellerAmountInLshForSell}`);
+  console.log(`market price is 1 LSH = ${marketPriceInLsk} LSK`);
 });
 
   test.each`
-    amountInLskForSell       |          estimatedReturnsInLsh     |         lskPaidPerLsh           |        sellerOrders       
-    ${2000}                  |                  ${2300}           |         ${0.77}                 |        ${asks}        
-  `('Should estimate $amountInLskForSell based on $lskPaidPerLsh to $estimatedReturnsInLsh', ({ sellerOrders, amountInLskForSell, lskPaidPerLsh }) => {
+    buyerAmountInLskForSell       |         marketPriceInLsk        |      estimatedLshCanBeBought       |        sellerOrders       
+    ${2000}                       |         ${0.77}                 |              ${2300}               |        ${asks}        
+  `('Should estimate $amountInLskForSell based on $lskPaidPerLsh to $estimatedReturnsInLsh', ({ sellerOrders, buyerAmountInLskForSell, marketPriceInLsk }) => {
   console.log(`orderbook is ${sellerOrders}`);
-  console.log(`amount in lsk is ${amountInLskForSell}`);
-  console.log(`rate is ${lskPaidPerLsh}`);
+  console.log(`amount in lsk is ${buyerAmountInLskForSell}`);
+  console.log(`market price is 1 LSH = ${marketPriceInLsk} LSK`);
 });
 });
