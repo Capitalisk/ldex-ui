@@ -40,15 +40,54 @@ const Keys = (dict) => Object.keys(dict);
 
 const Values = (dict) => Object.values(dict);
 
-// considering price unit is same for both buyer and seller, for current application it's in terms of lsk per lsh
-const estimatedPriceForSeller = (Amount, price, bids) => {
-
+const EstimationStatus = {
+  MATCH: 1,
+  PARTIAL_MATCH: 2,
+  NO_MATCH: 3,
 };
 
-const estimatedPriceForBuyer = (amount, price, asks) => {
+Object.freeze(EstimationStatus);
+// considering price unit is same for both buyer and seller, for current application it's in terms of lsk per lsh
+const estimatedReturnsForSeller = (amount, price, bids) => {
+  let estimatedReturns = 0;
+  let status = EstimationStatus.NO_MATCH;
+  const maxAmountCanBeReturned = amount * price;
+  for (const bid of bids) {
+    const remainingAmount = maxAmountCanBeReturned - estimatedReturns;
+    if (price <= bid.price) {
+      if (bid.amount >= remainingAmount) {
+        estimatedReturns += remainingAmount;
+        status = EstimationStatus.MATCH;
+        break;
+      } else {
+        estimatedReturns += bid.amount;
+        status = EstimationStatus.PARTIAL_MATCH;
+      }
+    }
+  }
+  return { estimatedReturns, status };
+};
 
+const estimatedReturnsForBuyer = (amount, price, asks) => {
+  let estimatedReturns = 0;
+  let status = EstimationStatus.NO_MATCH;
+  const maxAmountCanBeReturned = amount * (1 / price);
+  for (const ask of asks) {
+    const remainingAmount = maxAmountCanBeReturned - estimatedReturns;
+    if (price >= ask.price) {
+      if (ask.amount >= remainingAmount) {
+        estimatedReturns += remainingAmount;
+        status = EstimationStatus.MATCH;
+        break;
+      } else {
+        estimatedReturns += ask.amount;
+        status = EstimationStatus.PARTIAL_MATCH;
+      }
+    }
+  }
+  return { estimatedReturns, status };
 };
 
 export {
-  formatThousands, groupByKey, Keys, Values,
+  formatThousands, groupByKey, Keys, Values, estimatedReturnsForBuyer, estimatedReturnsForSeller, EstimationStatus,
 };

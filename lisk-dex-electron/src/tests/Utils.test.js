@@ -1,5 +1,5 @@
 import {
-  groupByKey, Keys, Values, formatThousands,
+  groupByKey, Keys, Values, formatThousands, estimatedReturnsForSeller, estimatedReturnsForBuyer, EstimationStatus,
 } from '../Utils';
 
 import { asks, bids } from './fixtures/orderbook1';
@@ -61,20 +61,26 @@ describe('Utils tests => ', () => {
   });
 
   test.each`
-    sellerAmountInLshForSell      |        marketPriceInLsk            |     estimatedReturnsInLsk      |        buyerOrders            
-    ${150}                        |        ${0.78}                     |         ${120}                 |        ${bids}               
-  `('Should estimate $amountInLshForSell based on $lshPaidPerLsk to $estimatedReturnsInLsk', ({ buyerOrders, sellerAmountInLshForSell, marketPriceInLsk }) => {
-  console.log(`orderbook is ${buyerOrders}`);
-  console.log(`amount in lsh is ${sellerAmountInLshForSell}`);
-  console.log(`market price is 1 LSH = ${marketPriceInLsk} LSK`);
+    sellerAmountInLshForSell      |        marketPriceInLsk            |     estimatedReturnsInLsk      |        buyerOrders    |     estimatedStatus        
+    ${150}                        |        ${0.78}                     |         ${0}                   |        ${bids}        |     ${EstimationStatus.NO_MATCH}
+    ${160}                        |        ${0.40}                     |         ${64}                  |        ${bids}        |     ${EstimationStatus.MATCH}
+    ${142}                        |        ${0.48}                     |         ${68.16}               |        ${bids}        |     ${EstimationStatus.MATCH}               
+  `('Should estimate $amountInLshForSell based on $lshPaidPerLsk to $estimatedReturnsInLsk', ({
+  buyerOrders, sellerAmountInLshForSell, marketPriceInLsk, estimatedReturnsInLsk, estimatedStatus,
+}) => {
+  const actualEstimatedReturnsInLsk = estimatedReturnsForSeller(sellerAmountInLshForSell, marketPriceInLsk, buyerOrders);
+  expect(actualEstimatedReturnsInLsk.estimatedReturns).toBe(estimatedReturnsInLsk);
+  expect(actualEstimatedReturnsInLsk.status).toBe(estimatedStatus);
 });
 
   test.each`
-    buyerAmountInLskForSell       |         marketPriceInLsk        |      estimatedLshCanBeBought       |        sellerOrders       
-    ${2000}                       |         ${0.77}                 |              ${2300}               |        ${asks}        
-  `('Should estimate $amountInLskForSell based on $lskPaidPerLsh to $estimatedReturnsInLsh', ({ sellerOrders, buyerAmountInLskForSell, marketPriceInLsk }) => {
-  console.log(`orderbook is ${sellerOrders}`);
-  console.log(`amount in lsk is ${buyerAmountInLskForSell}`);
-  console.log(`market price is 1 LSH = ${marketPriceInLsk} LSK`);
+    buyerAmountInLskForSell       |         marketPriceInLsk        |      estimatedLshCanBeBought       |        sellerOrders    |     estimatedStatus
+    ${2000}                       |         ${0.77}                 |              ${3.1169}             |        ${asks}         |     ${EstimationStatus.PARTIAL_MATCH}
+  `('Should estimate $amountInLskForSell based on $lskPaidPerLsh to $estimatedReturnsInLsh', ({
+  sellerOrders, buyerAmountInLskForSell, marketPriceInLsk, estimatedLshCanBeBought, estimatedStatus,
+}) => {
+  const actualLshCanBeBought = estimatedReturnsForBuyer(buyerAmountInLskForSell, marketPriceInLsk, sellerOrders);
+  expect(actualLshCanBeBought.estimatedReturns).toBe(estimatedLshCanBeBought);
+  expect(actualLshCanBeBought.status).toBe(estimatedStatus);
 });
 });
