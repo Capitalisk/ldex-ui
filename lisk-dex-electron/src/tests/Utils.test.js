@@ -2,7 +2,7 @@ import {
   groupByKey, Keys, Values, formatThousands, estimatedReturnsForSeller, estimatedReturnsForBuyer, EstimationStatus,
 } from '../Utils';
 
-import { asks, bids } from './fixtures/orderbook1';
+import { asks, bids } from './fixtures/orderbook';
 
 describe('Utils tests => ', () => {
   test.each`
@@ -64,7 +64,13 @@ describe('Utils tests => ', () => {
     sellerAmountInLshForSell      |        marketPriceInLsk            |     estimatedReturnsInLsk      |        buyerOrders    |     estimatedStatus        
     ${150}                        |        ${0.78}                     |         ${0}                   |        ${bids}        |     ${EstimationStatus.NO_MATCH}
     ${160}                        |        ${0.40}                     |         ${64}                  |        ${bids}        |     ${EstimationStatus.MATCH}
-    ${142}                        |        ${0.48}                     |         ${68.16}               |        ${bids}        |     ${EstimationStatus.MATCH}               
+    ${142}                        |        ${0.48}                     |         ${68.16}               |        ${bids}        |     ${EstimationStatus.MATCH} 
+    ${739.130434783}              |        ${0.23}                     |         ${170}                 |        ${bids}        |     ${EstimationStatus.MATCH} 
+    ${947.368421053}              |        ${0.19}                     |         ${180}                 |        ${bids}        |     ${EstimationStatus.MATCH} 
+    ${818.18181}                  |        ${0.22}                     |         ${180}                 |        ${bids}        |     ${EstimationStatus.PARTIAL_MATCH} 
+    ${327.868852459}              |        ${0.61}                     |         ${0}                   |        ${bids}        |     ${EstimationStatus.NO_MATCH} 
+    ${457.142857143}              |        ${0.35}                     |         ${160}                 |        ${bids}        |     ${EstimationStatus.MATCH} 
+    ${1495.0166113}               |        ${0.602}                    |         ${0}                   |        ${bids}        |     ${EstimationStatus.NO_MATCH} 
   `('Should estimate $amountInLshForSell based on $lshPaidPerLsk to $estimatedReturnsInLsk', ({
   buyerOrders, sellerAmountInLshForSell, marketPriceInLsk, estimatedReturnsInLsk, estimatedStatus,
 }) => {
@@ -76,6 +82,14 @@ describe('Utils tests => ', () => {
   test.each`
     buyerAmountInLskForSell       |         marketPriceInLsk        |      estimatedLshCanBeBought       |        sellerOrders    |     estimatedStatus
     ${2000}                       |         ${0.77}                 |              ${3.1169}             |        ${asks}         |     ${EstimationStatus.PARTIAL_MATCH}
+    ${2793.6}                     |         ${0.96}                 |              ${2910}               |        ${asks}         |     ${EstimationStatus.MATCH}
+    ${2821.5}                     |         ${0.95}                 |              ${2970}               |        ${asks}         |     ${EstimationStatus.MATCH}
+    ${2845.25}                    |         ${0.95}                 |              ${2995}               |        ${asks}         |     ${EstimationStatus.MATCH}
+    ${63.36}                      |         ${0.88}                 |              ${72}                 |        ${asks}         |     ${EstimationStatus.MATCH}
+    ${79.2}                       |         ${0.88}                 |              ${90}                 |        ${asks}         |     ${EstimationStatus.PARTIAL_MATCH}
+    ${76.244}                     |         ${0.778}                |              ${0}                  |        ${asks}         |     ${EstimationStatus.NO_MATCH}
+    ${78}                         |         ${0.78}                 |              ${0}                  |        ${asks}         |     ${EstimationStatus.NO_MATCH}
+    ${974.86}                     |         ${0.79}                 |              ${0}                  |        ${asks}         |     ${EstimationStatus.NO_MATCH}
   `('Should estimate $amountInLskForSell based on $lskPaidPerLsh to $estimatedReturnsInLsh', ({
   sellerOrders, buyerAmountInLskForSell, marketPriceInLsk, estimatedLshCanBeBought, estimatedStatus,
 }) => {
