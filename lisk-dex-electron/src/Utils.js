@@ -48,7 +48,7 @@ const EstimationStatus = {
 
 Object.freeze(EstimationStatus);
 // considering price unit is same for both buyer and seller, for current application it's in terms of lsk per lsh
-const estimatedReturnsForSeller = (amount, price, bids) => {
+const estimateFlatReturnsForSeller = (amount, price, bids) => {
   let estimatedReturns = 0;
   let status = EstimationStatus.NO_MATCH;
   const maxAmountCanBeReturned = amount * price;
@@ -68,7 +68,7 @@ const estimatedReturnsForSeller = (amount, price, bids) => {
   return { estimatedReturns, status };
 };
 
-const estimatedReturnsForBuyer = (amount, price, asks) => {
+const estimatedFlatReturnsForBuyer = (amount, price, asks) => {
   let estimatedReturns = 0;
   let status = EstimationStatus.NO_MATCH;
   const maxAmountCanBeReturned = amount * (1 / price);
@@ -88,6 +88,48 @@ const estimatedReturnsForBuyer = (amount, price, asks) => {
   return { estimatedReturns, status };
 };
 
+const estimateBestReturnsForSeller = (amount, price, bids) => {
+  let estimatedReturns = 0;
+  let status = EstimationStatus.NO_MATCH;
+  for (const bid of bids) {
+    const amountYetToBeSold = amount - (estimatedReturns / price);
+    if (price <= bid.price) {
+      const bestBidReturns = amountYetToBeSold * bid.price;
+      if (bid.amount >= bestBidReturns) {
+        estimatedReturns += bestBidReturns;
+        status = EstimationStatus.MATCH;
+        break;
+      } else {
+        estimatedReturns += bid.amount;
+        status = EstimationStatus.PARTIAL_MATCH;
+      }
+    }
+  }
+  return { estimatedReturns, status };
+};
+
+const estimatedBestReturnsForBuyer = (amount, price, asks) => {
+  let estimatedReturns = 0;
+  let status = EstimationStatus.NO_MATCH;
+  for (const ask of asks) {
+    const amountYetToBeSold = amount - (estimatedReturns * price);
+    if (price >= ask.price) {
+      const bestAskReturns = amountYetToBeSold / ask.price;
+      if (ask.amount >= bestAskReturns) {
+        estimatedReturns += bestAskReturns;
+        status = EstimationStatus.MATCH;
+        break;
+      } else {
+        estimatedReturns += ask.amount;
+        status = EstimationStatus.PARTIAL_MATCH;
+      }
+    }
+  }
+  return { estimatedReturns, status };
+};
+
+
 export {
-  formatThousands, groupByKey, Keys, Values, estimatedReturnsForBuyer, estimatedReturnsForSeller, EstimationStatus,
+  formatThousands, groupByKey, Keys, Values, estimatedFlatReturnsForBuyer, estimateFlatReturnsForSeller, estimateBestReturnsForSeller,
+  estimatedBestReturnsForBuyer, EstimationStatus,
 };
