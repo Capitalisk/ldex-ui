@@ -91,8 +91,8 @@ const estimatedFlatReturnsForBuyer = (amount, price, asks) => {
 const estimateBestReturnsForSeller = (amount, price, bids) => {
   let estimatedReturns = 0;
   let status = EstimationStatus.NO_MATCH;
+  let amountYetToBeSold = amount;
   for (const bid of bids) {
-    const amountYetToBeSold = amount - (estimatedReturns / price);
     if (price <= bid.price) {
       const bestBidReturns = amountYetToBeSold * bid.price;
       if (bid.amount >= bestBidReturns) {
@@ -101,6 +101,8 @@ const estimateBestReturnsForSeller = (amount, price, bids) => {
         break;
       } else {
         estimatedReturns += bid.amount;
+        const amountSold = (bid.amount / bid.price);
+        amountYetToBeSold -= amountSold;
         status = EstimationStatus.PARTIAL_MATCH;
       }
     }
@@ -111,8 +113,8 @@ const estimateBestReturnsForSeller = (amount, price, bids) => {
 const estimatedBestReturnsForBuyer = (amount, price, asks) => {
   let estimatedReturns = 0;
   let status = EstimationStatus.NO_MATCH;
+  let amountYetToBeSold = amount;
   for (const ask of asks) {
-    const amountYetToBeSold = amount - (estimatedReturns * price);
     if (price >= ask.price) {
       const bestAskReturns = amountYetToBeSold / ask.price;
       if (ask.amount >= bestAskReturns) {
@@ -121,6 +123,8 @@ const estimatedBestReturnsForBuyer = (amount, price, asks) => {
         break;
       } else {
         estimatedReturns += ask.amount;
+        const amountSold = (ask.amount * ask.price);
+        amountYetToBeSold -= amountSold;
         status = EstimationStatus.PARTIAL_MATCH;
       }
     }
