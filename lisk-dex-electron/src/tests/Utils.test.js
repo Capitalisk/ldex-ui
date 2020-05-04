@@ -67,9 +67,9 @@ describe('Utils tests => ', () => {
     ${142}                        |        ${0.48}                     |         ${68.16}               |        ${bids}        |     ${EstimationStatus.MATCH} 
     ${739.130434783}              |        ${0.23}                     |         ${170}                 |        ${bids}        |     ${EstimationStatus.MATCH} 
     ${947.368421053}              |        ${0.19}                     |         ${180}                 |        ${bids}        |     ${EstimationStatus.MATCH} 
-    ${818.181818182}              |        ${0.22}                     |         ${180}                 |        ${bids}        |     ${EstimationStatus.PARTIAL_MATCH} 
+    ${818.181818182}              |        ${0.22}                     |         ${178.2073}            |        ${bids}        |     ${EstimationStatus.PARTIAL_MATCH} 
     ${327.868852459}              |        ${0.61}                     |         ${0}                   |        ${bids}        |     ${EstimationStatus.NO_MATCH} 
-    ${457.142857143}              |        ${0.35}                     |         ${160}                 |        ${bids}        |     ${EstimationStatus.PARTIAL_MATCH} 
+    ${457.142857143}              |        ${0.35}                     |         ${154.4369}            |        ${bids}        |     ${EstimationStatus.PARTIAL_MATCH} 
     ${1495.0166113}               |        ${0.602}                    |         ${0}                   |        ${bids}        |     ${EstimationStatus.NO_MATCH} 
   `('Should estimate $sellerAmountInLshForSell based on $marketPriceInLsk to $estimatedReturnsInLsk', ({
   buyerOrders, sellerAmountInLshForSell, marketPriceInLsk, estimatedReturnsInLsk, estimatedStatus,
@@ -86,7 +86,7 @@ describe('Utils tests => ', () => {
     ${2821.5}                     |         ${0.95}                 |              ${2970}               |        ${asks}         |     ${EstimationStatus.MATCH}
     ${2845.25}                    |         ${0.95}                 |              ${2995}               |        ${asks}         |     ${EstimationStatus.MATCH}
     ${63.36}                      |         ${0.88}                 |              ${72}                 |        ${asks}         |     ${EstimationStatus.MATCH}
-    ${79.2}                       |         ${0.88}                 |              ${90}                 |        ${asks}         |     ${EstimationStatus.PARTIAL_MATCH}
+    ${79.2}                       |         ${0.88}                 |              ${86.3001}            |        ${asks}         |     ${EstimationStatus.PARTIAL_MATCH}
     ${76.244}                     |         ${0.76}                 |              ${0}                  |        ${asks}         |     ${EstimationStatus.NO_MATCH}
     ${78}                         |         ${0.56}                 |              ${0}                  |        ${asks}         |     ${EstimationStatus.NO_MATCH}
     ${974.86}                     |         ${0.20}                 |              ${0}                  |        ${asks}         |     ${EstimationStatus.NO_MATCH}
