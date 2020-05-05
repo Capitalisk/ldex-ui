@@ -1,8 +1,9 @@
 import {
-  groupByKey, Keys, Values, formatThousands, EstimationStatus, estimateBestReturnsForSeller, estimatedBestReturnsForBuyer,
+  groupByKey, Keys, Values, formatThousands, EstimationStatus, estimateBestReturnsForSeller, estimatedBestReturnsForBuyer, getUIOrderBookFrom,
 } from '../Utils';
 
-import { asks, bids } from './fixtures/orderbook';
+import { asks, bids } from './fixtures/orderbook/orderbook';
+import context from './fixtures/context/context';
 
 describe('Utils tests => ', () => {
   test.each`
@@ -97,4 +98,20 @@ describe('Utils tests => ', () => {
   expect(actualLshCanBeBought.estimatedReturns.toFixed(4)).toBe(estimatedLshCanBeBought.toFixed(4));
   expect(actualLshCanBeBought.status).toBe(estimatedStatus);
 });
+
+  it('Should Return UI Orderbook from context orderbook', () => {
+    const expectedOrderBook = {
+      asks: [
+        { price: 0.9500, amount: 2000.0000 },
+        { price: 0.8700, amount: 66.7126 },
+        { price: 0.8000, amount: 0.5000 },
+      ],
+      bids: [
+        { price: 0.6000, amount: 71.9376 },
+        { price: 0.4000, amount: 62.6993 },
+      ],
+    };
+    const actualProcessedOrderBook = getUIOrderBookFrom(context.orderBookData);
+    expect(actualProcessedOrderBook).toStrictEqual(expectedOrderBook);
+  });
 });

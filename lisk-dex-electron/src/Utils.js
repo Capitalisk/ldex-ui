@@ -93,7 +93,31 @@ const estimatedBestReturnsForBuyer = (amount, price, asks) => {
   return { estimatedReturns, status };
 };
 
+// todo - reuse the function in orderbook.js, make sure calculations are in one place
+const getUIOrderBookFrom = (contextOrderBook) => {
+  const calculateAmount = (size, whole) => parseFloat((size / whole).toFixed(4));
+  const asks = [];
+  const bids = [];
+  for (const ask of contextOrderBook.asks) {
+    const size = ask.sizeRemaining;
+    const whole = 10 ** 8;
+    const amount = calculateAmount(size, whole);
+    const { price } = ask;
+    asks.push({ amount, price });
+  }
+  asks.sort((ask1, ask2) => ask2.price - ask1.price);
+  for (const bid of contextOrderBook.bids) {
+    const size = bid.valueRemaining;
+    const whole = 10 ** 8;
+    const amount = calculateAmount(size, whole);
+    const { price } = bid;
+    bids.push({ amount, price });
+  }
+  bids.sort((bid1, bid2) => bid2.price - bid1.price);
+  return { asks, bids };
+};
+
 
 export {
-  formatThousands, groupByKey, Keys, Values, estimateBestReturnsForSeller, estimatedBestReturnsForBuyer, EstimationStatus,
+  formatThousands, groupByKey, Keys, Values, estimateBestReturnsForSeller, estimatedBestReturnsForBuyer, EstimationStatus, getUIOrderBookFrom,
 };
