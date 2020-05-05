@@ -41,53 +41,14 @@ const Keys = (dict) => Object.keys(dict);
 const Values = (dict) => Object.values(dict);
 
 const EstimationStatus = {
-  MATCH: 1,
-  PARTIAL_MATCH: 2,
-  NO_MATCH: 3,
+  MATCH: 'MATCH',
+  PARTIAL_MATCH: 'PARTIAL_MATCH',
+  NO_MATCH: 'NO_MATCH',
 };
 
 Object.freeze(EstimationStatus);
+
 // considering price unit is same for both buyer and seller, for current application it's in terms of lsk per lsh
-const estimateFlatReturnsForSeller = (amount, price, bids) => {
-  let estimatedReturns = 0;
-  let status = EstimationStatus.NO_MATCH;
-  const maxAmountCanBeReturned = amount * price;
-  for (const bid of bids) {
-    const remainingAmount = maxAmountCanBeReturned - estimatedReturns;
-    if (price <= bid.price) {
-      if (bid.amount >= remainingAmount) {
-        estimatedReturns += remainingAmount;
-        status = EstimationStatus.MATCH;
-        break;
-      } else {
-        estimatedReturns += bid.amount;
-        status = EstimationStatus.PARTIAL_MATCH;
-      }
-    }
-  }
-  return { estimatedReturns, status };
-};
-
-const estimatedFlatReturnsForBuyer = (amount, price, asks) => {
-  let estimatedReturns = 0;
-  let status = EstimationStatus.NO_MATCH;
-  const maxAmountCanBeReturned = amount * (1 / price);
-  for (const ask of asks) {
-    const remainingAmount = maxAmountCanBeReturned - estimatedReturns;
-    if (price >= ask.price) {
-      if (ask.amount >= remainingAmount) {
-        estimatedReturns += remainingAmount;
-        status = EstimationStatus.MATCH;
-        break;
-      } else {
-        estimatedReturns += ask.amount;
-        status = EstimationStatus.PARTIAL_MATCH;
-      }
-    }
-  }
-  return { estimatedReturns, status };
-};
-
 const estimateBestReturnsForSeller = (amount, price, bids) => {
   let estimatedReturns = 0;
   let status = EstimationStatus.NO_MATCH;
@@ -101,7 +62,7 @@ const estimateBestReturnsForSeller = (amount, price, bids) => {
         break;
       } else {
         estimatedReturns += bid.amount;
-        const amountSold = (bid.amount / bid.price);
+        const amountSold = bid.amount / bid.price;
         amountYetToBeSold -= amountSold;
         status = EstimationStatus.PARTIAL_MATCH;
       }
@@ -123,7 +84,7 @@ const estimatedBestReturnsForBuyer = (amount, price, asks) => {
         break;
       } else {
         estimatedReturns += ask.amount;
-        const amountSold = (ask.amount * ask.price);
+        const amountSold = ask.amount * ask.price;
         amountYetToBeSold -= amountSold;
         status = EstimationStatus.PARTIAL_MATCH;
       }
@@ -134,6 +95,5 @@ const estimatedBestReturnsForBuyer = (amount, price, asks) => {
 
 
 export {
-  formatThousands, groupByKey, Keys, Values, estimatedFlatReturnsForBuyer, estimateFlatReturnsForSeller, estimateBestReturnsForSeller,
-  estimatedBestReturnsForBuyer, EstimationStatus,
+  formatThousands, groupByKey, Keys, Values, estimateBestReturnsForSeller, estimatedBestReturnsForBuyer, EstimationStatus,
 };

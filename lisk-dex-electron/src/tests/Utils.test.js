@@ -1,6 +1,5 @@
 import {
-  groupByKey, Keys, Values, formatThousands, estimateFlatReturnsForSeller, estimatedFlatReturnsForBuyer, EstimationStatus,
-  estimateBestReturnsForSeller, estimatedBestReturnsForBuyer,
+  groupByKey, Keys, Values, formatThousands, EstimationStatus, estimateBestReturnsForSeller, estimatedBestReturnsForBuyer,
 } from '../Utils';
 
 import { asks, bids } from './fixtures/orderbook';
@@ -60,44 +59,6 @@ describe('Utils tests => ', () => {
     const expectedValues = [{ price: 0.8, value: 7 }, { price: 0.85, value: 1 }, { price: 0.86, value: 1 }, { price: 0.9, value: 1 }, { price: 0.92, value: 6 }];
     expect(Values(actualDict)).toEqual(expectedValues);
   });
-
-  test.each`
-      sellerAmountInLshForSell      |        marketPriceInLsk            |     estimatedReturnsInLsk      |        buyerOrders    |     estimatedStatus
-      ${150}                        |        ${0.78}                     |         ${0}                   |        ${bids}        |     ${EstimationStatus.NO_MATCH}
-      ${160}                        |        ${0.40}                     |         ${64}                  |        ${bids}        |     ${EstimationStatus.MATCH}
-      ${142}                        |        ${0.48}                     |         ${68.16}               |        ${bids}        |     ${EstimationStatus.MATCH}
-      ${739.130434783}              |        ${0.23}                     |         ${170}                 |        ${bids}        |     ${EstimationStatus.MATCH}
-      ${947.368421053}              |        ${0.19}                     |         ${180}                 |        ${bids}        |     ${EstimationStatus.MATCH}
-      ${818.181818182}              |        ${0.22}                     |         ${178.2073}            |        ${bids}        |     ${EstimationStatus.PARTIAL_MATCH}
-      ${327.868852459}              |        ${0.61}                     |         ${0}                   |        ${bids}        |     ${EstimationStatus.NO_MATCH}
-      ${457.142857143}              |        ${0.35}                     |         ${154.4369}            |        ${bids}        |     ${EstimationStatus.PARTIAL_MATCH}
-      ${1495.0166113}               |        ${0.602}                    |         ${0}                   |        ${bids}        |     ${EstimationStatus.NO_MATCH}
-    `('Should estimate flat returns for {$sellerAmountInLshForSell} LSH based on {$marketPriceInLsk} LSK/LSH', ({
-  buyerOrders, sellerAmountInLshForSell, marketPriceInLsk, estimatedReturnsInLsk, estimatedStatus,
-}) => {
-  const actualEstimatedReturnsInLsk = estimateFlatReturnsForSeller(sellerAmountInLshForSell, marketPriceInLsk, buyerOrders);
-  expect(actualEstimatedReturnsInLsk.estimatedReturns.toFixed(4)).toBe(estimatedReturnsInLsk.toFixed(4));
-  expect(actualEstimatedReturnsInLsk.status).toBe(estimatedStatus);
-});
-
-  test.each`
-      buyerAmountInLskForSell       |         marketPriceInLsk        |      estimatedLshCanBeBought       |        sellerOrders    |     estimatedStatus
-      ${2000}                       |         ${0.77}                 |              ${3.1169}             |        ${asks}         |     ${EstimationStatus.PARTIAL_MATCH}
-      ${2793.6}                     |         ${0.96}                 |              ${2910}               |        ${asks}         |     ${EstimationStatus.MATCH}
-      ${2821.5}                     |         ${0.95}                 |              ${2970}               |        ${asks}         |     ${EstimationStatus.MATCH}
-      ${2845.25}                    |         ${0.95}                 |              ${2995}               |        ${asks}         |     ${EstimationStatus.MATCH}
-      ${63.36}                      |         ${0.88}                 |              ${72}                 |        ${asks}         |     ${EstimationStatus.MATCH}
-      ${79.2}                       |         ${0.88}                 |              ${86.3001}            |        ${asks}         |     ${EstimationStatus.PARTIAL_MATCH}
-      ${76.244}                     |         ${0.76}                 |              ${0}                  |        ${asks}         |     ${EstimationStatus.NO_MATCH}
-      ${78}                         |         ${0.56}                 |              ${0}                  |        ${asks}         |     ${EstimationStatus.NO_MATCH}
-      ${974.86}                     |         ${0.20}                 |              ${0}                  |        ${asks}         |     ${EstimationStatus.NO_MATCH}
-    `('Should estimate flat returns for {$buyerAmountInLskForSell} LSK based on {$marketPriceInLsk} LSK/LSH', ({
-  sellerOrders, buyerAmountInLskForSell, marketPriceInLsk, estimatedLshCanBeBought, estimatedStatus,
-}) => {
-  const actualLshCanBeBought = estimatedFlatReturnsForBuyer(buyerAmountInLskForSell, marketPriceInLsk, sellerOrders);
-  expect(actualLshCanBeBought.estimatedReturns.toFixed(4)).toBe(estimatedLshCanBeBought.toFixed(4));
-  expect(actualLshCanBeBought.status).toBe(estimatedStatus);
-});
 
   test.each`
       sellerAmountInLshForSell      |        marketPriceInLsk            |     estimatedReturnsInLsk      |        buyerOrders    |     estimatedStatus
