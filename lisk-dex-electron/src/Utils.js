@@ -94,7 +94,7 @@ const estimatedBestReturnsForBuyer = (amount, price, asks) => {
 };
 
 // todo - reuse the function in orderbook.js, make sure calculations are in one place
-const getUIOrderBookFrom = (contextOrderBook) => {
+const getCleanOrderBook = (contextOrderBook) => {
   const calculateAmount = (size, whole) => parseFloat((size / whole).toFixed(4));
   const asks = [];
   const bids = [];
@@ -119,5 +119,5 @@ const getUIOrderBookFrom = (contextOrderBook) => {
 
 
 export {
-  formatThousands, groupByKey, Keys, Values, estimateBestReturnsForSeller, estimatedBestReturnsForBuyer, EstimationStatus, getUIOrderBookFrom,
+  formatThousands, groupByKey, Keys, Values, estimateBestReturnsForSeller, estimatedBestReturnsForBuyer, EstimationStatus, getCleanOrderBook,
 };
