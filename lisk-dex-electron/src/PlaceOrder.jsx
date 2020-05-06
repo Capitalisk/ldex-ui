@@ -4,6 +4,7 @@ import * as transactions from '@liskhq/lisk-transactions';
 import axios from 'axios';
 import BalanceDisplay from './BalanceDisplay';
 import userContext from './context';
+import { getCleanOrderBook, estimateBestReturnsForSeller, estimatedBestReturnsForBuyer } from './Utils';
 
 export default class PlaceOrder extends React.Component {
   static contextType = userContext;
@@ -33,6 +34,32 @@ export default class PlaceOrder extends React.Component {
   }
 
   getOrderType = () => (this.state.marketMode ? 'market' : 'limit');
+
+  getEstimatedReturns = () => {
+    const orderBook = getCleanOrderBook(this.context.orderBookData);
+    const amount = parseFloat(this.state.amount);
+    const { asks } = orderBook;
+    const { bids } = orderBook;
+    let estimatedReturns = { };
+    let assetType = '';
+
+    let { price } = this.state;
+
+    if (this.props.side === 'ask') {
+      if (this.getOrderType() === 'market') {
+        price = this.context.maxBid;
+      }
+      estimatedReturns = estimateBestReturnsForSeller(amount, price, bids);
+      assetType = this.context.activeAssets[1].toUpperCase();
+    } else {
+      if (this.getOrderType() === 'market') {
+        price = this.context.minAsk;
+      }
+      estimatedReturns = estimatedBestReturnsForBuyer(amount, price, asks);
+      assetType = this.context.activeAssets[0].toUpperCase();
+    }
+    return { ...estimatedReturns, assetType };
+  }
 
   handleSubmit(event) {
     event.preventDefault();
@@ -268,60 +295,16 @@ export default class PlaceOrder extends React.Component {
             <br />
             {this.state.errors.amount && <div className="error-message">{this.state.errors.amount}</div>}
             <input name="amount" className="order-val-input" type="text" title="Decimal number" value={this.state.amount} onChange={this.handleChange} />
-            {this.state.marketMode
-              && (
-              <>
-                {
-                  this.props.side === 'bid'
-                  && (
-                  <div style={{ color: 'grey', fontSize: '15px', marginBottom: '10px' }}>
-                    ≈
-                    {(this.state.amount / this.context.minAsk).toFixed(4)}
-                    {' '}
-                    {this.context.activeAssets[0].toUpperCase()}
-                  </div>
-                  )
-                }
-                {
-                  this.props.side === 'ask'
-                  && (
-                  <div style={{ color: 'grey', fontSize: '15px', marginBottom: '10px' }}>
-                    ≈
-                    {(this.state.amount * this.context.maxBid).toFixed(4)}
-                    {' '}
-                    {this.context.activeAssets[1].toUpperCase()}
-                  </div>
-                  )
-                }
-              </>
-              )}
-            {!this.state.marketMode
-              && (
-              <>
-                {
-                  this.props.side === 'bid'
-                  && (
-                  <div style={{ color: 'grey', fontSize: '15px', marginBottom: '10px' }}>
-                    ≈
-                    {(this.state.amount / this.state.price).toFixed(4)}
-                    {' '}
-                    {this.context.activeAssets[0].toUpperCase()}
-                  </div>
-                  )
-                }
-                {
-                  this.props.side === 'ask'
-                  && (
-                  <div style={{ color: 'grey', fontSize: '15px', marginBottom: '10px' }}>
-                    ≈
-                    {(this.state.amount * this.state.price).toFixed(4)}
-                    {' '}
-                    {this.context.activeAssets[1].toUpperCase()}
-                  </div>
-                  )
-                }
-              </>
-              )}
+            {
+               (
+                 <div style={{ color: 'grey', fontSize: '15px', marginBottom: '10px' }}>
+                   ≈
+                   {this.getEstimatedReturns().estimatedReturns.toFixed(4)}
+                   {' '}
+                   {this.getEstimatedReturns().assetType}
+                 </div>
+               )
+            }
             {this.props.side === 'bid' && <input className="place-buy-order-button" type="submit" value={this.state.isSubmitting ? '' : 'Submit'} disabled={this.state.isSubmitting} />}
             {this.props.side === 'ask' && <input className="place-sell-order-button" type="submit" value={this.state.isSubmitting ? '' : 'Submit'} disabled={this.state.isSubmitting} />}
             {this.state.isSubmitting && (

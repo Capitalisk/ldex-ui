@@ -12,12 +12,12 @@ export default class Orderbook extends React.Component {
   render() {
     if (this.props.side === 'asks') {
       const groupedAskOrders = Values(groupByKey(this.props.orderBookData.asks, 'price', 'sizeRemaining'));
-      const orders = groupedAskOrders.map((order) => (
+      const orders = groupedAskOrders.map((ask) => (
         <OrderbookEntry
           whole={10 ** 8} // 10 ** 8 beddow in one LSK
-          key={order.id}
-          size={order.sizeRemaining}
-          price={order.price}
+          key={ask.id}
+          size={ask.sizeRemaining}
+          price={ask.price}
           maxSize={this.props.orderBookData.maxSize}
           side={this.props.side}
           sizeDecimals={4}
@@ -28,12 +28,12 @@ export default class Orderbook extends React.Component {
     }
     if (this.props.side === 'bids') {
       const groupedBidsOrders = Values(groupByKey(this.props.orderBookData.bids, 'price', 'valueRemaining'));
-      const orders = groupedBidsOrders.map((order) => (
+      const orders = groupedBidsOrders.map((bid) => (
         <OrderbookEntry
           whole={10 ** 8} // 10 ** 8 beddow in one LSK
-          key={order.id}
-          size={order.valueRemaining}
-          price={order.price}
+          key={bid.id}
+          size={bid.valueRemaining}
+          price={bid.price}
           maxSize={this.props.orderBookData.maxSize}
           side={this.props.side}
           sizeDecimals={4}
