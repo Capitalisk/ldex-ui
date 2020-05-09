@@ -266,6 +266,7 @@ export default class PlaceOrder extends React.Component {
 
   render() {
     const canTrade = this.context.keys[this.context.activeAssets[0]] && this.context.keys[this.context.activeAssets[1]];
+    const er = this.getEstimatedReturns();
     return (
       <div style={{ padding: '5px' }}>
         <div className="action-name">{this.props.side === 'bid' ? 'BUY' : 'SELL'}</div>
@@ -299,9 +300,12 @@ export default class PlaceOrder extends React.Component {
                (
                  <div style={{ color: 'grey', fontSize: '15px', marginBottom: '10px' }}>
                    ≈
-                   {this.getEstimatedReturns().estimatedReturns.toFixed(4)}
+                   {er.estimatedReturns.toFixed(4)}
                    {' '}
-                   {this.getEstimatedReturns().assetType}
+                   {er.assetType}
+                   {' ('}
+                   {er.status.replace('_', ' ')}
+                   {')'}
                  </div>
                )
             }
