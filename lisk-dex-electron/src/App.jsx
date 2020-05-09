@@ -125,7 +125,7 @@ class App extends React.Component {
 
   refreshPriceHistory = async () => {
     try {
-      await this._refreshPriceHistory();
+      return await this._refreshPriceHistory();
     } catch (error) {
       console.error(error);
       this.notify('Failed to refresh the market price history - Check your connection.', true);
@@ -228,10 +228,12 @@ class App extends React.Component {
 
     priceHistory.reverse();
 
-    this.setState({
+    const newState = {
       priceHistory,
       priceDecimalPrecision,
-    });
+    };
+
+    return newState;
   }
 
   orderCancel = async (order) => {
@@ -364,7 +366,7 @@ class App extends React.Component {
 
   refreshOrderbook = async () => {
     try {
-      await this._refreshOrderbook();
+      return await this._refreshOrderbook();
     } catch (error) {
       console.error(error);
       this.notify('Failed to refresh the order book - Check your connection.', true);
@@ -525,8 +527,7 @@ class App extends React.Component {
       minAsk,
       yourOrders: Object.values(yourOrderMap),
     };
-
-    this.setState(newState);
+    return newState;
   }
 
   getPriceDecimalPrecision() {
@@ -534,13 +535,18 @@ class App extends React.Component {
     return dexOptions.priceDecimalPrecision == null ? DEFAULT_PRICE_DECIMAL_PRECISION : dexOptions.priceDecimalPrecision;
   }
 
+  _updateUIWithNewData = () => {
+    Promise.all([this.refreshOrderbook(), this.refreshPriceHistory()]).then(([newOrderBookState, newPriceHistoryState]) => {
+      const combinedStateUpdate = { ...newOrderBookState, ...newPriceHistoryState };
+      this.setState(combinedStateUpdate);
+    });
+  }
+
   componentDidUpdate() {
     if (this.state.configurationLoaded && !this.intervalRegistered) {
-      this.refreshOrderbook();
-      this.refreshPriceHistory();
+      this._updateUIWithNewData();
       setInterval(async () => {
-        this.refreshOrderbook();
-        this.refreshPriceHistory();
+        this._updateUIWithNewData();
       }, this.state.configuration.refreshInterval);
       this.intervalRegistered = true;
     }
