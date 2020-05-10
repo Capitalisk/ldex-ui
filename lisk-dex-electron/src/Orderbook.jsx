@@ -42,5 +42,6 @@ export default class Orderbook extends React.Component {
       ));
       return <div className="bidOrderList">{orders}</div>;
     }
+    return <></>;
   }
 }

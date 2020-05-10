@@ -31,7 +31,7 @@ export default class PlaceOrder extends React.Component {
   }
 
   getOrderType() {
-      return this.state.marketMode ? 'market' : 'limit';
+    return this.state.marketMode ? 'market' : 'limit';
   }
 
   getEstimatedReturns() {
@@ -134,12 +134,12 @@ export default class PlaceOrder extends React.Component {
   }
 
   // todo : need to check at what other places this can be used
-  clearValues () {
+  clearValues() {
     this.setState({
       price: 0,
       amount: 0,
     });
-  };
+  }
 
 
   generateOrder(tx, type, sourceChain, targetChain, side, price) {

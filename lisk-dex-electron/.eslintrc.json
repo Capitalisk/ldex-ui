@@ -17,6 +17,7 @@
     "no-restricted-syntax": "off",
     "react/static-property-placement": "off",
     "react/prop-types": "off",
-    "consistent-return": "warn"
+    "consistent-return": "off",
+    "class-methods-use-this": "off"
   }
 }

@@ -73,9 +73,6 @@ export default async function processConfiguration(config) {
   // Throws an exception if check fails for given config object
   const _config = UnprocessedDEXConfiguration.check(config);
 
-  // if (DEXConfiguration.guard(config)) {
-  //     console.log('Matched with Dex Configuration')
-
   for (let i = 0; i < Object.keys(config.markets).length; i += 1) {
     const market = config.markets[Object.keys(config.markets)[i]];
     const client = getClient(market.dexApiUrl);
