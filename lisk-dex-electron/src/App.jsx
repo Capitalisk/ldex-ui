@@ -125,16 +125,7 @@ class App extends React.Component {
     return makerRegex.test(transactionData);
   }
 
-  async refreshPriceHistory() {
-    try {
-      return await this._refreshPriceHistory();
-    } catch (error) {
-      console.error(error);
-      this.notify('Failed to refresh the market price history - Check your connection.', true);
-    }
-  }
-
-  async _refreshPriceHistory() {
+  async fetchPriceHistoryState() {
     const [quoteChainTxns, baseChainTxns] = await Promise.all(
       this.state.activeAssets.map(async (assetSymbol) => {
         const asset = this.state.configuration.assets[assetSymbol];
@@ -371,16 +362,7 @@ class App extends React.Component {
     });
   }
 
-  async refreshOrderbook() {
-    try {
-      return await this._refreshOrderbook();
-    } catch (error) {
-      console.error(error);
-      this.notify('Failed to refresh the order book - Check your connection.', true);
-    }
-  }
-
-  async _refreshOrderbook() {
+  async fetchOrderbookState() {
     const dexClient = this.getDexClient();
 
     const quoteAsset = this.state.activeAssets[0];
@@ -526,7 +508,6 @@ class App extends React.Component {
       }
     }
 
-
     const newState = {
       orderBookData: { bids, asks, maxSize },
       priceDecimalPrecision: this.getPriceDecimalPrecision(),
@@ -543,8 +524,16 @@ class App extends React.Component {
   }
 
   async _updateUIWithNewData() {
-    const [newOrderBookState, newPriceHistoryState] = await Promise.all([this.refreshOrderbook(), this.refreshPriceHistory()]);
-    const combinedStateUpdate = { ...newOrderBookState, ...newPriceHistoryState };
+    let combinedStateUpdate;
+    try {
+      const [newOrderBookState, newPriceHistoryState] = await Promise.all([this.fetchOrderbookState(), this.fetchPriceHistoryState()]);
+      combinedStateUpdate = { ...newOrderBookState, ...newPriceHistoryState };
+    } catch (error) {
+      console.error(error);
+      this.notify('Failed to refresh data - Check your connection.', true);
+
+      return;
+    }
     this.setState(combinedStateUpdate);
   }
 
@@ -580,7 +569,16 @@ class App extends React.Component {
     }
     if (atLeastOneKey) {
       await this.setState({ keys, signedIn: true, displaySigninModal: false });
-      this.refreshOrderbook();
+      let newOrderBookState;
+      try {
+        newOrderBookState = await this.fetchOrderbookState();
+      } catch (error) {
+        console.error(error);
+        this.notify('Failed to fetch order book - Check your connection.', true);
+
+        return;
+      }
+      await this.setState(newOrderBookState);
     }
   }
 
