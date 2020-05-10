@@ -21,9 +21,9 @@ describe('Utils tests => ', () => {
     ${-1342340.65}            |           ${'-1,342,340.65'}
     ${-1040.1}                |           ${'-1,040.1'}
   `('Should format $largeNumber to $expectedFormattedLargeNumber', ({ largeNumber, expectedFormattedLargeNumber }) => {
-    const actualFormattedLargeNumber = formatThousands(largeNumber, ',');
-    expect(actualFormattedLargeNumber).toEqual(expectedFormattedLargeNumber);
-  });
+  const actualFormattedLargeNumber = formatThousands(largeNumber, ',');
+  expect(actualFormattedLargeNumber).toEqual(expectedFormattedLargeNumber);
+});
 
   it('Reduces an array with group by query', () => {
     const actualArray = [{ price: 0.8, value: 1 }, { price: 0.8, value: 2 }, { price: 0.85, value: 1 }, { price: 0.86, value: 1 },
@@ -51,13 +51,13 @@ describe('Utils tests => ', () => {
       ${327.868852459}              |        ${0.61}                     |         ${0}                   |        ${bids}        |     ${EstimationStatus.NO_MATCH}
       ${457.142857143}              |        ${0.35}                     |         ${154.4369}            |        ${bids}        |     ${EstimationStatus.PARTIAL_MATCH}
       ${1495.0166113}               |        ${0.602}                    |         ${0}                   |        ${bids}        |     ${EstimationStatus.NO_MATCH}
-    `('Should estimate best returns for {$sellerAmountInLshForSell} LSH based on {$marketPriceInLsk} LSK/LSH', ({
-      buyerOrders, sellerAmountInLshForSell, marketPriceInLsk, estimatedReturnsInLsk, estimatedStatus,
-    }) => {
-      const actualEstimatedReturnsInLsk = estimateBestReturnsForSeller(sellerAmountInLshForSell, marketPriceInLsk, buyerOrders);
-      expect(actualEstimatedReturnsInLsk.estimatedReturns.toFixed(4)).toBe(estimatedReturnsInLsk.toFixed(4));
-      expect(actualEstimatedReturnsInLsk.status).toBe(estimatedStatus);
-    });
+  `('Should estimate best returns for {$sellerAmountInLshForSell} LSH based on {$marketPriceInLsk} LSK/LSH', ({
+  buyerOrders, sellerAmountInLshForSell, marketPriceInLsk, estimatedReturnsInLsk, estimatedStatus,
+}) => {
+  const actualEstimatedReturnsInLsk = estimateBestReturnsForSeller(sellerAmountInLshForSell, marketPriceInLsk, buyerOrders);
+  expect(actualEstimatedReturnsInLsk.estimatedReturns.toFixed(4)).toBe(estimatedReturnsInLsk.toFixed(4));
+  expect(actualEstimatedReturnsInLsk.status).toBe(estimatedStatus);
+});
 
   test.each`
     buyerAmountInLskForSell       |         marketPriceInLsk        |      estimatedLshCanBeBought       |        sellerOrders    |     estimatedStatus
@@ -71,12 +71,12 @@ describe('Utils tests => ', () => {
     ${78}                         |         ${0.56}                 |              ${0}                  |        ${asks}         |     ${EstimationStatus.NO_MATCH}
     ${974.86}                     |         ${0.20}                 |              ${0}                  |        ${asks}         |     ${EstimationStatus.NO_MATCH}
   `('Should estimate best returns for {$buyerAmountInLskForSell} LSK based on {$marketPriceInLsk} LSK/LSH', ({
-    sellerOrders, buyerAmountInLskForSell, marketPriceInLsk, estimatedLshCanBeBought, estimatedStatus,
-  }) => {
-    const actualLshCanBeBought = estimatedBestReturnsForBuyer(buyerAmountInLskForSell, marketPriceInLsk, sellerOrders);
-    expect(actualLshCanBeBought.estimatedReturns.toFixed(4)).toBe(estimatedLshCanBeBought.toFixed(4));
-    expect(actualLshCanBeBought.status).toBe(estimatedStatus);
-  });
+  sellerOrders, buyerAmountInLskForSell, marketPriceInLsk, estimatedLshCanBeBought, estimatedStatus,
+}) => {
+  const actualLshCanBeBought = estimatedBestReturnsForBuyer(buyerAmountInLskForSell, marketPriceInLsk, sellerOrders);
+  expect(actualLshCanBeBought.estimatedReturns.toFixed(4)).toBe(estimatedLshCanBeBought.toFixed(4));
+  expect(actualLshCanBeBought.status).toBe(estimatedStatus);
+});
 
   it('Should Return UI Orderbook from context orderbook', () => {
     const expectedOrderBook = {
