@@ -23,14 +23,14 @@ export default class OrderbookEntry extends React.Component {
   render() {
     const formattedPrice = this.props.price.toFixed(this.props.priceDecimals);
     const size = (this.props.size / this.props.whole).toFixed(this.props.sizeDecimals);
-    const formattedSize = formatThousands(size, ',');
+    const formattedSize = formatThousands(size);
 
     return (
-
       <div style={{ background: this.bgCSS(), marginTop: '1px', marginBottom: '1px' }} className="orderLine">
         {formattedPrice}
         {' '}
         &nbsp;|&nbsp;
+        {' '}
         {formattedSize}
       </div>
     );

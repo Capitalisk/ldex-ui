@@ -75,6 +75,7 @@ export default class PlaceOrder extends React.Component {
         <div key={asset} style={{ marginBottom: '20px' }}>
           <span>
             Passphrase for
+            {' '}
             {asset.toUpperCase()}
             :
             {' '}

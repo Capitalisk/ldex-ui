@@ -182,6 +182,11 @@ class App extends React.Component {
 
       const counterpartyTakerId = this.getTakerOrderIdFromTransaction(txn);
       const counterpartyTxns = quoteChainMakers[counterpartyTakerId] || quoteChainTakers[counterpartyTakerId] || [];
+
+      if (!counterpartyTxns.length) {
+        continue;
+      }
+
       // Group base chain orders which were matched with the same counterparty order together.
       if (!txnPairsMap[counterpartyTakerId]) {
         txnPairsMap[counterpartyTakerId] = {

@@ -1,11 +1,13 @@
-const formatThousands = (num, separator) => {
+const formatThousands = function (num, separator) {
+  let sign = num < 0 ? '-' : '';
+  num = Math.abs(num);
   separator = separator || ',';
-  const numParts = [];
-  const paddingZero = '0';
+  let numParts = [];
+  let paddingZero = '0';
 
   let fractionDecimals = num.toString().split('.')[1] || '';
   if (fractionDecimals.length) {
-    fractionDecimals = `.${fractionDecimals}`;
+    fractionDecimals = '.' + fractionDecimals;
   }
   let remaining = Math.floor(num);
   if (remaining === 0) {
@@ -17,12 +19,12 @@ const formatThousands = (num, separator) => {
     lastDigits = (remaining % 1000).toString();
     remaining = Math.floor(remaining / 1000);
     if (remaining !== 0) {
-      lastDigits += paddingZero.repeat(3 - lastDigits.length);
+      lastDigits = paddingZero.repeat(3 - lastDigits.length) + lastDigits;
     }
     numParts.push(lastDigits);
   }
-  return numParts.reverse().join(separator) + fractionDecimals;
-};
+  return sign + numParts.reverse().join(separator) + fractionDecimals;
+}
 
 const groupByKey = (array, Key, sumKey) => array.reduce((accumulator, newItem) => {
   const groupByKeyValue = newItem[Key];
