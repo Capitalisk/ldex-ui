@@ -52,6 +52,15 @@ Object.freeze(EstimationStatus);
 
 // considering price unit is same for both buyer and seller, for current application it's in terms of lsk per lsh
 const estimateBestReturnsForSeller = (amount, price, bids, isMarketOrder) => {
+  bids = [...bids].sort((a, b) => {
+    if (a.price > b.price) {
+      return -1;
+    }
+    if (a.price < b.price) {
+      return 1;
+    }
+    return 0;
+  });
   let estimatedReturns = 0;
   let status = EstimationStatus.NO_MATCH;
   let amountYetToBeSold = amount;
@@ -74,6 +83,15 @@ const estimateBestReturnsForSeller = (amount, price, bids, isMarketOrder) => {
 };
 
 const estimatedBestReturnsForBuyer = (amount, price, asks, isMarketOrder) => {
+  asks = [...asks].sort((a, b) => {
+    if (a.price < b.price) {
+      return -1;
+    }
+    if (a.price > b.price) {
+      return 1;
+    }
+    return 0;
+  });
   let estimatedReturns = 0;
   let status = EstimationStatus.NO_MATCH;
   let amountYetToBeSold = amount;
