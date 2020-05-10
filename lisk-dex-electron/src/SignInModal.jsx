@@ -11,10 +11,6 @@ export default class PlaceOrder extends React.Component {
       passphrase: '',
       addresses: {},
     };
-
-    this.handleChange = this.handleChange.bind(this);
-    this.handleSubmit = this.handleSubmit.bind(this);
-    this.handleWalletCreate = this.handleWalletCreate.bind(this);
   }
 
   updateAddress(asset, passphrase) {
@@ -31,7 +27,7 @@ export default class PlaceOrder extends React.Component {
     return address;
   }
 
-  handleChange(event) {
+  handleChange = (event) => {
     const { target } = event;
     const value = target.type === 'checkbox' ? target.checked : target.value;
     const { name } = target;
@@ -43,7 +39,7 @@ export default class PlaceOrder extends React.Component {
     });
   }
 
-  handleSubmit(event) {
+  handleSubmit = (event) => {
     event.preventDefault();
     const payload = {};
     for (const asset of this.props.enabledAssets) {
@@ -52,7 +48,7 @@ export default class PlaceOrder extends React.Component {
     this.props.passphraseSubmit(payload);
   }
 
-  handleWalletCreate(event) {
+  handleWalletCreate = (event) => {
     event.preventDefault();
     const asset = event.target.name;
     const passphrase = Mnemonic.generateMnemonic();

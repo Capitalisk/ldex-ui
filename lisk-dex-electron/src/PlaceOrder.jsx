@@ -18,12 +18,9 @@ export default class PlaceOrder extends React.Component {
       isSubmitting: false,
       errors: {},
     };
-
-    this.handleChange = this.handleChange.bind(this);
-    this.handleSubmit = this.handleSubmit.bind(this);
   }
 
-  handleChange(event) {
+  handleChange = (event) => {
     const { target } = event;
     const value = target.type === 'checkbox' ? target.checked : target.value;
     const { name } = target;
@@ -33,9 +30,11 @@ export default class PlaceOrder extends React.Component {
     });
   }
 
-  getOrderType = () => (this.state.marketMode ? 'market' : 'limit');
+  getOrderType() {
+      return this.state.marketMode ? 'market' : 'limit';
+  }
 
-  getEstimatedReturns = () => {
+  getEstimatedReturns() {
     const orderBook = getCleanOrderBook(this.context.orderBookData);
     const amount = (function getCleanAmount(value) {
       return parseFloat(value) || 0;
@@ -64,7 +63,7 @@ export default class PlaceOrder extends React.Component {
     return { ...estimatedReturns, assetType };
   }
 
-  handleSubmit(event) {
+  handleSubmit = (event) => {
     event.preventDefault();
     this.clearErrors();
     if (this.validateOrder()) {
@@ -81,7 +80,7 @@ export default class PlaceOrder extends React.Component {
     this.setState((prevState) => ({ marketMode: !prevState.marketMode }));
   }
 
-  validateOrder = () => {
+  validateOrder() {
     let success = true;
     const { dexOptions } = this.context.configuration.markets[this.context.activeMarket];
     const { priceDecimalPrecision } = dexOptions;
@@ -128,14 +127,14 @@ export default class PlaceOrder extends React.Component {
     return success;
   }
 
-  clearErrors = () => {
+  clearErrors() {
     this.setState({
       errors: {},
     });
   }
 
   // todo : need to check at what other places this can be used
-  clearValues = () => {
+  clearValues () {
     this.setState({
       price: 0,
       amount: 0,
@@ -143,7 +142,7 @@ export default class PlaceOrder extends React.Component {
   };
 
 
-  generateOrder = (tx, type, sourceChain, targetChain, side, price) => {
+  generateOrder(tx, type, sourceChain, targetChain, side, price) {
     const order = {
       id: tx.id,
       type,
@@ -166,12 +165,12 @@ export default class PlaceOrder extends React.Component {
     return order;
   }
 
-  handleTransactionSubmit = (tx, type, sourceChain, targetChain, side, price) => {
+  handleTransactionSubmit(tx, type, sourceChain, targetChain, side, price) {
     const order = this.generateOrder(tx, type, sourceChain, targetChain, side, price);
     this.props.orderSubmit(order);
   }
 
-  placeOrder = () => {
+  placeOrder() {
     if (this.state.marketMode) {
       let dexAddress;
       let destAddress;

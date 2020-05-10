@@ -15,13 +15,9 @@ export default class YourOrders extends React.Component {
     super(props);
     this.state = {
     };
-
-    this.handleChange = this.handleChange.bind(this);
-    this.handleSubmit = this.handleSubmit.bind(this);
-    this.handleCancel = this.handleCancel.bind(this);
   }
 
-  handleChange(event) {
+  handleChange = (event) => {
     const { target } = event;
     const value = target.type === 'checkbox' ? target.checked : target.value;
     const { name } = target;
@@ -35,7 +31,7 @@ export default class YourOrders extends React.Component {
     event.preventDefault();
   }
 
-  handleCancel(order) {
+  handleCancel = (order) => {
     this.props.orderCanceled(order);
   }
 

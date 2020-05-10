@@ -79,9 +79,11 @@ class App extends React.Component {
     this.loadConfiguration();
   }
 
-  getDexClient = () => getClient(this.state.configuration.markets[this.state.activeMarket].dexApiUrl);
+  getDexClient() {
+    return getClient(this.state.configuration.markets[this.state.activeMarket].dexApiUrl);
+  }
 
-  loadConfiguration = async () => {
+  async loadConfiguration() {
     const localClient = getClient('');
     const defaultConfiguration = await getConfig(localClient);
     const configuration = await processConfiguration(defaultConfiguration);
@@ -96,7 +98,7 @@ class App extends React.Component {
     });
   }
 
-  getTakerOrderIdFromTransaction= (transaction) => {
+  getTakerOrderIdFromTransaction(transaction) {
     // TODO: Match order id based on position in protocol argument list instead of regex.
     const takerOrderIdRegex = /,[0-9]+:/g;
 
@@ -109,21 +111,21 @@ class App extends React.Component {
     return null;
   }
 
-  isTakerTransaction = (transaction) => {
+  isTakerTransaction(transaction) {
     const takerRegex = /^t1,/g;
 
     const transactionData = transaction.asset.data || '';
     return takerRegex.test(transactionData);
   }
 
-  isMakerTransaction = (transaction) => {
+  isMakerTransaction(transaction) {
     const makerRegex = /^t2,/g;
 
     const transactionData = transaction.asset.data || '';
     return makerRegex.test(transactionData);
   }
 
-  refreshPriceHistory = async () => {
+  async refreshPriceHistory() {
     try {
       return await this._refreshPriceHistory();
     } catch (error) {
@@ -132,7 +134,7 @@ class App extends React.Component {
     }
   }
 
-  _refreshPriceHistory = async () => {
+  async _refreshPriceHistory() {
     const [quoteChainTxns, baseChainTxns] = await Promise.all(
       this.state.activeAssets.map(async (assetSymbol) => {
         const asset = this.state.configuration.assets[assetSymbol];
@@ -336,7 +338,7 @@ class App extends React.Component {
     });
   }
 
-  notify = (message, isError) => {
+  notify(message, isError) {
     const newNotification = {
       id: this.notificationId += 1,
       message,
@@ -364,7 +366,7 @@ class App extends React.Component {
     });
   }
 
-  refreshOrderbook = async () => {
+  async refreshOrderbook() {
     try {
       return await this._refreshOrderbook();
     } catch (error) {
@@ -373,7 +375,7 @@ class App extends React.Component {
     }
   }
 
-  _refreshOrderbook = async () => {
+  async _refreshOrderbook() {
     const dexClient = this.getDexClient();
 
     const quoteAsset = this.state.activeAssets[0];
