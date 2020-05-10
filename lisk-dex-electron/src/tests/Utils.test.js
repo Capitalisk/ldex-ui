@@ -62,10 +62,10 @@ describe('Utils tests => ', () => {
   test.each`
     buyerAmountInLskForSell       |         marketPriceInLsk        |      estimatedLshCanBeBought       |        sellerOrders    |     estimatedStatus
     ${2000}                       |         ${0.77}                 |              ${3.1169}             |        ${asks}         |     ${EstimationStatus.PARTIAL_MATCH}
-    ${2793.6}                     |         ${0.96}                 |              ${2996.5777}          |        ${asks}         |     ${EstimationStatus.MATCH}
+    ${2793.6}                     |         ${0.96}                 |              ${2997.1761}          |        ${asks}         |     ${EstimationStatus.MATCH}
     ${2821.5}                     |         ${0.95}                 |              ${2999.7445}          |        ${asks}         |     ${EstimationStatus.PARTIAL_MATCH}
     ${2845.25}                    |         ${0.95}                 |              ${2999.7445}          |        ${asks}         |     ${EstimationStatus.PARTIAL_MATCH}
-    ${63.36}                      |         ${0.88}                 |              ${72.9715}            |        ${asks}         |     ${EstimationStatus.MATCH}
+    ${63.36}                      |         ${0.88}                 |              ${74.1392}            |        ${asks}         |     ${EstimationStatus.MATCH}
     ${79.2}                       |         ${0.88}                 |              ${86.3001}            |        ${asks}         |     ${EstimationStatus.PARTIAL_MATCH}
     ${76.244}                     |         ${0.76}                 |              ${0}                  |        ${asks}         |     ${EstimationStatus.NO_MATCH}
     ${78}                         |         ${0.56}                 |              ${0}                  |        ${asks}         |     ${EstimationStatus.NO_MATCH}
