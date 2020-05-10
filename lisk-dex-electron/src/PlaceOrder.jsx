@@ -45,8 +45,8 @@ export default class PlaceOrder extends React.Component {
     let estimatedReturns = { };
     let assetType = '';
 
-    let { price } = this.state;
-    let isMarketOrder = this.getOrderType() === 'market';
+    const { price } = this.state;
+    const isMarketOrder = this.getOrderType() === 'market';
 
     if (this.props.side === 'ask') {
       estimatedReturns = estimateBestReturnsForSeller(amount, price, bids, isMarketOrder);
