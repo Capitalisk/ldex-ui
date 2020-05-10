@@ -535,11 +535,10 @@ class App extends React.Component {
     return dexOptions.priceDecimalPrecision == null ? DEFAULT_PRICE_DECIMAL_PRECISION : dexOptions.priceDecimalPrecision;
   }
 
-  _updateUIWithNewData = () => {
-    Promise.all([this.refreshOrderbook(), this.refreshPriceHistory()]).then(([newOrderBookState, newPriceHistoryState]) => {
-      const combinedStateUpdate = { ...newOrderBookState, ...newPriceHistoryState };
-      this.setState(combinedStateUpdate);
-    });
+  async _updateUIWithNewData() {
+    const [newOrderBookState, newPriceHistoryState] = await Promise.all([this.refreshOrderbook(), this.refreshPriceHistory()]);
+    const combinedStateUpdate = { ...newOrderBookState, ...newPriceHistoryState };
+    this.setState(combinedStateUpdate);
   }
 
   componentDidUpdate() {
