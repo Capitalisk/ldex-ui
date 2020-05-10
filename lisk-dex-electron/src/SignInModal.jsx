@@ -85,6 +85,7 @@ export default class PlaceOrder extends React.Component {
           {this.state.addresses[asset] && (
           <span className="generated-wallet-address">
             Wallet address:
+            {' '}
             {this.state.addresses[asset]}
           </span>
           )}
