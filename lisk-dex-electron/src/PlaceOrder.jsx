@@ -37,7 +37,10 @@ export default class PlaceOrder extends React.Component {
 
   getEstimatedReturns = () => {
     const orderBook = getCleanOrderBook(this.context.orderBookData);
-    const amount = parseFloat(this.state.amount);
+    const amount = (function getCleanAmount(value) {
+      return parseFloat(value) || 0;
+    }(this.state.amount));
+
     const { asks } = orderBook;
     const { bids } = orderBook;
     let estimatedReturns = { };
@@ -266,6 +269,7 @@ export default class PlaceOrder extends React.Component {
 
   render() {
     const canTrade = this.context.keys[this.context.activeAssets[0]] && this.context.keys[this.context.activeAssets[1]];
+    const er = this.getEstimatedReturns();
     return (
       <div style={{ padding: '5px' }}>
         <div className="action-name">{this.props.side === 'bid' ? 'BUY' : 'SELL'}</div>
@@ -299,9 +303,12 @@ export default class PlaceOrder extends React.Component {
                (
                  <div style={{ color: 'grey', fontSize: '15px', marginBottom: '10px' }}>
                    ≈
-                   {this.getEstimatedReturns().estimatedReturns.toFixed(4)}
+                   {er.estimatedReturns.toFixed(4)}
                    {' '}
-                   {this.getEstimatedReturns().assetType}
+                   {er.assetType}
+                   {' ('}
+                   {er.status.replace('_', ' ')}
+                   {')'}
                  </div>
                )
             }
