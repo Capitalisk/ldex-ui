@@ -49,12 +49,12 @@ const EstimationStatus = {
 Object.freeze(EstimationStatus);
 
 // considering price unit is same for both buyer and seller, for current application it's in terms of lsk per lsh
-const estimateBestReturnsForSeller = (amount, price, bids) => {
+const estimateBestReturnsForSeller = (amount, price, bids, isMarketOrder) => {
   let estimatedReturns = 0;
   let status = EstimationStatus.NO_MATCH;
   let amountYetToBeSold = amount;
   for (const bid of bids) {
-    if (price <= bid.price) {
+    if (isMarketOrder || price <= bid.price) {
       const bestBidReturns = amountYetToBeSold * bid.price;
       if (bid.amount >= bestBidReturns) {
         estimatedReturns += bestBidReturns;
@@ -71,12 +71,12 @@ const estimateBestReturnsForSeller = (amount, price, bids) => {
   return { estimatedReturns, status };
 };
 
-const estimatedBestReturnsForBuyer = (amount, price, asks) => {
+const estimatedBestReturnsForBuyer = (amount, price, asks, isMarketOrder) => {
   let estimatedReturns = 0;
   let status = EstimationStatus.NO_MATCH;
   let amountYetToBeSold = amount;
   for (const ask of asks) {
-    if (price >= ask.price) {
+    if (isMarketOrder || price >= ask.price) {
       const bestAskReturns = amountYetToBeSold / ask.price;
       if (ask.amount >= bestAskReturns) {
         estimatedReturns += bestAskReturns;

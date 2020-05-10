@@ -46,18 +46,13 @@ export default class PlaceOrder extends React.Component {
     let assetType = '';
 
     let { price } = this.state;
+    let isMarketOrder = this.getOrderType() === 'market';
 
     if (this.props.side === 'ask') {
-      if (this.getOrderType() === 'market') {
-        price = this.context.maxBid;
-      }
-      estimatedReturns = estimateBestReturnsForSeller(amount, price, bids);
+      estimatedReturns = estimateBestReturnsForSeller(amount, price, bids, isMarketOrder);
       assetType = this.context.activeAssets[1].toUpperCase();
     } else {
-      if (this.getOrderType() === 'market') {
-        price = this.context.minAsk;
-      }
-      estimatedReturns = estimatedBestReturnsForBuyer(amount, price, asks);
+      estimatedReturns = estimatedBestReturnsForBuyer(amount, price, asks, isMarketOrder);
       assetType = this.context.activeAssets[0].toUpperCase();
     }
     return { ...estimatedReturns, assetType };
