@@ -32,7 +32,10 @@ export default class YourOrders extends React.Component {
   }
 
   handleCancel = (order) => {
-    this.props.orderCanceled(order);
+    const confirmed = window.confirm('Are you sure you want to cancel this limit order?');
+    if (confirmed) {
+      this.props.orderCanceled(order);
+    }
   }
 
   render() {
