@@ -4,7 +4,9 @@ import * as transactions from '@liskhq/lisk-transactions';
 import axios from 'axios';
 import BalanceDisplay from './BalanceDisplay';
 import userContext from './context';
-import { getCleanOrderBook, estimateBestReturnsForSeller, estimatedBestReturnsForBuyer } from './Utils';
+import {
+  getCleanOrderBook, estimateBestReturnsForSeller, estimatedBestReturnsForBuyer, EstimationStatus,
+} from './Utils';
 
 export default class PlaceOrder extends React.Component {
   static contextType = userContext;
@@ -43,19 +45,33 @@ export default class PlaceOrder extends React.Component {
     const { asks } = orderBook;
     const { bids } = orderBook;
     let estimatedReturns = { };
-    let assetType = '';
-
+    let assetExchanged = '';
+    let assetExchangedAgainst = '';
     const { price } = this.state;
     const isMarketOrder = this.getOrderType() === 'market';
-
     if (this.props.side === 'ask') {
       estimatedReturns = estimateBestReturnsForSeller(amount, price, bids, isMarketOrder);
-      assetType = this.context.activeAssets[1].toUpperCase();
+      assetExchanged = this.context.activeAssets[1].toUpperCase();
+      assetExchangedAgainst = this.context.activeAssets[0].toUpperCase();
     } else {
       estimatedReturns = estimatedBestReturnsForBuyer(amount, price, asks, isMarketOrder);
-      assetType = this.context.activeAssets[0].toUpperCase();
+      assetExchanged = this.context.activeAssets[0].toUpperCase();
+      assetExchangedAgainst = this.context.activeAssets[1].toUpperCase();
     }
-    return { ...estimatedReturns, assetType };
+    return { ...estimatedReturns, assetExchanged, assetExchangedAgainst };
+  }
+
+  getEstimatedReturnsBreakDown(estimate) {
+    let verboseEstimation = `${estimate.estimatedReturns.toFixed(4)} ${estimate.assetExchanged}`;
+    if (estimate.status === EstimationStatus.PARTIAL_MATCH) {
+      verboseEstimation += ` + ${estimate.amountYetToBeSold.toFixed(4)} ${estimate.assetExchangedAgainst}`;
+      if (this.getOrderType() === 'market') {
+        verboseEstimation += ' (refund)';
+      } else {
+        verboseEstimation += ' (pending)';
+      }
+    }
+    return verboseEstimation;
   }
 
   handleSubmit = (event) => {
@@ -297,12 +313,7 @@ export default class PlaceOrder extends React.Component {
                (
                  <div style={{ color: 'grey', fontSize: '15px', marginBottom: '10px' }}>
                    ≈
-                   {estimate.estimatedReturns.toFixed(4)}
-                   {' '}
-                   {estimate.assetType}
-                   {' ('}
-                   {estimate.status.replace('_', ' ')}
-                   {')'}
+                   {this.getEstimatedReturnsBreakDown(estimate)}
                  </div>
                )
             }
