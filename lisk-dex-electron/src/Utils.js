@@ -69,6 +69,7 @@ const estimateBestReturnsForSeller = (amount, price, bids, isMarketOrder) => {
       const bestBidReturns = amountYetToBeSold * bid.price;
       if (bid.amount >= bestBidReturns) {
         estimatedReturns += bestBidReturns;
+        amountYetToBeSold = 0;
         status = EstimationStatus.MATCH;
         break;
       } else {
@@ -79,7 +80,7 @@ const estimateBestReturnsForSeller = (amount, price, bids, isMarketOrder) => {
       }
     }
   }
-  return { estimatedReturns, status };
+  return { amountYetToBeSold, estimatedReturns, status };
 };
 
 const estimatedBestReturnsForBuyer = (amount, price, asks, isMarketOrder) => {
@@ -100,6 +101,7 @@ const estimatedBestReturnsForBuyer = (amount, price, asks, isMarketOrder) => {
       const bestAskReturns = amountYetToBeSold / ask.price;
       if (ask.amount >= bestAskReturns) {
         estimatedReturns += bestAskReturns;
+        amountYetToBeSold = 0;
         status = EstimationStatus.MATCH;
         break;
       } else {
@@ -110,7 +112,7 @@ const estimatedBestReturnsForBuyer = (amount, price, asks, isMarketOrder) => {
       }
     }
   }
-  return { estimatedReturns, status };
+  return { amountYetToBeSold, estimatedReturns, status };
 };
 
 // todo - reuse the function in orderbook.js, make sure calculations are in one place
