@@ -205,6 +205,7 @@ export default class PlaceOrder extends React.Component {
 
       if (dexAddress && destAddress && passphrase && targetChain && broadcastURL) {
         if (this.state.amount > 0) {
+          const side = this.props.side;
           const tx = transactions.transfer({
             amount: transactions.utils.convertLSKToBeddows(this.state.amount.toString()).toString(),
             recipientId: dexAddress,
@@ -218,13 +219,13 @@ export default class PlaceOrder extends React.Component {
             } catch (err) {
               const error = new Error(`Failed to post market order because of error: ${err.message}`);
               error.response = err.response;
-              error.order = this.generateOrder(tx, 'market', sourceChain, targetChain, this.props.side);
+              error.order = this.generateOrder(tx, 'market', sourceChain, targetChain, side);
               // this.props.orderSubmitError && this.props.orderSubmitError(error);
               this.setState({ isSubmitting: false });
               return;
             }
             this.setState({ isSubmitting: false });
-            this.handleTransactionSubmit(tx, 'market', sourceChain, targetChain, this.props.side);
+            this.handleTransactionSubmit(tx, 'market', sourceChain, targetChain, side);
           })();
         }
       }
@@ -251,10 +252,12 @@ export default class PlaceOrder extends React.Component {
 
       if (dexAddress && destAddress && passphrase && targetChain && broadcastURL) {
         if (this.state.amount > 0) {
+          const price = this.state.price;
+          const side = this.props.side;
           const tx = transactions.transfer({
             amount: transactions.utils.convertLSKToBeddows(this.state.amount.toString()).toString(),
             recipientId: dexAddress,
-            data: `${targetChain},limit,${this.state.price},${destAddress}`,
+            data: `${targetChain},limit,${price},${destAddress}`,
             passphrase,
           });
           (async () => {
@@ -264,13 +267,13 @@ export default class PlaceOrder extends React.Component {
             } catch (err) {
               const error = new Error(`Failed to post limit order because of error: ${err.message}`);
               error.response = err.response;
-              error.order = this.generateOrder(tx, 'limit', sourceChain, targetChain, this.props.side, parseFloat(this.state.price));
+              error.order = this.generateOrder(tx, 'limit', sourceChain, targetChain, side, parseFloat(price));
               // this.props.orderSubmitError && this.props.orderSubmitError(error);
               this.setState({ isSubmitting: false });
               return;
             }
             this.setState({ isSubmitting: false });
-            this.handleTransactionSubmit(tx, 'limit', sourceChain, targetChain, this.props.side, parseFloat(this.state.price));
+            this.handleTransactionSubmit(tx, 'limit', sourceChain, targetChain, side, parseFloat(price));
           })();
         }
       }
