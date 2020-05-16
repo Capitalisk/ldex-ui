@@ -34,5 +34,5 @@ export async function getProcessedHeights(instance) {
 }
 
 export async function getConfig(instance) {
-  return (await instance.get('/config.json')).data;
+  return (await instance.get('config.json')).data;
 }
