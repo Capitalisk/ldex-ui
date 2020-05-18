@@ -6,6 +6,11 @@
     "es6": true
   },
   "parser": "babel-eslint",
+  "overrides": [
+    {
+      "files": ["*.jsx", "*.js"]
+    }
+  ],
   "rules": {
     "max-len": "off",
     "no-underscore-dangle": "off",
