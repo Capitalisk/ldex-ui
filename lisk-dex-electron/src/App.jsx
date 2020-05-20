@@ -99,30 +99,29 @@ class App extends React.Component {
   }
 
   getTakerOrderIdFromTransaction(transaction) {
-    // TODO: Match order id based on position in protocol argument list instead of regex.
-    const takerOrderIdRegex = /,[0-9]+:/g;
-
     const transactionData = transaction.asset.data || '';
-    const matches = transactionData.match(takerOrderIdRegex);
-    if (matches) {
-      const match = matches[0];
-      return match.slice(1, match.length - 1);
+    const header = transactionData.split(':')[0];
+    const parts = header.split(',');
+    const txnType = parts[0];
+    if (txnType === 't1') {
+      return parts[2];
+    }
+    if (txnType === 't2') {
+      return parts[3];
     }
     return null;
   }
 
   isTakerTransaction(transaction) {
-    const takerRegex = /^t1,/g;
-
     const transactionData = transaction.asset.data || '';
-    return takerRegex.test(transactionData);
+    const header = transactionData.split(':')[0];
+    return header.split(',')[0] === 't1';
   }
 
   isMakerTransaction(transaction) {
-    const makerRegex = /^t2,/g;
-
     const transactionData = transaction.asset.data || '';
-    return makerRegex.test(transactionData);
+    const header = transactionData.split(':')[0];
+    return header.split(',')[0] === 't2';
   }
 
   async fetchPriceHistoryState() {
