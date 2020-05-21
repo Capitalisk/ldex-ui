@@ -9,7 +9,7 @@ export function getClient(apiBaseUrl) {
 }
 
 export async function getOrderBook(instance, orderBookDepth) {
-  const { data: orderBook } = await instance.get(`/order-book?depth=${orderBookDepth}`)
+  const { data: orderBook } = await instance.get(`/order-book?depth=${orderBookDepth}`);
   return orderBook;
 }
 
