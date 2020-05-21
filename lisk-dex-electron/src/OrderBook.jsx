@@ -12,7 +12,6 @@ export default class OrderBook extends React.Component {
   render() {
     if (this.props.side === 'asks') {
       const groupedAskOrders = Values(this.props.orderBookData.asks, 'price', 'sizeRemaining');
-      groupedAskOrders.reverse();
       const orders = groupedAskOrders.map((ask) => (
         <OrderBookEntry
           whole={10 ** 8} // 10 ** 8 beddow in one LSK

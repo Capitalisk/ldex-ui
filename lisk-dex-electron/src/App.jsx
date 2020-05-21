@@ -392,7 +392,7 @@ class App extends React.Component {
     }
 
     const [
-      orders,
+      orderLevels,
       processedHeights,
       yourAsks,
       pendingQuoteAssetTransfers,
@@ -428,19 +428,21 @@ class App extends React.Component {
       }
     }
 
-    for (const order of orders) {
-      if (order.side === 'bid') {
-        bids.push(order);
-        if (order.value > maxSize.bid) {
-          maxSize.bid = order.valueRemaining;
+    for (const orderLvl of orderLevels) {
+      if (orderLvl.side === 'bid') {
+        bids.push(orderLvl);
+        if (orderLvl.valueRemaining > maxSize.bid) {
+          maxSize.bid = orderLvl.valueRemaining;
         }
-      } else if (order.side === 'ask') {
-        asks.push(order);
-        if (order.size > maxSize.ask) {
-          maxSize.ask = order.sizeRemaining;
+      } else if (orderLvl.side === 'ask') {
+        asks.push(orderLvl);
+        if (orderLvl.sizeRemaining > maxSize.ask) {
+          maxSize.ask = orderLvl.sizeRemaining;
         }
       }
     }
+
+    asks.reverse();
 
     let maxBid = 0;
     let minAsk = 0;

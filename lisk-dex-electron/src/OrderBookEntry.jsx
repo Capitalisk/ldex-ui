@@ -19,7 +19,6 @@ export default class OrderBookEntry extends React.Component {
     }
   }
 
-
   render() {
     const formattedPrice = this.props.price.toFixed(this.props.priceDecimals);
     const size = (this.props.size / this.props.whole).toFixed(this.props.sizeDecimals);
