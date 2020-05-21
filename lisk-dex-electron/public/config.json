@@ -25,7 +25,8 @@
   "markets": {
     "lsh/lsk": {
       "dexApiUrl": "http://18.206.164.187:7011",
-      "assets": ["lsh", "lsk"]
+      "assets": ["lsh", "lsk"],
+      "orderBookDepth": 20
     }
   }
 }

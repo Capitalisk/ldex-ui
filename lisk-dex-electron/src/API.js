@@ -8,24 +8,21 @@ export function getClient(apiBaseUrl) {
   });
 }
 
-export async function getOrderbook(instance) {
-  const [{ data: bids }, { data: asks }] = await Promise.all([
-    instance.get('/orders/bids?sort=price:desc'),
-    instance.get('/orders/asks?sort=price:asc'),
-  ]);
-  return bids.concat(asks);
+export async function getOrderBook(instance, orderBookDepth) {
+  const { data: orderBook } = await instance.get(`/order-book?depth=${orderBookDepth}`)
+  return orderBook;
 }
 
 export async function getBidsFromWallet(instance, sourceWalletAddress) {
-  return (await instance.get(`/orders/bids?sourceWalletAddress=${sourceWalletAddress}&sort=price:desc`)).data;
+  return (await instance.get(`/orders/bids?sourceWalletAddress=${sourceWalletAddress}`)).data;
 }
 
 export async function getAsksFromWallet(instance, sourceWalletAddress) {
-  return (await instance.get(`/orders/asks?sourceWalletAddress=${sourceWalletAddress}&sort=price:asc`)).data;
+  return (await instance.get(`/orders/asks?sourceWalletAddress=${sourceWalletAddress}`)).data;
 }
 
 export async function getPendingTransfers(instance, targetAssetSymbol, recipientId) {
-  return (await instance.get(`/transfers/pending?targetChain=${targetAssetSymbol}&recipientId=${recipientId}&sort=timestamp:desc`)).data;
+  return (await instance.get(`/transfers/pending?targetChain=${targetAssetSymbol}&recipientId=${recipientId}`)).data;
 }
 
 export async function getProcessedHeights(instance) {

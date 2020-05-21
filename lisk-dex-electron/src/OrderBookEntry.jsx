@@ -1,8 +1,8 @@
 import React from 'react';
-import './OrderbookEntry.css';
+import './OrderBookEntry.css';
 import { formatThousands } from './Utils';
 
-export default class OrderbookEntry extends React.Component {
+export default class OrderBookEntry extends React.Component {
   constructor(props) {
     super(props);
     this.state = {};

@@ -1,5 +1,5 @@
 import {
-  groupByKey, formatThousands, EstimationStatus, estimateBestReturnsForSeller, estimatedBestReturnsForBuyer, getCleanOrderBook,
+  formatThousands, EstimationStatus, estimateBestReturnsForSeller, estimatedBestReturnsForBuyer, getCleanOrderBook,
 } from '../Utils';
 
 import { asks, bids } from './fixtures/orderbook/orderbook';
@@ -25,23 +25,8 @@ describe('Utils tests => ', () => {
   expect(actualFormattedLargeNumber).toEqual(expectedFormattedLargeNumber);
 });
 
-  it('Reduces an array with group by query', () => {
-    const actualArray = [{ price: 0.8, value: 1 }, { price: 0.8, value: 2 }, { price: 0.85, value: 1 }, { price: 0.86, value: 1 },
-      { price: 0.9, value: 1 }, { price: 0.92, value: 2 }, { price: 0.92, value: 4 }, { price: 0.8, value: 4 }];
-
-    const expectedReduction = {
-      0.8: { price: 0.8, value: 7 },
-      0.85: { price: 0.85, value: 1 },
-      0.86: { price: 0.86, value: 1 },
-      0.9: { price: 0.9, value: 1 },
-      0.92: { price: 0.92, value: 6 },
-    };
-
-    expect(groupByKey(actualArray, 'price', 'value')).toEqual(expectedReduction);
-  });
-
   test.each`
-      sellerAmountInLshForSell      |        marketPriceInLsk            |     estimatedReturnsInLsk      |        buyerOrders    |     estimatedStatus                      |     amountYetToBeSold                                                 
+      sellerAmountInLshForSell      |        marketPriceInLsk            |     estimatedReturnsInLsk      |        buyerOrders    |     estimatedStatus                      |     amountYetToBeSold
       ${150}                        |        ${0.78}                     |         ${0}                   |        ${bids}        |     ${EstimationStatus.NO_MATCH}         |        ${150}
       ${160}                        |        ${0.40}                     |         ${94.5792}             |        ${bids}        |     ${EstimationStatus.MATCH}            |        ${0}
       ${142}                        |        ${0.48}                     |         ${85.2}                |        ${bids}        |     ${EstimationStatus.MATCH}            |        ${0}
@@ -61,7 +46,7 @@ describe('Utils tests => ', () => {
 });
 
   test.each`
-    buyerAmountInLskForSell       |         marketPriceInLsk        |      estimatedLshCanBeBought       |        sellerOrders    |     estimatedStatus                      |     amountYetToBeSold    
+    buyerAmountInLskForSell       |         marketPriceInLsk        |      estimatedLshCanBeBought       |        sellerOrders    |     estimatedStatus                      |     amountYetToBeSold
     ${2000}                       |         ${0.77}                 |              ${3.1169}             |        ${asks}         |     ${EstimationStatus.PARTIAL_MATCH}    |        ${1997.599987}
     ${2793.6}                     |         ${0.96}                 |              ${2997.1761}          |        ${asks}         |     ${EstimationStatus.MATCH}            |        ${0}
     ${2821.5}                     |         ${0.95}                 |              ${2999.7445}          |        ${asks}         |     ${EstimationStatus.PARTIAL_MATCH}    |        ${25.46005500000001}

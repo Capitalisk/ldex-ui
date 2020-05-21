@@ -26,18 +26,6 @@ const formatThousands = (num, separator) => {
   return sign + numParts.reverse().join(separator) + fractionDecimals;
 };
 
-const groupByKey = (array, Key, sumKey) => array.reduce((accumulator, newItem) => {
-  const groupByKeyValue = newItem[Key];
-  if (groupByKeyValue in accumulator) {
-    const prevItem = accumulator[groupByKeyValue];
-    prevItem[sumKey] += newItem[sumKey];
-    accumulator[groupByKeyValue] = prevItem;
-  } else {
-    accumulator[groupByKeyValue] = newItem;
-  }
-  return accumulator;
-}, {});
-
 const Keys = (dict) => Object.keys(dict);
 
 const Values = (dict) => Object.values(dict);
@@ -115,7 +103,6 @@ const estimatedBestReturnsForBuyer = (amount, price, asks, isMarketOrder) => {
   return { amountYetToBeSold, estimatedReturns, status };
 };
 
-// todo - reuse the function in orderbook.js, make sure calculations are in one place
 const getCleanOrderBook = (contextOrderBook) => {
   const calculateAmount = (size, whole) => parseFloat((size / whole).toFixed(4));
   const asks = [];
@@ -127,7 +114,6 @@ const getCleanOrderBook = (contextOrderBook) => {
     const { price } = ask;
     asks.push({ amount, price });
   }
-  asks.sort((ask1, ask2) => ask2.price - ask1.price);
   for (const bid of contextOrderBook.bids) {
     const size = bid.valueRemaining;
     const whole = 10 ** 8;
@@ -135,11 +121,10 @@ const getCleanOrderBook = (contextOrderBook) => {
     const { price } = bid;
     bids.push({ amount, price });
   }
-  bids.sort((bid1, bid2) => bid2.price - bid1.price);
   return { asks, bids };
 };
 
 
 export {
-  formatThousands, groupByKey, Keys, Values, estimateBestReturnsForSeller, estimatedBestReturnsForBuyer, EstimationStatus, getCleanOrderBook,
+  formatThousands, Keys, Values, estimateBestReturnsForSeller, estimatedBestReturnsForBuyer, EstimationStatus, getCleanOrderBook,
 };

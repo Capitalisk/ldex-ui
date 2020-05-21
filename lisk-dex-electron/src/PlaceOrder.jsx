@@ -38,9 +38,7 @@ export default class PlaceOrder extends React.Component {
 
   getEstimatedReturns() {
     const orderBook = getCleanOrderBook(this.context.orderBookData);
-    const amount = (function getCleanAmount(value) {
-      return parseFloat(value) || 0;
-    }(this.state.amount));
+    const amount = parseFloat(this.state.amount) || 0;
 
     const { asks } = orderBook;
     const { bids } = orderBook;

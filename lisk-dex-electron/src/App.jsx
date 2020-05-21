@@ -4,14 +4,14 @@ import './App.css';
 import * as cryptography from '@liskhq/lisk-cryptography';
 import { Mnemonic } from '@liskhq/lisk-passphrase';
 import axios from 'axios';
-import Orderbook from './Orderbook';
+import OrderBook from './OrderBook';
 import PriceHistoryChart from './PriceHistoryChart';
 import PlaceOrder from './PlaceOrder';
 import YourOrders from './YourOrders';
 import SignInModal from './SignInModal';
 import SignInState from './SignInState';
 import {
-  getOrderbook,
+  getOrderBook,
   getAsksFromWallet,
   getBidsFromWallet,
   getPendingTransfers,
@@ -28,6 +28,7 @@ import processConfiguration from './config/Configuration';
 const NOTIFICATIONS_MAX_QUEUE_LENGTH = 3;
 const DEFAULT_API_MAX_PAGE_SIZE = 100;
 const DEFAULT_PRICE_DECIMAL_PRECISION = 4;
+const DEFAULT_ORDER_BOOK_DEPTH = 20;
 
 class App extends React.Component {
   constructor(props) {
@@ -361,14 +362,16 @@ class App extends React.Component {
     });
   }
 
-  async fetchOrderbookState() {
+  async fetchOrderBookState() {
     const dexClient = this.getDexClient();
 
     const quoteAsset = this.state.activeAssets[0];
     const baseAsset = this.state.activeAssets[1];
 
+    const { orderBookDepth } = this.state.configuration.markets[this.state.activeMarket] || {};
+
     const apiResults = [
-      getOrderbook(dexClient),
+      getOrderBook(dexClient, orderBookDepth == null ? DEFAULT_ORDER_BOOK_DEPTH : orderBookDepth),
       getProcessedHeights(dexClient),
     ];
     if (this.state.keys[quoteAsset]) {
@@ -408,10 +411,10 @@ class App extends React.Component {
       yourOrderMap[yourOrder.id] = yourOrder;
     }
 
-    const yourOrderbookIds = new Set();
+    const yourOrderBookIds = new Set();
 
     for (const order of yourOrders) {
-      yourOrderbookIds.add(order.id);
+      yourOrderBookIds.add(order.id);
       const existingOrder = yourOrderMap[order.id];
       if (!existingOrder || existingOrder.status === 'pending') {
         order.status = 'ready';
@@ -453,19 +456,10 @@ class App extends React.Component {
       return transactionData.charAt(0);
     };
 
-    // TODO: Match order id based on position in protocol argument list instead of regex.
-    const originOrderIdRegexT1 = /,[0-9]+:/g;
-    const originOrderIdRegexOthers = /,[0-9]+,/g;
-
     const getOriginOrderId = (pendingTransfer) => {
       const transactionData = pendingTransfer.transaction.asset.data || '';
-      const regex = transactionData.slice(0, 2) === 't1' ? originOrderIdRegexT1 : originOrderIdRegexOthers;
-      const matches = transactionData.match(regex);
-      if (matches) {
-        const match = matches[0];
-        return match.slice(1, match.length - 1);
-      }
-      return null;
+      const header = transactionData.split(':')[0];
+      return header.split(',')[2] || null;
     };
 
     const pendingTransfers = [...pendingBaseAssetTransfers, ...pendingQuoteAssetTransfers];
@@ -497,7 +491,7 @@ class App extends React.Component {
           yourOrder.status = 'matching';
         }
       } else {
-        if (yourOrder.status !== 'pending' && !yourOrderbookIds.has(yourOrder.id)) {
+        if (yourOrder.status !== 'pending' && !yourOrderBookIds.has(yourOrder.id)) {
           delete yourOrderMap[yourOrder.id];
           continue;
         }
@@ -506,7 +500,6 @@ class App extends React.Component {
         }
       }
     }
-
     const newState = {
       orderBookData: { bids, asks, maxSize },
       priceDecimalPrecision: this.getPriceDecimalPrecision(),
@@ -525,7 +518,7 @@ class App extends React.Component {
   async _updateUIWithNewData() {
     let combinedStateUpdate;
     try {
-      const [newOrderBookState, newPriceHistoryState] = await Promise.all([this.fetchOrderbookState(), this.fetchPriceHistoryState()]);
+      const [newOrderBookState, newPriceHistoryState] = await Promise.all([this.fetchOrderBookState(), this.fetchPriceHistoryState()]);
       combinedStateUpdate = { ...newOrderBookState, ...newPriceHistoryState };
     } catch (error) {
       console.error(error);
@@ -570,7 +563,7 @@ class App extends React.Component {
       await this.setState({ keys, signedIn: true, displaySigninModal: false });
       let newOrderBookState;
       try {
-        newOrderBookState = await this.fetchOrderbookState();
+        newOrderBookState = await this.fetchOrderBookState();
       } catch (error) {
         console.error(error);
         this.notify('Failed to fetch order book - Check your connection.', true);
@@ -640,9 +633,9 @@ class App extends React.Component {
             <div className="buy-panel">
               <PlaceOrder side="bid" orderSubmit={this.orderSubmit} orderSubmitError={this.orderSubmitError} />
             </div>
-            <div className="orderbook-container">
+            <div className="order-book-container">
               <div className="sell-orders">
-                <Orderbook side="asks" orderBookData={this.state.orderBookData} priceDecimalPrecision={this.state.priceDecimalPrecision} />
+                <OrderBook side="asks" orderBookData={this.state.orderBookData} priceDecimalPrecision={this.state.priceDecimalPrecision} />
               </div>
               <div className="price-display">
                 Price:
@@ -652,7 +645,7 @@ class App extends React.Component {
                 {this.state.activeAssets[1].toUpperCase()}
               </div>
               <div className="buy-orders">
-                <Orderbook side="bids" orderBookData={this.state.orderBookData} priceDecimalPrecision={this.state.priceDecimalPrecision} />
+                <OrderBook side="bids" orderBookData={this.state.orderBookData} priceDecimalPrecision={this.state.priceDecimalPrecision} />
               </div>
             </div>
             <div className="price-chart">
