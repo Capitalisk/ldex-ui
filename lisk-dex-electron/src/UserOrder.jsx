@@ -12,22 +12,32 @@ export default class UserOrder extends React.Component {
     this.state = {};
   }
 
-  cancelOrder = () => {
-    const dexAddress = this.context.configuration.markets[this.context.activeMarket].dexOptions.chains[this.props.order.sourceChain].walletAddress;
-    const { passphrase } = this.context.keys[this.props.order.sourceChain];
-    const { targetChain } = this.props.order;
-    const orderId = this.props.order.id;
-    const broadcastURL = this.context.configuration.assets[this.props.order.sourceChain].apiUrl;
+  cancelOrder = async () => {
+    const confirmed = window.confirm('Are you sure you want to cancel this limit order?');
+    if (confirmed) {
+      const dexAddress = this.context.configuration.markets[this.context.activeMarket].dexOptions.chains[this.props.order.sourceChain].walletAddress;
+      const { passphrase } = this.context.keys[this.props.order.sourceChain];
+      const { targetChain } = this.props.order;
+      const orderId = this.props.order.id;
+      const broadcastURL = this.context.configuration.assets[this.props.order.sourceChain].apiUrl;
 
-    const tx = transactions.transfer({
-      amount: transactions.utils.convertLSKToBeddows('0.11').toString(),
-      recipientId: dexAddress,
-      data: `${targetChain},close,${orderId}`,
-      passphrase,
-    });
-    axios.post(`${broadcastURL}/transactions`, tx).then(() => {
+      const tx = transactions.transfer({
+        amount: transactions.utils.convertLSKToBeddows('0.11').toString(),
+        recipientId: dexAddress,
+        data: `${targetChain},close,${orderId}`,
+        passphrase,
+      });
+      let order = this.props.order;
+      try {
+        await axios.post(`${broadcastURL}/transactions`, tx);
+      } catch (error) {
+        error.orderToCancel = order;
+        this.props.failedToCancelOrder(error);
+
+        return;
+      }
       this.props.orderCanceled(this.props.order);
-    });
+    }
   }
 
   render() {

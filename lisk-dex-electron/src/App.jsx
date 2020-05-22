@@ -234,6 +234,12 @@ class App extends React.Component {
     return newState;
   }
 
+  orderCancelFail = async (error) => {
+    let errorDetails = this._prepareErrorMessage(error);
+    let message = `Failed to cancel the order with id ${error.orderToCancel.id} - ${errorDetails}.`;
+    this.notify(message, true);
+  }
+
   orderCancel = async (order) => {
     const { unitValue } = this.state.configuration.assets[order.sourceChain];
     const chainSymbol = order.sourceChain.toUpperCase();
@@ -259,11 +265,11 @@ class App extends React.Component {
     }));
   }
 
-  orderSubmitError = async (error) => {
-    const { order } = error;
+  _prepareErrorMessage = (error) => {
     let errorDetails;
     if (
-      error.response.data
+      error.response
+      && error.response.data
       && error.response.data.errors
       && error.response.data.errors.length
       && error.response.data.errors[0].message
@@ -272,6 +278,13 @@ class App extends React.Component {
     } else {
       errorDetails = 'Check your connection';
     }
+    return errorDetails;
+  }
+
+  orderSubmitError = async (error) => {
+    const { order } = error;
+    let errorDetails = this._prepareErrorMessage(error);
+
     const { unitValue } = this.state.configuration.assets[order.sourceChain];
     const chainSymbol = order.sourceChain.toUpperCase();
     let message;
@@ -662,7 +675,7 @@ class App extends React.Component {
               />
             </div>
             <div className="your-orders">
-              <YourOrders orders={this.state.yourOrders} orderCanceled={this.orderCancel} />
+              <YourOrders orders={this.state.yourOrders} orderCanceled={this.orderCancel} handleCancelFail={this.orderCancelFail} />
             </div>
             <div className="market-name-and-stats">
               <MarketList markets={this.state.configuration.markets} refreshInterval={this.state.configuration.refreshInterval} />

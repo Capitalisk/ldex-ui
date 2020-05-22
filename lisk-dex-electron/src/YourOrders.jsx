@@ -32,10 +32,11 @@ export default class YourOrders extends React.Component {
   }
 
   handleCancel = (order) => {
-    const confirmed = window.confirm('Are you sure you want to cancel this limit order?');
-    if (confirmed) {
-      this.props.orderCanceled(order);
-    }
+    this.props.orderCanceled(order);
+  }
+
+  handleCancelFail = (error) => {
+    this.props.handleCancelFail(error);
   }
 
   render() {
@@ -74,13 +75,13 @@ export default class YourOrders extends React.Component {
             width: '50%', margin: 0, padding: 0, overflowY: 'scroll',
           }}
           >
-            {bids.slice().reverse().map((order) => <UserOrder key={order.id} side="bid" order={order} orderCanceled={this.handleCancel} />)}
+            {bids.slice().reverse().map((order) => <UserOrder key={order.id} side="bid" order={order} orderCanceled={this.handleCancel} failedToCancelOrder={this.handleCancelFail} />)}
           </div>
           <div style={{
             width: '50%', margin: 0, padding: 0, overflowY: 'scroll',
           }}
           >
-            {asks.map((order) => <UserOrder key={order.id} side="ask" order={order} orderCanceled={this.handleCancel} />)}
+            {asks.map((order) => <UserOrder key={order.id} side="ask" order={order} orderCanceled={this.handleCancel} failedToCancelOrder={this.handleCancelFail} />)}
           </div>
         </div>
       </>

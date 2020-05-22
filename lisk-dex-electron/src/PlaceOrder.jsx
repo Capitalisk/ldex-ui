@@ -218,7 +218,7 @@ export default class PlaceOrder extends React.Component {
               const error = new Error(`Failed to post market order because of error: ${err.message}`);
               error.response = err.response;
               error.order = this.generateOrder(tx, 'market', sourceChain, targetChain, side);
-              // this.props.orderSubmitError && this.props.orderSubmitError(error);
+              this.props.orderSubmitError && this.props.orderSubmitError(error);
               this.setState({ isSubmitting: false });
               return;
             }
@@ -266,7 +266,7 @@ export default class PlaceOrder extends React.Component {
               const error = new Error(`Failed to post limit order because of error: ${err.message}`);
               error.response = err.response;
               error.order = this.generateOrder(tx, 'limit', sourceChain, targetChain, side, parseFloat(price));
-              // this.props.orderSubmitError && this.props.orderSubmitError(error);
+              this.props.orderSubmitError && this.props.orderSubmitError(error);
               this.setState({ isSubmitting: false });
               return;
             }
