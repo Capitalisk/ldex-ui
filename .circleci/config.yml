@@ -15,7 +15,7 @@ jobs:
             - run: npm run lint
             - run: npm test
 
-  distribute:
+  distribute-app:
     docker:
       - image: tenatek/node-wine
     working_directory: ~/repo/lisk-dex-electron  
@@ -37,10 +37,16 @@ jobs:
           path: ~/repo/lisk-dex-electron/dist  
             
 workflows:
-    build-and-test:
+    test-and-deploy:
       jobs:
         - build-and-test
-        - distribute:
+        - distribute-app-approval:
             type: approval
             requires:
               - build-and-test
+        - distribute-app:
+            requires:
+              - distribute-app-approval
+            filters:
+              branches:
+                only: approval
