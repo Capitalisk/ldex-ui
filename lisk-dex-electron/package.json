@@ -34,12 +34,8 @@
     "eject": "react-scripts eject",
     "lint": "eslint .",
     "lint-fix": "eslint --fix .",
-    "build-all-platforms": "electron-packager ./ lisk-dex --all --app-version=\"$npm_package_version\"",
-    "build-win32": "",
-    "build-win64": "",
-    "build-macOSX": "",
-    "build-linux-x86": "",
-    "build-linux-x64": "electron-packager ./ lisk-dex --platform=linux --arch=x64 --app-version=\"$npm_package_version\""
+    "build-all-platforms": "electron-packager ./ lisk-dex --all --out=dist",
+    "build-all-platfoms-using-docker": ""
   },
   "eslintConfig": {
     "extends": "airbnb",

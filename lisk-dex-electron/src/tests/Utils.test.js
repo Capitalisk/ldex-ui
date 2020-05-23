@@ -68,9 +68,9 @@ describe('Utils tests => ', () => {
   it('Should Return UI Orderbook from context orderbook', () => {
     const expectedOrderBook = {
       asks: [
-        { price: 0.9500, amount: 2000.0000 },
-        { price: 0.8700, amount: 66.7126 },
         { price: 0.8000, amount: 0.5000 },
+        { price: 0.8700, amount: 66.7126 },
+        { price: 0.9500, amount: 2000.0000 },
       ],
       bids: [
         { price: 0.6000, amount: 71.9376 },
