@@ -33,8 +33,9 @@ jobs:
           command: |
             set +e
             npm run build-all-platforms
-      - store_artifacts:
-          path: ~/repo/lisk-dex-electron/dist  
+            ci-scripts/artifact-zipper.sh
+      - store_artifacts:  
+          path: ~/repo/lisk-dex-electron/dist/compressed
             
 workflows:
     test-and-deploy:
