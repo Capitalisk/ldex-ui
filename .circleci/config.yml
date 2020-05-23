@@ -40,13 +40,10 @@ workflows:
     test-and-deploy:
       jobs:
         - build-and-test
-        - distribute-app-approval:
+        - hold:
             type: approval
             requires:
               - build-and-test
         - distribute-app:
             requires:
-              - distribute-app-approval
-            filters:
-              branches:
-                only: approval
+              - hold
