@@ -48,7 +48,9 @@
     "lint": "eslint .",
     "lint-fix": "eslint --fix .",
     "pack": "electron-builder --dir",
-    "dist": "electron-builder"
+    "dist": "electron-builder",
+    "multi-dist": "electron-builder -mwl",
+    "spawn-interactive-pacakging-env": "./docker-electron-env.sh"
   },
   "eslintConfig": {
     "extends": "airbnb",
