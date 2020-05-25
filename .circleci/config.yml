@@ -33,7 +33,7 @@ jobs:
           name: Create Build Artifact 
           command: |
             set +e
-            npm run dist
+            npm run multi-dist
             ci-scripts/artifacts-isolator.sh
       - store_artifacts:  
           path: ~/repo/lisk-dex-electron/dist/artifacts
