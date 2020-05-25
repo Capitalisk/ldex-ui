@@ -11,6 +11,7 @@
     "files": [
       "build/",
       "!dist/",
+      "!ci-scripts/",
       "!public/",
       "!src/",
       "!node_modules/",
