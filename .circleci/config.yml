@@ -7,11 +7,14 @@ jobs:
     steps:
       - checkout:  
            path: ~/repo
-      - node/with-cache:
-          steps:
-            - run: npm install  
-            - run: npm run lint
-            - run: npm test
+      - run:
+          name: Build and Test project
+          command: |
+            set +e
+            npm install
+            npm run build     
+            npm run lint
+            npm test
 
   distribute-app:
     docker:
