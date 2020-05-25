@@ -18,7 +18,7 @@ function createWindow() {
   });
 
   mainWindow.loadURL(
-    `file://${path.join(__dirname, '../build/index.html')}`,
+    `file://${path.join(__dirname, 'index.html')}`,
   );
 
   mainWindow.webContents.on('new-window', (event, url) => {
