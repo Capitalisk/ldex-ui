@@ -18,7 +18,7 @@ jobs:
 
   distribute-app:
     docker:
-      - image: tenatek/node-wine
+      - image: electronuserland/builder:wine
     working_directory: ~/repo/lisk-dex-electron  
     steps:
       - checkout:  
@@ -36,7 +36,7 @@ jobs:
             npm run dist
             ci-scripts/artifacts-isolator.sh
       - store_artifacts:  
-          path: ~/repo/lisk-dex-electron/dist/compressed
+          path: ~/repo/lisk-dex-electron/dist/artifacts
             
 workflows:
     test-and-deploy:
