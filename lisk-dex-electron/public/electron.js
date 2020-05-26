@@ -26,8 +26,9 @@ function createWindow() {
     electron.shell.openExternal(url);
   });
 
-  mainWindow.on('closed', () => {
-    mainWindow = null;
+  mainWindow.on('close', (e) => {
+    e.preventDefault();
+    mainWindow.destroy();
   });
 }
 
