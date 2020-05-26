@@ -37,6 +37,7 @@ jobs:
             ci-scripts/artifacts-isolator.sh
       - store_artifacts:  
           path: ~/repo/lisk-dex-electron/dist/artifacts
+          destination: artifacts
             
 workflows:
     test-and-deploy:
