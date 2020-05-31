@@ -16,7 +16,7 @@ jobs:
             npm run lint
             npm test
 
-  generate-artifact-win-lin:
+  win-linux:
     docker:
       - image: electronuserland/builder:wine
     working_directory: ~/repo/lisk-dex-electron  
@@ -39,7 +39,7 @@ jobs:
           path: ~/repo/lisk-dex-electron/dist/artifacts
           destination: artifacts
 
-  generate-artifact-mac:
+  mac:
     macos:
       xcode: 11.3.0
     working_directory: ~/repo/lisk-dex-electron  
@@ -82,9 +82,9 @@ workflows:
             type: approval
             requires:
               - build-and-test
-        - generate-artifact-win-lin:
+        - win-linux:
             requires:
               - hold
-        - generate-artifact-mac:
+        - mac:
             requires:
               - hold

@@ -1,0 +1,63 @@
+productName: "Lisk Dex"
+appId: io.lisk.electron-cra
+compression: normal
+npmRebuild: true
+asar: true
+
+protocols:
+  name: Lisk Dex
+  schemes:
+    - ldex.exchange
+
+mac:
+  artifactName: ${name}-${version}-${os}.${ext}
+  category: Finance
+  target:
+    - dmg
+    - zip
+
+linux:
+  artifactName: ${name}-${version}-${os}-${arch}.${ext}
+  category: Finance
+  target:
+    - target: AppImage
+      arch:
+        - x64
+        - ia32
+    - target: tar.gz
+      arch:
+        - x64
+        - ia32
+
+win:
+  artifactName: ${name}-${version}-${os}-${arch}.${ext}
+  target:
+    - target: nsis
+      arch:
+        - x64
+        - ia32
+    - target: zip
+      arch:
+        - x64
+        - ia32
+
+nsis:
+  oneClick: false
+  perMachine: true
+  allowToChangeInstallationDirectory: true
+
+files:
+  - "build/"
+  - "!dist/"
+  - "!ci-scripts/"
+  -  "!public/"
+  - "!src/"
+  - "!node_modules/"
+  - "!**/*.{imlohproforigpycpyorbcswpcsprojslnxproj}"
+  - "!.editorconfig"
+  - "!**/._*"
+  - "!**/{.DS_Store.git.hg.svnCVSRCSSCCS.gitignore.gitattributes}"
+  - "!**/{__pycache__thumbs.db.flowconfig.idea.vs.nyc_output}"
+  - "!**/{appveyor.yml.travis.ymlcircle.yml}"
+  - "!**/{npm-debug.logyarn.lock.yarn-integrity.yarn-metadata.json}"
+  - "!**/{.eslintignore.eslintrc.json}"

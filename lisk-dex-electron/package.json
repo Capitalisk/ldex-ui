@@ -6,28 +6,6 @@
   "main": "build/electron.js",
   "author": "Jong, sacOO7",
   "description": "Lisk DEX-UI app for exchanging tokens with sidechains",
-  "build": {
-    "appId": "com.example.electron-cra",
-    "files": [
-      "build/",
-      "!dist/",
-      "!ci-scripts/",
-      "!public/",
-      "!src/",
-      "!node_modules/",
-      "!**/*.{iml,o,hprof,orig,pyc,pyo,rbc,swp,csproj,sln,xproj}",
-      "!.editorconfig",
-      "!**/._*",
-      "!**/{.DS_Store,.git,.hg,.svn,CVS,RCS,SCCS,.gitignore,.gitattributes}",
-      "!**/{__pycache__,thumbs.db,.flowconfig,.idea,.vs,.nyc_output}",
-      "!**/{appveyor.yml,.travis.yml,circle.yml}",
-      "!**/{npm-debug.log,yarn.lock,.yarn-integrity,.yarn-metadata.json}",
-      "!**/{.eslintignore,.eslintrc.json}"
-    ],
-    "directories": {
-      "buildResources": "assets"
-    }
-  },
   "dependencies": {
     "@liskhq/lisk-cryptography": "^2.2.0",
     "@liskhq/lisk-passphrase": "^2.0.3",
