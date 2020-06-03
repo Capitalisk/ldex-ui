@@ -1,22 +1,22 @@
 {
-  "appTitle": "Lisk DEX",
+  "appTitle": "LDEX",
   "feedbackLink": {
     "text": "Report bug / send feedback",
-    "url": "https://github.com/Jaxkr/lisk-dex-ui/issues/new"
+    "url": "https://github.com/leasehold/lisk-dex-ui/issues/new"
   },
   "notificationDuration": 10000,
   "refreshInterval": 15000,
   "assets": {
     "lsk": {
-      "name": "Lisk testnet",
-      "apiUrl": "https://test-02.liskapi.io/api",
+      "name": "Lisk",
+      "apiUrl": "https://ldex.exchange/chain/lsk/api",
       "unitValue": 100000000,
       "apiMaxPageSize": 100,
       "processingHeightExpiry": 5
     },
     "lsh": {
-      "name": "Leasehold testnet",
-      "apiUrl": "http://18.206.164.187:7010/api",
+      "name": "Leasehold",
+      "apiUrl": "https://ldex.exchange/chain/lsh/api",
       "unitValue": 100000000,
       "apiMaxPageSize": 100,
       "processingHeightExpiry": 5
@@ -24,7 +24,7 @@
   },
   "markets": {
     "lsh/lsk": {
-      "dexApiUrl": "http://18.206.164.187:7011",
+      "dexApiUrl": "https://ldex.exchange/dex/lsh-lsk/api",
       "assets": ["lsh", "lsk"],
       "orderBookDepth": 20
     }
