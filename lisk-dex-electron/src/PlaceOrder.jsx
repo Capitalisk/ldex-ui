@@ -61,7 +61,7 @@ export default class PlaceOrder extends React.Component {
 
   getEstimatedReturnsBreakDown(estimate) {
     let verboseEstimation = `${estimate.estimatedReturns.toFixed(4)} ${estimate.assetExchanged}`;
-    if (estimate.status === EstimationStatus.PARTIAL_MATCH) {
+    if (estimate.status === EstimationStatus.PARTIAL_MATCH || estimate.amountYetToBeSold > 0) {
       verboseEstimation += ` + ${estimate.amountYetToBeSold.toFixed(4)} ${estimate.assetExchangedAgainst}`;
       if (this.getOrderType() === 'market') {
         verboseEstimation += ' (refund)';
