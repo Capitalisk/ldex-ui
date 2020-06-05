@@ -125,6 +125,20 @@ class App extends React.Component {
     return header.split(',')[0] === 't2';
   }
 
+  _getExpectedCounterpartyTransactionCount(transaction) {
+    const transactionData = transaction.asset.data || '';
+    const header = transactionData.split(':')[0];
+    const parts = header.split(',');
+    const txnType = parts[0];
+    if (txnType === 't1') {
+      return parts[3] || 1;
+    }
+    if (txnType === 't2') {
+      return 1;
+    }
+    return 0;
+  }
+
   async fetchPriceHistoryState() {
     const [quoteChainTxns, baseChainTxns] = await Promise.all(
       this.state.activeAssets.map(async (assetSymbol) => {
@@ -190,15 +204,19 @@ class App extends React.Component {
     }
 
     const priceHistory = [];
-    const txnPairsList = Object.values(txnPairsMap);
 
-    // Pop out all entries which are definitely incompete or possibly incompete due to result limit.
-    while (txnPairsList.length) {
-      const lastPair = txnPairsList.pop();
-      if (lastPair.base.length > 0 && lastPair.quote.length > 0) {
-        break;
+    // Filter out all entries which are incompete.
+    const txnPairsList = Object.values(txnPairsMap).filter((txnPair) => {
+      const firstBaseTxn = txnPair.base[0];
+      const firstQuoteTxn = txnPair.quote[0];
+      if (!firstBaseTxn || !firstQuoteTxn) {
+        return false;
       }
-    }
+      const expectedBaseCount = this._getExpectedCounterpartyTransactionCount(firstQuoteTxn);
+      const expectedQuoteCount = this._getExpectedCounterpartyTransactionCount(firstBaseTxn);
+
+      return txnPair.base.length >= expectedBaseCount && txnPair.quote.length >= expectedQuoteCount;
+    });
 
     const { dexOptions } = this.state.configuration.markets[this.state.activeMarket];
     const priceDecimalPrecision = this.getPriceDecimalPrecision();
