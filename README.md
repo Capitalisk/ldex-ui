@@ -1,13 +1,19 @@
 # lisk-dex-ui
 
-## How to run
+## Requirements
 
-1. Clone repository and `cd` into it.
-2. `cd lisk-dex-electron && npm i`
-3. `npm run start`
-4. Leaving the last process running, `npm run electron`.
+- Terminal/Console
+- Git (setup steps: https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
+- Node.js (installers: https://nodejs.org/en/download/)
 
-This setup allows Electron to hot-reload from a web server, making development much more convenient; And, we can still produce a bundled app that works offline.
+## How to run from source (recommended)
 
-Alternatively, you can view the running application at http://localhost:3000/
+Running this application directly from source on your own desktop is the most secure way to trade.
 
+1. Clone this repository: `git clone https://github.com/Leasehold/lisk-dex-ui.git`
+2. `cd lisk-dex-ui/lisk-dex-electron`
+3. `npm install`
+4. `npm run build`
+5. `npm run electron`
+
+For development, use `npm run start` and view the running application at http://localhost:3000/
