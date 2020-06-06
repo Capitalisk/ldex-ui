@@ -22,7 +22,9 @@
   "scripts": {
     "electron": "electron .",
     "start": "BROWSER=none react-scripts start",
-    "build": "react-scripts build",
+    "start-prod": "BROWSER=none REACT_APP_PRODUCTION=true react-scripts start",
+    "build-dev": "BROWSER=none react-scripts build",
+    "build-prod": "BROWSER=none REACT_APP_PRODUCTION=true react-scripts build",
     "test": "react-scripts test src/tests",
     "eject": "react-scripts eject",
     "lint": "eslint .",

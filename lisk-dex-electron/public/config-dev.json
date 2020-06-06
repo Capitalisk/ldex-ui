@@ -1,0 +1,32 @@
+{
+  "appTitle": "Lisk DEX",
+  "feedbackLink": {
+    "text": "Report bug / send feedback",
+    "url": "https://github.com/Jaxkr/lisk-dex-ui/issues/new"
+  },
+  "notificationDuration": 10000,
+  "refreshInterval": 15000,
+  "assets": {
+    "lsk": {
+      "name": "Lisk testnet",
+      "apiUrl": "https://test-02.liskapi.io/api",
+      "unitValue": 100000000,
+      "apiMaxPageSize": 100,
+      "processingHeightExpiry": 5
+    },
+    "lsh": {
+      "name": "Leasehold testnet",
+      "apiUrl": "http://18.206.164.187:7010/api",
+      "unitValue": 100000000,
+      "apiMaxPageSize": 100,
+      "processingHeightExpiry": 5
+    }
+  },
+  "markets": {
+    "lsh/lsk": {
+      "dexApiUrl": "http://18.206.164.187:7011",
+      "assets": ["lsh", "lsk"],
+      "orderBookDepth": 20
+    }
+  }
+}
