@@ -31,5 +31,8 @@ export async function getProcessedHeights(instance) {
 }
 
 export async function getConfig(instance) {
-  return (await instance.get('config.json')).data;
+  if (process.env.REACT_APP_PRODUCTION) {
+    return (await instance.get('config.json')).data;
+  }
+  return (await instance.get('config-dev.json')).data;
 }

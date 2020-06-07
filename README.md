@@ -10,13 +10,13 @@
 
 Running this application directly from source on your own desktop is the most secure way to trade.
 
-### To run for the first time:
+### To run for the first time (for traders):
 
 1. Using the terminal, navigate to the directory where you want to install this app.
 2. Clone this repository: `git clone https://github.com/Leasehold/lisk-dex-ui.git`
 3. `cd lisk-dex-ui/lisk-dex-electron`
 4. `npm install`
-5. `npm run build`
+5. `npm run build-prod`
 6. `npm run electron`
 
 ### To run every other time:
