@@ -10,6 +10,9 @@ export default class OrderBook extends React.Component {
   }
 
   render() {
+    let assets = this.props.assets || [];
+    const quoteSymbol = assets[0];
+    const baseSymbol = assets[1];
     if (this.props.side === 'asks') {
       const groupedAskOrders = Values(this.props.orderBookData.asks, 'price', 'sizeRemaining');
       const orders = groupedAskOrders.map((ask) => (
@@ -22,6 +25,7 @@ export default class OrderBook extends React.Component {
           side={this.props.side}
           sizeDecimals={4}
           priceDecimals={this.props.priceDecimalPrecision}
+          symbol={quoteSymbol}
         />
       ));
       return <div className="askOrderList">{orders}</div>;
@@ -38,6 +42,7 @@ export default class OrderBook extends React.Component {
           side={this.props.side}
           sizeDecimals={4}
           priceDecimals={this.props.priceDecimalPrecision}
+          symbol={baseSymbol}
         />
       ));
       return <div className="bidOrderList">{orders}</div>;

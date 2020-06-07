@@ -31,6 +31,8 @@ export default class OrderBookEntry extends React.Component {
         &nbsp;|&nbsp;
         {' '}
         {formattedSize}
+        {' '}
+        {(this.props.symbol || '').toUpperCase()}
       </div>
     );
   }
