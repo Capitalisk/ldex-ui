@@ -29,6 +29,7 @@ export default class SignInState extends React.Component {
             <span className="sign-in-state-address">
               {' '}
               as
+              {' '}
               {addressesInfo}
             </span>
           </span>
