@@ -99,7 +99,6 @@ export default class PlaceOrder extends React.Component {
         <div id="sign-in-modal" className="modal-foreground">
           <form onSubmit={this.handleSubmit}>
             <div style={{ textAlign: 'right', width: '100%' }}>
-              <input className="button-primary" style={{ fontSize: '20px', marginRight: '10px' }} type="submit" value="Submit" />
               <button type="button" className="button-secondary" onClick={this.props.close}>Close</button>
             </div>
             <h2>Sign in using your blockchain passphrases.</h2>
