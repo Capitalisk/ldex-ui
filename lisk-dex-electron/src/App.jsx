@@ -52,7 +52,7 @@ class App extends React.Component {
       displayLeaveWarning: false,
       maxBid: 0,
       minAsk: 0,
-      lastTradePrice: 0,
+      lastTradePrice: null,
       yourOrders: [],
       // to prevent cross-chain replay attacks, the user can specify a key for each chain that they are trading on.
       // the address will be used when the asset is being used as the destination chain.
@@ -563,7 +563,7 @@ class App extends React.Component {
     if (combinedStateUpdate.priceHistory.length) {
       combinedStateUpdate.lastTradePrice = combinedStateUpdate.priceHistory[combinedStateUpdate.priceHistory.length - 1].price;
     } else {
-      combinedStateUpdate.lastTradePrice = 0;
+      combinedStateUpdate.lastTradePrice = null;
     }
     this.setState(combinedStateUpdate);
   }
@@ -676,13 +676,7 @@ class App extends React.Component {
               <div className="sell-orders">
                 <OrderBook side="asks" orderBookData={this.state.orderBookData} priceDecimalPrecision={this.state.priceDecimalPrecision} assets={this.state.activeAssets} />
               </div>
-              <div className="price-display">
-                Price:
-                {' '}
-                {this.state.lastTradePrice}
-                {' '}
-                {this.state.activeAssets[1].toUpperCase()}
-              </div>
+              {this.state.lastTradePrice == null ? <div className="price-display"></div> : <div className="price-display">Price:{' '}{this.state.lastTradePrice}{' '}{this.state.activeAssets[1].toUpperCase()}</div>}
               <div className="buy-orders">
                 <OrderBook side="bids" orderBookData={this.state.orderBookData} priceDecimalPrecision={this.state.priceDecimalPrecision} assets={this.state.activeAssets} />
               </div>
