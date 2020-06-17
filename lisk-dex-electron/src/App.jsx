@@ -52,6 +52,7 @@ class App extends React.Component {
       displayLeaveWarning: false,
       maxBid: 0,
       minAsk: 0,
+      lastTradePrice: 0,
       yourOrders: [],
       // to prevent cross-chain replay attacks, the user can specify a key for each chain that they are trading on.
       // the address will be used when the asset is being used as the destination chain.
@@ -559,6 +560,11 @@ class App extends React.Component {
 
       return;
     }
+    if (combinedStateUpdate.priceHistory.length) {
+      combinedStateUpdate.lastTradePrice = combinedStateUpdate.priceHistory[combinedStateUpdate.priceHistory.length - 1].price;
+    } else {
+      combinedStateUpdate.lastTradePrice = 0;
+    }
     this.setState(combinedStateUpdate);
   }
 
@@ -673,7 +679,7 @@ class App extends React.Component {
               <div className="price-display">
                 Price:
                 {' '}
-                {this.state.minAsk}
+                {this.state.lastTradePrice}
                 {' '}
                 {this.state.activeAssets[1].toUpperCase()}
               </div>
