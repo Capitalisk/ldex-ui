@@ -32,6 +32,23 @@ export default class PlaceOrder extends React.Component {
     });
   }
 
+  showEstimateInfo = (statuses) => {
+    if (this.props.showEstimateInfo) {
+      const messageParts = ['This is an estimate of how many tokens you can expect to receive.'];
+      if (statuses.includes('pending')) {
+        messageParts.push(
+          'A (pending) status means that some of the order cannot be filled immediately and will stay pending inside the order book until it is matched with future counteroffers.'
+        );
+      }
+      if (statuses.includes('refund')) {
+        messageParts.push(
+          'A (refund) status means that a portion of the order cannot be filled immediately and some tokens will be refunded back to your wallet - It is recommended that you reduce the size of your order to avoid this situation.'
+        )
+      }
+      this.props.showEstimateInfo(messageParts.join(' '));
+    }
+  }
+
   getOrderType() {
     return this.state.marketMode ? 'market' : 'limit';
   }
@@ -61,15 +78,18 @@ export default class PlaceOrder extends React.Component {
 
   getEstimatedReturnsBreakDown(estimate) {
     let verboseEstimation = `${estimate.estimatedReturns.toFixed(4)} ${estimate.assetExchanged}`;
+    const statuses = [];
     if (estimate.status === EstimationStatus.PARTIAL_MATCH || estimate.amountYetToBeSold > 0) {
       verboseEstimation += ` + ${estimate.amountYetToBeSold.toFixed(4)} ${estimate.assetExchangedAgainst}`;
       if (this.getOrderType() === 'market') {
         verboseEstimation += ' (refund)';
+        statuses.push('refund');
       } else {
         verboseEstimation += ' (pending)';
+        statuses.push('pending');
       }
     }
-    return verboseEstimation;
+    return <span><span>{verboseEstimation}</span>{' '}<input className="estimator-info-button" type="button" value="[?]" onClick={() => this.showEstimateInfo(statuses)} /></span>;
   }
 
   handleSubmit = (event) => {
@@ -302,9 +322,9 @@ export default class PlaceOrder extends React.Component {
                 {' '}
                 <br />
                 {this.state.errors.price && <div className="error-message">{this.state.errors.price}</div>}
-                <div class="price-container">
+                <div className="price-container">
                   <input name="price" className="order-val-input" type="text" title="Decimal number" value={this.state.price} onChange={this.handleChange} />
-                  <div class="input-chain-symbol">{(this.context.activeAssets[1] || '').toUpperCase()}</div>
+                  <div className="input-chain-symbol">{(this.context.activeAssets[1] || '').toUpperCase()}</div>
                 </div>
               </>
               )}
@@ -312,9 +332,9 @@ export default class PlaceOrder extends React.Component {
             {' '}
             <br />
             {this.state.errors.amount && <div className="error-message">{this.state.errors.amount}</div>}
-            <div class="amount-container">
+            <div className="amount-container">
               <input name="amount" className="order-val-input" type="text" title="Decimal number" value={this.state.amount} onChange={this.handleChange} />
-              <div class="input-chain-symbol">{(this.props.side === 'ask' ? this.context.activeAssets[0] : this.context.activeAssets[1] || '').toUpperCase()}</div>
+              <div className="input-chain-symbol">{(this.props.side === 'ask' ? this.context.activeAssets[0] : this.context.activeAssets[1] || '').toUpperCase()}</div>
             </div>
             {
                (

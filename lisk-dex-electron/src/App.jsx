@@ -284,6 +284,10 @@ class App extends React.Component {
     }));
   }
 
+  showEstimateInfo = async (message) => {
+    this.notify(message);
+  }
+
   _prepareErrorMessage = (error) => {
     let errorDetails;
     if (
@@ -667,10 +671,10 @@ class App extends React.Component {
               {this.state.notifications.map((data) => <Notification key={data.id} data={data} />)}
             </div>
             <div className="sell-panel">
-              <PlaceOrder side="ask" orderSubmit={this.orderSubmit} orderSubmitError={this.orderSubmitError} />
+              <PlaceOrder side="ask" orderSubmit={this.orderSubmit} orderSubmitError={this.orderSubmitError} showEstimateInfo={this.showEstimateInfo} />
             </div>
             <div className="buy-panel">
-              <PlaceOrder side="bid" orderSubmit={this.orderSubmit} orderSubmitError={this.orderSubmitError} />
+              <PlaceOrder side="bid" orderSubmit={this.orderSubmit} orderSubmitError={this.orderSubmitError} showEstimateInfo={this.showEstimateInfo} />
             </div>
             <div className="order-book-container">
               <div className="sell-orders">
