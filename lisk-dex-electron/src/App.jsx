@@ -91,7 +91,7 @@ class App extends React.Component {
     const configuration = await processConfiguration(defaultConfiguration);
     const marketSymbols = Object.keys(configuration.markets);
     const defaultMarketKey = marketSymbols[0];
-    this.setState({
+    await this.setState({
       configuration,
       activeMarket: defaultMarketKey,
       activeAssets: configuration.markets[defaultMarketKey].assets,
@@ -279,8 +279,8 @@ class App extends React.Component {
     }
     this.notify(message);
 
-    this.setState((prevState) => ({
-      yourOrders: prevState.yourOrders,
+    await this.setState(({yourOrders}) => ({
+      yourOrders,
     }));
   }
 
@@ -334,39 +334,41 @@ class App extends React.Component {
     order.submitExpiryHeight = order.submitHeight + this.state.configuration
       .markets[this.state.activeMarket].dexOptions.chains[order.sourceChain].requiredConfirmations + heightSafetyMargin;
 
-    const yourOrderMap = {};
-    for (const yourOrder of this.state.yourOrders) {
-      yourOrderMap[yourOrder.id] = yourOrder;
-    }
+    await this.setState(({yourOrders, configuration, activeMarket}) => {
+      const yourOrderMap = {};
+      for (const yourOrder of yourOrders) {
+        yourOrderMap[yourOrder.id] = yourOrder;
+      }
 
-    order.status = 'pending';
-    yourOrderMap[order.id] = order;
+      order.status = 'pending';
+      yourOrderMap[order.id] = order;
 
-    const orderDexAddress = this.state.configuration.markets[this.state.activeMarket].dexOptions.chains[order.sourceChain].walletAddress;
-    const { unitValue } = this.state.configuration.assets[order.sourceChain];
-    const chainSymbol = order.sourceChain.toUpperCase();
+      const orderDexAddress = configuration.markets[activeMarket].dexOptions.chains[order.sourceChain].walletAddress;
+      const { unitValue } = configuration.assets[order.sourceChain];
+      const chainSymbol = order.sourceChain.toUpperCase();
 
-    let message;
-    if (order.type === 'limit') {
-      message = `A limit order with amount ${
-        Math.round(((order.value || order.size) * 100) / unitValue) / 100
-      } ${chainSymbol} at price ${
-        order.price
-      } was submitted to the DEX address ${
-        orderDexAddress
-      } on the ${chainSymbol} blockchain`;
-    } else {
-      message = `A market order with amount ${
-        Math.round(((order.value || order.size) * 100) / unitValue) / 100
-      } ${chainSymbol} was submitted to the DEX address ${
-        orderDexAddress
-      } on the ${chainSymbol} blockchain`;
-    }
+      let message;
+      if (order.type === 'limit') {
+        message = `A limit order with amount ${
+          Math.round(((order.value || order.size) * 100) / unitValue) / 100
+        } ${chainSymbol} at price ${
+          order.price
+        } was submitted to the DEX address ${
+          orderDexAddress
+        } on the ${chainSymbol} blockchain`;
+      } else {
+        message = `A market order with amount ${
+          Math.round(((order.value || order.size) * 100) / unitValue) / 100
+        } ${chainSymbol} was submitted to the DEX address ${
+          orderDexAddress
+        } on the ${chainSymbol} blockchain`;
+      }
 
-    this.notify(message);
+      this.notify(message);
 
-    this.setState({
-      yourOrders: Object.values(yourOrderMap),
+      return {
+        yourOrders: Object.values(yourOrderMap),
+      };
     });
   }
 
@@ -436,7 +438,7 @@ class App extends React.Component {
       pendingBaseAssetTransfers,
     ] = await Promise.all(apiResults);
 
-    const yourOrders = [...yourAsks, ...yourBids];
+    const yourOpenOrders = [...yourAsks, ...yourBids];
 
     const bids = [];
     const asks = [];
@@ -447,10 +449,10 @@ class App extends React.Component {
       yourOrderMap[yourOrder.id] = yourOrder;
     }
 
-    const yourOrderBookIds = new Set();
+    const yourOpenOrderIds = new Set();
 
-    for (const order of yourOrders) {
-      yourOrderBookIds.add(order.id);
+    for (const order of yourOpenOrders) {
+      yourOpenOrderIds.add(order.id);
       const existingOrder = yourOrderMap[order.id];
       if (!existingOrder || existingOrder.status === 'pending') {
         order.status = 'ready';
@@ -506,10 +508,10 @@ class App extends React.Component {
     const uniqueRefundTransfers = pendingTransfers.filter((transfer) => getTransferType(transfer) === 'r' && !tradeTransfersOriginOrderIds.has(getOriginOrderId(transfer)));
     const uniquePendingTransfers = [...tradeTransfers, ...uniqueRefundTransfers];
 
-    const transferOrderIds = new Set();
+    const pendingTransferOrderIds = new Set();
     for (const pendingTransfer of uniquePendingTransfers) {
       const originOrderId = getOriginOrderId(pendingTransfer);
-      transferOrderIds.add(originOrderId);
+      pendingTransferOrderIds.add(originOrderId);
     }
 
     const yourOrderList = Object.values(yourOrderMap);
@@ -522,14 +524,14 @@ class App extends React.Component {
           continue;
         }
       }
-      if (transferOrderIds.has(yourOrder.id)) {
+      if (pendingTransferOrderIds.has(yourOrder.id)) {
         if (yourOrder.status === 'pending') {
           yourOrder.status = 'processing';
         } else if (yourOrder.status === 'ready') {
           yourOrder.status = 'matching';
         }
       } else {
-        if (yourOrder.status !== 'pending' && !yourOrderBookIds.has(yourOrder.id)) {
+        if (yourOrder.status !== 'pending' && !yourOpenOrderIds.has(yourOrder.id)) {
           delete yourOrderMap[yourOrder.id];
           continue;
         }
@@ -569,7 +571,7 @@ class App extends React.Component {
     } else {
       combinedStateUpdate.lastTradePrice = null;
     }
-    this.setState(combinedStateUpdate);
+    await this.setState(combinedStateUpdate);
   }
 
   componentDidUpdate() {
@@ -595,7 +597,7 @@ class App extends React.Component {
         const passphrase = payload[asset].trim();
         if (!Mnemonic.validateMnemonic(passphrase, Mnemonic.wordlists.english)) {
           delete keys[asset];
-          this.setState({ signInFailure: true });
+          await this.setState({ signInFailure: true });
           return;
         }
         const { address } = cryptography.getAddressAndPublicKeyFromPassphrase(passphrase);
