@@ -302,14 +302,20 @@ export default class PlaceOrder extends React.Component {
                 {' '}
                 <br />
                 {this.state.errors.price && <div className="error-message">{this.state.errors.price}</div>}
-                <input name="price" className="order-val-input" type="text" title="Decimal number" value={this.state.price} onChange={this.handleChange} />
+                <div class="price-container">
+                  <input name="price" className="order-val-input" type="text" title="Decimal number" value={this.state.price} onChange={this.handleChange} />
+                  <div class="input-chain-symbol">{(this.context.activeAssets[1] || '').toUpperCase()}</div>
+                </div>
               </>
               )}
             Amount:
             {' '}
             <br />
             {this.state.errors.amount && <div className="error-message">{this.state.errors.amount}</div>}
-            <input name="amount" className="order-val-input" type="text" title="Decimal number" value={this.state.amount} onChange={this.handleChange} />
+            <div class="amount-container">
+              <input name="amount" className="order-val-input" type="text" title="Decimal number" value={this.state.amount} onChange={this.handleChange} />
+              <div class="input-chain-symbol">{(this.props.side === 'ask' ? this.context.activeAssets[0] : this.context.activeAssets[1] || '').toUpperCase()}</div>
+            </div>
             {
                (
                  <div style={{ color: 'grey', fontSize: '15px', marginBottom: '10px' }}>

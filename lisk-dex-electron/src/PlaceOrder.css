@@ -50,10 +50,26 @@
   cursor: default;
 }
 
+.price-container, .amount-container {
+  position: relative;
+}
+
+.input-chain-symbol {
+  position: absolute;
+  right: 30px;
+  top: calc(50% - 11px);
+  color: #999999;
+  user-select: none;
+}
+
 @media only screen and (max-width: 400px) {
   .market-limit-tabs {
     display: flex;
     flex-direction: column;
     margin-right: 10px;
+  }
+
+  .input-chain-symbol {
+    right: 10px;
   }
 }
