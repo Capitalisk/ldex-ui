@@ -56,7 +56,7 @@
 
 .input-chain-symbol {
   position: absolute;
-  right: 25px;
+  right: 10%;
   top: calc(50% - 11px);
   color: #999999;
   user-select: none;
