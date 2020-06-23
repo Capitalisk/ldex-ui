@@ -4,6 +4,7 @@ import * as transactions from '@liskhq/lisk-transactions';
 import axios from 'axios';
 import BalanceDisplay from './BalanceDisplay';
 import userContext from './context';
+import Tooltip from './Tooltip';
 import {
   getCleanOrderBook, estimateBestReturnsForSeller, estimatedBestReturnsForBuyer, EstimationStatus,
 } from './Utils';
@@ -37,16 +38,18 @@ export default class PlaceOrder extends React.Component {
       const messageParts = ['This is an estimate of how many tokens you can expect to receive.'];
       if (statuses.includes('pending')) {
         messageParts.push(
-          'A (pending) status means that some of the order cannot be filled immediately and will stay pending inside the order book until it is matched with future counteroffers.'
+          'A (pending) status means that some of the order cannot be filled immediately and will stay pending inside the order book until it is matched with future counteroffers.',
         );
       }
       if (statuses.includes('refund')) {
         messageParts.push(
-          'A (refund) status means that a portion of the order cannot be filled immediately and some tokens will be refunded back to your wallet - It is recommended that you reduce the size of your order to avoid this situation.'
-        )
+          'A (refund) status means that a portion of the order cannot be filled immediately and some tokens will be refunded back to your wallet - It is recommended that you reduce the size of your order to avoid this situation.',
+        );
       }
-      this.props.showEstimateInfo(messageParts.join(' '));
+      // this.props.showEstimateInfo(messageParts.join(' '));
+      return messageParts.join(' ');
     }
+    return '';
   }
 
   getOrderType() {
@@ -89,7 +92,13 @@ export default class PlaceOrder extends React.Component {
         statuses.push('pending');
       }
     }
-    return <span><span>{verboseEstimation}</span>{' '}<input className="estimator-info-button" type="button" value="[?]" onClick={() => this.showEstimateInfo(statuses)} /></span>;
+    return (
+      <span>
+        <span>{verboseEstimation}</span>
+        &nbsp;&nbsp;
+        <Tooltip message={this.showEstimateInfo(statuses)} position="right"><img src="https://img.icons8.com/flat_round/64/000000/info.png" width="16px" /></Tooltip>
+      </span>
+    );
   }
 
   handleSubmit = (event) => {
@@ -223,7 +232,7 @@ export default class PlaceOrder extends React.Component {
 
       if (dexAddress && destAddress && passphrase && targetChain && broadcastURL) {
         if (this.state.amount > 0) {
-          const side = this.props.side;
+          const { side } = this.props;
           const tx = transactions.transfer({
             amount: transactions.utils.convertLSKToBeddows(this.state.amount.toString()).toString(),
             recipientId: dexAddress,
@@ -270,8 +279,8 @@ export default class PlaceOrder extends React.Component {
 
       if (dexAddress && destAddress && passphrase && targetChain && broadcastURL) {
         if (this.state.amount > 0) {
-          const price = this.state.price;
-          const side = this.props.side;
+          const { price } = this.state;
+          const { side } = this.props;
           const tx = transactions.transfer({
             amount: transactions.utils.convertLSKToBeddows(this.state.amount.toString()).toString(),
             recipientId: dexAddress,
