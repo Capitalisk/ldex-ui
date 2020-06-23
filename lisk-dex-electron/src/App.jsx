@@ -680,11 +680,11 @@ class App extends React.Component {
             </div>
             <div className="order-book-container">
               <div className="sell-orders">
-                <OrderBook side="asks" orderBookData={this.state.orderBookData} priceDecimalPrecision={this.state.priceDecimalPrecision} assets={this.state.activeAssets} />
+                <OrderBook side="asks" orderBookData={this.state.orderBookData} assets={this.state.activeAssets} />
               </div>
               {this.state.lastTradePrice == null ? <div className="price-display"></div> : <div className="price-display">Price:{' '}{this.state.lastTradePrice}{' '}{this.state.activeAssets[1].toUpperCase()}</div>}
               <div className="buy-orders">
-                <OrderBook side="bids" orderBookData={this.state.orderBookData} priceDecimalPrecision={this.state.priceDecimalPrecision} assets={this.state.activeAssets} />
+                <OrderBook side="bids" orderBookData={this.state.orderBookData} assets={this.state.activeAssets} />
               </div>
             </div>
             <div className="price-chart">
