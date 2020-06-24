@@ -30,7 +30,7 @@ export default class OrderBook extends React.Component {
       if (orders && orders.length > 0) {
         return <div className="askOrderList">{orders}</div>;
       }
-      return <div className="askOrderList emptyAsk">No asks available</div>;
+      return <div className="askOrderList"><div className="emptyAsk">No asks available</div></div>;
     }
     if (this.props.side === 'bids') {
       const groupedBidsOrders = Values(this.props.orderBookData.bids, 'price', 'valueRemaining');
@@ -49,7 +49,7 @@ export default class OrderBook extends React.Component {
       if (orders && orders.length > 0) {
         return <div className="bidOrderList">{orders}</div>;
       }
-      return <div className="bidOrderList emptyBid">No bids available</div>;
+      return <div className="bidOrderList"><div className="emptyBid">No bids available</div></div>;
     }
     return <></>;
   }

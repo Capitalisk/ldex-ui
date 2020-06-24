@@ -1,25 +1,31 @@
 .askOrderList {
-    display: flex;
-    align-items: flex-start;
-    flex-direction: column-reverse;
-    height: 100%;
-    overflow-y: scroll;
+  display: flex;
+  align-items: flex-start;
+  flex-direction: column-reverse;
+  height: 100%;
+  overflow-y: scroll;
 }
 
 .bidOrderList {
-    display: flex;
-    align-items: flex-start;
-    flex-direction: column;
-    height: 100%;
-    overflow-y: scroll;
+  display: flex;
+  align-items: flex-start;
+  flex-direction: column;
+  height: 100%;
+  overflow-y: scroll;
 }
 
 .emptyAsk {
-    align-items: center !important;
-    margin-top: -20px;
+  padding-top: 10px;
+  padding-bottom: 10px;
+  width: 100%;
+  text-align: center;
+  color: #999999;
 }
 
 .emptyBid {
-    align-items: center !important;
-    margin-top: 20px;
+  padding-top: 10px;
+  padding-bottom: 10px;
+  width: 100%;
+  text-align: center;
+  color: #999999;
 }
