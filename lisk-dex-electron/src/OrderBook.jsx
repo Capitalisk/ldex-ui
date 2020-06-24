@@ -10,7 +10,7 @@ export default class OrderBook extends React.Component {
   }
 
   render() {
-    let assets = this.props.assets || [];
+    const assets = this.props.assets || [];
     const quoteSymbol = assets[0];
     const baseSymbol = assets[1];
     if (this.props.side === 'asks') {
@@ -27,7 +27,10 @@ export default class OrderBook extends React.Component {
           symbol={quoteSymbol}
         />
       ));
-      return <div className="askOrderList">{orders}</div>;
+      if (orders && orders.length > 0) {
+        return <div className="askOrderList">{orders}</div>;
+      }
+      return <div className="askOrderList emptyAsk">No asks available</div>;
     }
     if (this.props.side === 'bids') {
       const groupedBidsOrders = Values(this.props.orderBookData.bids, 'price', 'valueRemaining');
@@ -43,7 +46,10 @@ export default class OrderBook extends React.Component {
           symbol={baseSymbol}
         />
       ));
-      return <div className="bidOrderList">{orders}</div>;
+      if (orders && orders.length > 0) {
+        return <div className="bidOrderList">{orders}</div>;
+      }
+      return <div className="bidOrderList emptyBid">No bids available</div>;
     }
     return <></>;
   }
