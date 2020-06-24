@@ -20,12 +20,24 @@
       "unitValue": 100000000,
       "apiMaxPageSize": 100,
       "processingHeightExpiry": 5
+    },
+    "clsk": {
+      "name": "Capitalisk testnet",
+      "apiUrl": "http://18.206.164.187:7020/api",
+      "unitValue": 100000000,
+      "apiMaxPageSize": 100,
+      "processingHeightExpiry": 5
     }
   },
   "markets": {
     "lsh/lsk": {
       "dexApiUrl": "http://18.206.164.187:7011",
       "assets": ["lsh", "lsk"],
+      "orderBookDepth": 20
+    },
+    "clsk/lsk": {
+      "dexApiUrl": "http://18.206.164.187:7021",
+      "assets": ["clsk", "lsk"],
       "orderBookDepth": 20
     }
   }

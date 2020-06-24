@@ -53,6 +53,8 @@ class App extends React.Component {
       maxBid: 0,
       minAsk: 0,
       lastTradePrice: null,
+      baseAssetBalance: null,
+      quoteAssetBalance: null,
       yourOrders: [],
       // to prevent cross-chain replay attacks, the user can specify a key for each chain that they are trading on.
       // the address will be used when the asset is being used as the destination chain.
@@ -74,10 +76,7 @@ class App extends React.Component {
     };
 
     this.notificationId = 0;
-    this.showSignIn = this.showSignIn.bind(this);
     this.intervalRegistered = false;
-    this.passphraseSubmit = this.passphraseSubmit.bind(this);
-    this.updateWindowDimensions = this.updateWindowDimensions.bind(this);
     this.loadConfiguration();
   }
 
@@ -91,6 +90,7 @@ class App extends React.Component {
     const configuration = await processConfiguration(defaultConfiguration);
     const marketSymbols = Object.keys(configuration.markets);
     const defaultMarketKey = marketSymbols[0];
+    this.defaultMarket = defaultMarketKey;
     await this.setState({
       configuration,
       activeMarket: defaultMarketKey,
@@ -334,42 +334,40 @@ class App extends React.Component {
     order.submitExpiryHeight = order.submitHeight + this.state.configuration
       .markets[this.state.activeMarket].dexOptions.chains[order.sourceChain].requiredConfirmations + heightSafetyMargin;
 
-    await this.setState(({yourOrders, configuration, activeMarket}) => {
+    await this.setState(({yourOrders}) => {
       const yourOrderMap = {};
       for (const yourOrder of yourOrders) {
         yourOrderMap[yourOrder.id] = yourOrder;
       }
-
       order.status = 'pending';
       yourOrderMap[order.id] = order;
-
-      const orderDexAddress = configuration.markets[activeMarket].dexOptions.chains[order.sourceChain].walletAddress;
-      const { unitValue } = configuration.assets[order.sourceChain];
-      const chainSymbol = order.sourceChain.toUpperCase();
-
-      let message;
-      if (order.type === 'limit') {
-        message = `A limit order with amount ${
-          Math.round(((order.value || order.size) * 100) / unitValue) / 100
-        } ${chainSymbol} at price ${
-          order.price
-        } was submitted to the DEX address ${
-          orderDexAddress
-        } on the ${chainSymbol} blockchain`;
-      } else {
-        message = `A market order with amount ${
-          Math.round(((order.value || order.size) * 100) / unitValue) / 100
-        } ${chainSymbol} was submitted to the DEX address ${
-          orderDexAddress
-        } on the ${chainSymbol} blockchain`;
-      }
-
-      this.notify(message);
-
       return {
         yourOrders: Object.values(yourOrderMap),
       };
     });
+
+    const orderDexAddress = this.state.configuration.markets[this.state.activeMarket].dexOptions.chains[order.sourceChain].walletAddress;
+    const { unitValue } = this.state.configuration.assets[order.sourceChain];
+    const chainSymbol = order.sourceChain.toUpperCase();
+
+    let message;
+    if (order.type === 'limit') {
+      message = `A limit order with amount ${
+        Math.round(((order.value || order.size) * 100) / unitValue) / 100
+      } ${chainSymbol} at price ${
+        order.price
+      } was submitted to the DEX address ${
+        orderDexAddress
+      } on the ${chainSymbol} blockchain`;
+    } else {
+      message = `A market order with amount ${
+        Math.round(((order.value || order.size) * 100) / unitValue) / 100
+      } ${chainSymbol} was submitted to the DEX address ${
+        orderDexAddress
+      } on the ${chainSymbol} blockchain`;
+    }
+
+    this.notify(message);
   }
 
   notify(message, isError) {
@@ -555,16 +553,26 @@ class App extends React.Component {
     return dexOptions.priceDecimalPrecision == null ? DEFAULT_PRICE_DECIMAL_PRECISION : dexOptions.priceDecimalPrecision;
   }
 
-  async _updateUIWithNewData() {
-    let combinedStateUpdate;
+  async updateUIWithNewData() {
+    let combinedStateUpdate = {};
     try {
-      const [newOrderBookState, newPriceHistoryState] = await Promise.all([this.fetchOrderBookState(), this.fetchPriceHistoryState()]);
+      const [newOrderBookState, newPriceHistoryState] = await Promise.all([
+        this.fetchOrderBookState(),
+        this.fetchPriceHistoryState(),
+      ]);
       combinedStateUpdate = { ...newOrderBookState, ...newPriceHistoryState };
     } catch (error) {
       console.error(error);
       this.notify('Failed to refresh data - Check your connection.', true);
 
       return;
+    }
+    try {
+      const assetBalances = await this.fetchAssetBalances();
+      combinedStateUpdate = {...combinedStateUpdate, ...assetBalances};
+    } catch (error) {
+      console.error(error);
+      this.notify('Failed to update asset balances - Check your connection.', true);
     }
     if (combinedStateUpdate.priceHistory.length) {
       combinedStateUpdate.lastTradePrice = combinedStateUpdate.priceHistory[combinedStateUpdate.priceHistory.length - 1].price;
@@ -576,19 +584,20 @@ class App extends React.Component {
 
   componentDidUpdate() {
     if (this.state.configurationLoaded && !this.intervalRegistered) {
-      this._updateUIWithNewData();
+      const locationProps = this.getPropsFromURL();
+      this.activateMarket(locationProps.market);
       setInterval(async () => {
-        this._updateUIWithNewData();
+        this.updateUIWithNewData();
       }, this.state.configuration.refreshInterval);
       this.intervalRegistered = true;
     }
   }
 
-  showSignIn() {
+  showSignIn = () => {
     this.setState({ displaySigninModal: true, signInFailure: false });
   }
 
-  async passphraseSubmit(payload) {
+  passphraseSubmit = async (payload) => {
     const keys = {};
     let atLeastOneKey = false;
     for (const asset in payload) {
@@ -604,6 +613,8 @@ class App extends React.Component {
         keys[asset] = { address, passphrase };
       }
     }
+
+    let combinedStateUpdate = {};
     if (atLeastOneKey) {
       await this.setState({ keys, signedIn: true, displaySigninModal: false });
       let newOrderBookState;
@@ -615,7 +626,16 @@ class App extends React.Component {
 
         return;
       }
-      await this.setState(newOrderBookState);
+      combinedStateUpdate = {...newOrderBookState};
+
+      try {
+        const assetBalances = await this.fetchAssetBalances();
+        combinedStateUpdate = {...combinedStateUpdate, ...assetBalances};
+      } catch (error) {
+        console.error(error);
+        this.notify('Failed to fetch asset balances - Check your connection.', true);
+      }
+      await this.setState(combinedStateUpdate);
     }
   }
 
@@ -638,13 +658,84 @@ class App extends React.Component {
   componentDidMount() {
     this.updateWindowDimensions();
     window.addEventListener('resize', this.updateWindowDimensions);
+    window.addEventListener('hashchange', this.locationHashChange, false);
   }
 
   componentWillUnmount() {
     window.removeEventListener('resize', this.updateWindowDimensions);
+    window.removeEventListener('hashchange', this.locationHashChange, false);
   }
 
-  updateWindowDimensions() {
+  async fetchAssetBalances() {
+    if (this.state.signedIn === true) {
+      const chainClient = axios.create();
+      chainClient.defaults.timeout = 10000;
+      const balances = await Promise.all(
+        this.state.activeAssets.map(async (asset) => {
+          if (asset in this.state.keys) {
+            const targetEndpoint = this.state.configuration.assets[asset].apiUrl;
+            const data = await chainClient.get(`${targetEndpoint}/accounts?address=${this.state.keys[asset].address}`);
+            if (data.data.data.length > 0) {
+              return data.data.data[0].balance;
+            }
+          }
+          return 0;
+        })
+      );
+      return {
+        baseAssetBalance: balances[0],
+        quoteAssetBalance: balances[1],
+      };
+    }
+    return {
+      baseAssetBalance: null,
+      quoteAssetBalance: null,
+    };
+  }
+
+  async activateMarket(activeMarket) {
+    if (!activeMarket) {
+      activeMarket = this.defaultMarket;
+    }
+    const activeAssets = activeMarket.split('/');
+    await this.setState({
+      yourOrders: [],
+      orderBookData: {
+        orders: [], bids: [], asks: [], maxSize: { bid: 0, ask: 0 },
+      },
+      lastTradePrice: null,
+      baseAssetBalance: null,
+      quoteAssetBalance: null,
+      activeMarket,
+      activeAssets,
+    });
+    await this.updateUIWithNewData();
+  }
+
+  getPropsFromURL() {
+    const locationHash = window.location.hash.slice(1);
+    const locationProps = locationHash.split('&')
+    .map((part) => part.split('='))
+    .reduce(
+      (propAccumulator, keyValuePair) => {
+        propAccumulator[keyValuePair[0]] = keyValuePair[1];
+        return propAccumulator;
+      },
+      {}
+    );
+    return locationProps;
+  }
+
+  locationHashChange = (event) => {
+    const locationProps = this.getPropsFromURL();
+    if (locationProps.market) {
+      this.activateMarket(locationProps.market);
+    } else if (this.defaultMarket) {
+      this.activateMarket(this.defaultMarket);
+    }
+  }
+
+  updateWindowDimensions = () => {
     this.setState({ windowWidth: window.innerWidth, windowHeight: window.innerHeight });
   }
 
@@ -662,7 +753,7 @@ class App extends React.Component {
               <b style={{ fontSize: '21px' }}>{this.state.configuration.appTitle}</b>
               {' '}
               &nbsp;
-              <a className="feedback-link" style={{ color: '#34cfeb', fontSize: '14px' }} href={this.state.configuration.feedbackLink.url} rel="noopener noreferrer" target="_blank">{this.state.configuration.feedbackLink.text}</a>
+              <a className="feedback-link" style={{ fontSize: '14px' }} href={this.state.configuration.feedbackLink.url} rel="noopener noreferrer" target="_blank">{this.state.configuration.feedbackLink.text}</a>
             </div>
             <div>
               <SignInState className="sign-in-state" showSignIn={this.showSignIn} keys={this.state.keys} signedIn={this.state.signedIn} signOut={this.signOut} />
@@ -673,10 +764,10 @@ class App extends React.Component {
               {this.state.notifications.map((data) => <Notification key={data.id} data={data} />)}
             </div>
             <div className="sell-panel">
-              <PlaceOrder side="ask" orderSubmit={this.orderSubmit} orderSubmitError={this.orderSubmitError} showEstimateInfo={this.showEstimateInfo} />
+              <PlaceOrder side="ask" orderSubmit={this.orderSubmit} orderSubmitError={this.orderSubmitError} showEstimateInfo={this.showEstimateInfo} assetBalance={this.state.baseAssetBalance} />
             </div>
             <div className="buy-panel">
-              <PlaceOrder side="bid" orderSubmit={this.orderSubmit} orderSubmitError={this.orderSubmitError} showEstimateInfo={this.showEstimateInfo} />
+              <PlaceOrder side="bid" orderSubmit={this.orderSubmit} orderSubmitError={this.orderSubmitError} showEstimateInfo={this.showEstimateInfo} assetBalance={this.state.quoteAssetBalance} />
             </div>
             <div className="order-book-container">
               <div className="sell-orders">
@@ -702,7 +793,7 @@ class App extends React.Component {
               <YourOrders orders={this.state.yourOrders} orderCanceled={this.orderCancel} handleCancelFail={this.orderCancelFail} />
             </div>
             <div className="market-name-and-stats">
-              <MarketList markets={this.state.configuration.markets} refreshInterval={this.state.configuration.refreshInterval} />
+              <MarketList markets={this.state.configuration.markets} activeMarket={this.state.activeMarket} refreshInterval={this.state.configuration.refreshInterval} />
             </div>
           </div>
         </userContext.Provider>

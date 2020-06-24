@@ -320,9 +320,9 @@ export default class PlaceOrder extends React.Component {
           <button type="button" className="tab-button" disabled={!this.state.marketMode} onClick={this.switchMode}>Limit</button>
         </div>
         {this.props.side === 'bid' && this.context.keys[this.context.activeAssets[1]]
-          && <BalanceDisplay whole={10 ** 8} asset={this.context.activeAssets[1]} />}
+          && <BalanceDisplay whole={10 ** 8} asset={this.context.activeAssets[1]} balance={this.props.assetBalance} />}
         {this.props.side === 'ask' && this.context.keys[this.context.activeAssets[0]]
-          && <BalanceDisplay whole={10 ** 8} asset={this.context.activeAssets[0]} />}
+          && <BalanceDisplay whole={10 ** 8} asset={this.context.activeAssets[0]} balance={this.props.assetBalance} />}
         {canTrade
           && (
           <form onSubmit={this.handleSubmit}>

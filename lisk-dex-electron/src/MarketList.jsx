@@ -4,8 +4,7 @@ import './PlaceOrder.css';
 export default class MarketList extends React.Component {
   constructor(props) {
     super(props);
-    this.state = {
-    };
+    this.state = {};
   }
 
   handleChange = (event) => {
@@ -27,15 +26,16 @@ export default class MarketList extends React.Component {
       <>
         <div style={{ padding: '10px' }}>
           <div className="action-name">MARKETS</div>
-          {Object.keys(this.props.markets).map((marketSymbol) => (
-            <div key={marketSymbol}>
-              <p>
-                Current market:
-                <b>{marketSymbol.toUpperCase()}</b>
-              </p>
-              <p>More markets coming soon!</p>
-            </div>
-          ))}
+          <div className="markets-container">
+            {Object.keys(this.props.markets).map((marketSymbol) => (
+              <div key={marketSymbol}>
+                <p>
+                  <b>{marketSymbol === this.props.activeMarket ? marketSymbol.toUpperCase() : <a href={`#market=${marketSymbol}`}>{marketSymbol.toUpperCase()}</a>}</b>
+                </p>
+              </div>
+            ))}
+          </div>
+          <p style={{color: '#999999'}}>More markets coming soon!</p>
           <small>
             <br />
             Data refreshed every
