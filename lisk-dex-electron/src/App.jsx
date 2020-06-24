@@ -668,18 +668,22 @@ class App extends React.Component {
 
   async fetchAssetBalances() {
     if (this.state.signedIn === true) {
-      const chainClient = axios.create();
-      chainClient.defaults.timeout = 10000;
+      const client = axios.create();
+      client.defaults.timeout = 10000;
       const balances = await Promise.all(
         this.state.activeAssets.map(async (asset) => {
           if (asset in this.state.keys) {
             const targetEndpoint = this.state.configuration.assets[asset].apiUrl;
-            const data = await chainClient.get(`${targetEndpoint}/accounts?address=${this.state.keys[asset].address}`);
-            if (data.data.data.length > 0) {
-              return data.data.data[0].balance;
+            try {
+              const data = await client.get(`${targetEndpoint}/accounts?address=${this.state.keys[asset].address}`);
+              if (data.data.data.length > 0) {
+                return data.data.data[0].balance;
+              }
+            } catch (error) {
+              console.error(error);
             }
           }
-          return 0;
+          return null;
         })
       );
       return {
