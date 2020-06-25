@@ -1,5 +1,6 @@
 import React from 'react';
 import './PlaceOrder.css';
+import InfoIcon from "./InfoIcon";
 
 export default class MarketList extends React.Component {
   constructor(props) {
@@ -31,6 +32,8 @@ export default class MarketList extends React.Component {
               <div key={marketSymbol}>
                 <p>
                   <b>{marketSymbol === this.props.activeMarket ? marketSymbol.toUpperCase() : <a href={`#market=${marketSymbol}`}>{marketSymbol.toUpperCase()}</a>}</b>
+                  &nbsp;&nbsp;
+                  <InfoIcon alt="info" width="18px" />
                 </p>
               </div>
             ))}
