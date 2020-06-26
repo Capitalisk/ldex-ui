@@ -1,11 +1,14 @@
 import React from 'react';
 import './PlaceOrder.css';
 import InfoIcon from "./InfoIcon";
+import Modal from './Modal'
 
 export default class MarketList extends React.Component {
   constructor(props) {
     super(props);
-    this.state = {};
+    this.state = {
+      modalOpened : false
+    };
   }
 
   handleChange = (event) => {
@@ -22,10 +25,15 @@ export default class MarketList extends React.Component {
     event.preventDefault();
   }
 
+  onInfoIconClick = () => {
+    this.setState({ modalOpened: !this.state.modalOpened })
+  }
+
   render() {
     return (
       <>
         <div style={{ padding: '10px' }}>
+          <Modal modalOpened={this.state.modalOpened}/>
           <div className="action-name">MARKETS</div>
           <div className="markets-container">
             {Object.keys(this.props.markets).map((marketSymbol) => (
@@ -33,7 +41,7 @@ export default class MarketList extends React.Component {
                 <p>
                   <b>{marketSymbol === this.props.activeMarket ? marketSymbol.toUpperCase() : <a href={`#market=${marketSymbol}`}>{marketSymbol.toUpperCase()}</a>}</b>
                   &nbsp;&nbsp;
-                  <InfoIcon alt="info" width="18px" />
+                  <InfoIcon alt="info" width="18px" onClick={this.onInfoIconClick}/>
                 </p>
               </div>
             ))}
