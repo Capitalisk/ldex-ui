@@ -25,6 +25,10 @@ export async function getPendingTransfers(instance, targetAssetSymbol, recipient
   return (await instance.get(`/transfers/pending?targetChain=${targetAssetSymbol}&recipientId=${recipientId}`)).data;
 }
 
+export async function getRecentTransfers(instance, originOrderId) {
+  return (await instance.get(`/transfers/recent?originOrderId=${originOrderId}`)).data;
+}
+
 export async function getProcessedHeights(instance) {
   const status = (await instance.get('/status')).data;
   return status.processedHeights;
