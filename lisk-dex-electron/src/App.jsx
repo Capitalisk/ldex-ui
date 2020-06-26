@@ -48,7 +48,6 @@ class App extends React.Component {
       enabledAssets: [],
       priceHistory: [],
       displaySigninModal: false,
-      signedIn: false,
       signInFailure: false,
       displayLeaveWarning: false,
       maxBid: 0,
@@ -60,6 +59,7 @@ class App extends React.Component {
       // to prevent cross-chain replay attacks, the user can specify a key for each chain that they are trading on.
       // the address will be used when the asset is being used as the destination chain.
       notifications: [],
+      signedIn: false,
       keys: {},
       windowWidth: 0,
       windowHeight: 0,
@@ -551,7 +551,7 @@ class App extends React.Component {
             pendingOrders.map(async (order) => {
               const currentHeight = processedHeights[order.sourceChain];
               if (currentHeight >= order.submitExpiryHeight) {
-                return order.id; // TODO 222 check
+                return order.id;
               }
               let result = await getRecentTransfers(dexClient, order.id);
               return result && result.length ? order.id : null;
