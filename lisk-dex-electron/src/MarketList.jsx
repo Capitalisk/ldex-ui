@@ -3,12 +3,20 @@ import './PlaceOrder.css';
 import InfoIcon from "./InfoIcon";
 import Modal from './Modal'
 
-export default class MarketList extends React.Component {
+export default class MarketList extends React.PureComponent {
   constructor(props) {
     super(props);
     this.state = {
-      modalOpened : false
-    };
+      modalOpened: false
+    }
+  }
+
+  onInfoIconClick = () => {
+    this.setState({ modalOpened: true })
+  }
+
+  modalClose = () => {
+    this.setState({ modalOpened: false })
   }
 
   handleChange = (event) => {
@@ -25,15 +33,12 @@ export default class MarketList extends React.Component {
     event.preventDefault();
   }
 
-  onInfoIconClick = () => {
-    this.setState({ modalOpened: !this.state.modalOpened })
-  }
 
   render() {
     return (
       <>
         <div style={{ padding: '10px' }}>
-          <Modal modalOpened={this.state.modalOpened}/>
+          <Modal modalOpened={this.state.modalOpened} closeModal={this.modalClose}/>
           <div className="action-name">MARKETS</div>
           <div className="markets-container">
             {Object.keys(this.props.markets).map((marketSymbol) => (
