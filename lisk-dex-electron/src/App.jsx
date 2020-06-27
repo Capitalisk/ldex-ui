@@ -67,7 +67,7 @@ class App extends React.Component {
 
     this.notificationId = 0;
     this.intervalRegistered = false;
-    this.pendingOrders = {};
+    this.restorePendingOrders();
     this.loadConfiguration();
   }
 
@@ -83,7 +83,9 @@ class App extends React.Component {
     const defaultMarketKey = marketSymbols[0];
     this.defaultMarket = defaultMarketKey;
     for (const market of marketSymbols) {
-      this.pendingOrders[market] = {};
+      if (!this.pendingOrders[market]) {
+        this.pendingOrders[market] = {};
+      }
     }
     await this.setState({
       configuration,
@@ -259,6 +261,7 @@ class App extends React.Component {
 
     order.status = 'canceling';
     this.pendingOrders[this.state.activeMarket][order.id] = order;
+    this.savePendingOrders();
 
     let message;
     if (order.type === 'limit') {
@@ -331,6 +334,7 @@ class App extends React.Component {
     order.status = 'pending';
 
     this.pendingOrders[this.state.activeMarket][order.id] = order;
+    this.savePendingOrders();
 
     await this.setState(({yourOrders}) => {
       const yourOrderMap = {};
@@ -406,6 +410,18 @@ class App extends React.Component {
     return header.split(',')[2] || null;
   };
 
+  savePendingOrders() {
+    window.localStorage.pendingOrders = JSON.stringify(this.pendingOrders);
+  }
+
+  restorePendingOrders() {
+    if (window.localStorage.pendingOrders) {
+      this.pendingOrders = JSON.parse(window.localStorage.pendingOrders);
+    } else {
+      this.pendingOrders = {};
+    }
+  }
+
   async fetchOrderBookState() {
     const dexClient = this.getDexClient();
 
@@ -463,12 +479,13 @@ class App extends React.Component {
     }
 
     const pendingOrdersForActiveMarket = Object.values(this.pendingOrders[activeMarket]);
-
     for (const pendingOrder of pendingOrdersForActiveMarket) {
       if (pendingTransferOrderIds.has(pendingOrder.id)) {
         pendingOrder.status = 'processing';
       }
-      yourOrderMap[pendingOrder.id] = pendingOrder;
+      if (this.state.keys[pendingOrder.sourceChain]) {
+        yourOrderMap[pendingOrder.id] = pendingOrder;
+      }
     }
 
     for (const order of yourOpenOrders) {
@@ -489,6 +506,7 @@ class App extends React.Component {
       }
       yourOrderMap[order.id] = order;
     }
+    this.savePendingOrders();
 
     for (const orderLvl of orderLevels) {
       if (orderLvl.side === 'bid') {
@@ -577,6 +595,7 @@ class App extends React.Component {
         delete this.pendingOrders[market][orderId];
       }
     }
+    this.savePendingOrders();
   }
 
   async updateUIWithNewData() {
