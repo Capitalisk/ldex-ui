@@ -67,7 +67,6 @@ class App extends React.Component {
 
     this.notificationId = 0;
     this.intervalRegistered = false;
-    this.restorePendingOrders();
     this.loadConfiguration();
   }
 
@@ -80,13 +79,9 @@ class App extends React.Component {
     const defaultConfiguration = await getConfig(localClient);
     const configuration = await processConfiguration(defaultConfiguration);
     const marketSymbols = Object.keys(configuration.markets);
+    this.initPendingOrders(marketSymbols);
     const defaultMarketKey = marketSymbols[0];
     this.defaultMarket = defaultMarketKey;
-    for (const market of marketSymbols) {
-      if (!this.pendingOrders[market]) {
-        this.pendingOrders[market] = {};
-      }
-    }
     await this.setState({
       configuration,
       activeMarket: defaultMarketKey,
@@ -414,11 +409,13 @@ class App extends React.Component {
     window.localStorage.pendingOrders = JSON.stringify(this.pendingOrders);
   }
 
-  restorePendingOrders() {
+  initPendingOrders(supportedMarkets) {
+    this.pendingOrders = {};
     if (window.localStorage.pendingOrders) {
-      this.pendingOrders = JSON.parse(window.localStorage.pendingOrders);
-    } else {
-      this.pendingOrders = {};
+      const prevPendingOrders = JSON.parse(window.localStorage.pendingOrders);
+      for (const market of supportedMarkets) {
+        this.pendingOrders[market] = prevPendingOrders[market] || {};
+      }
     }
   }
 
