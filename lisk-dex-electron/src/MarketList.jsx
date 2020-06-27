@@ -46,7 +46,7 @@ export default class MarketList extends React.PureComponent {
                 <p>
                   <b>{marketSymbol === this.props.activeMarket ? marketSymbol.toUpperCase() : <a href={`#market=${marketSymbol}`}>{marketSymbol.toUpperCase()}</a>}</b>
                   &nbsp;&nbsp;
-                  <InfoIcon alt="info" width="18px" onClick={this.onInfoIconClick}/>
+                  <InfoIcon alt="info" width="18px" onClick={this.onInfoIconClick} cursor='pointer'/>
                 </p>
               </div>
             ))}
