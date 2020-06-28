@@ -750,7 +750,7 @@ class App extends React.Component {
     return (
       <>
         <userContext.Provider value={{ ...this.state }}>
-          {this.state.displaySigninModal && <SignInModal failure={this.state.signInFailure} passphraseSubmit={this.passphraseSubmit} enabledAssets={this.state.enabledAssets} close={this.closeSignInModal} walletGenerated={this.walletGenerated} />}
+          {this.state.displaySigninModal && <SignInModal failure={this.state.signInFailure} passphraseSubmit={this.passphraseSubmit} enabledAssets={this.state.activeAssets} close={this.closeSignInModal} walletGenerated={this.walletGenerated} />}
           {this.state.displayLeaveWarning && <LeaveWarning setDisplayLeaveWarning={this.setDisplayLeaveWarning} />}
           <div className="top-bar">
             <div>
@@ -797,7 +797,7 @@ class App extends React.Component {
               <YourOrders orders={this.state.yourOrders} orderCanceled={this.orderCancel} handleCancelFail={this.orderCancelFail} />
             </div>
             <div className="market-name-and-stats">
-              <MarketList configuration={this.state.configuration} activeMarket={this.state.activeMarket}/>
+              <MarketList configuration={this.state.configuration} activeMarket={this.state.activeMarket} signOut={this.signOut} />
             </div>
           </div>
         </userContext.Provider>

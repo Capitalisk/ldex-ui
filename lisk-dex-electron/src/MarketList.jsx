@@ -35,6 +35,15 @@ export default class MarketList extends React.PureComponent {
     event.preventDefault();
   }
 
+  onMarketChange= (e) => {
+    const confirmed = window.confirm('You will be logged out of current session, are you sure you want to change the market selection? ');
+    if (!confirmed) {
+      e.preventDefault();
+    } else {
+      this.props.signOut()
+    }
+  }
+
   getModalContentFromConfig(config) {
     if (config) {
       const dexConfig = config.markets[this.props.activeMarket].dexOptions;
@@ -93,7 +102,7 @@ x        <div style={{ padding: '10px' }}>
                       marketSymbol === this.props.activeMarket ?
                           marketSymbol.toUpperCase()
                           :
-                          <a href={`#market=${marketSymbol}`}>{marketSymbol.toUpperCase()}</a>
+                          <a onClick={this.onMarketChange} href={`#market=${marketSymbol}`}>{marketSymbol.toUpperCase()}></a>
                     }
                   </b>
                   &nbsp;&nbsp;

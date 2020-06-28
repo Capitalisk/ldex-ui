@@ -4,7 +4,7 @@ import * as cryptography from '@liskhq/lisk-cryptography';
 import { Mnemonic } from '@liskhq/lisk-passphrase';
 
 
-export default class PlaceOrder extends React.Component {
+export default class SignInModal extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
