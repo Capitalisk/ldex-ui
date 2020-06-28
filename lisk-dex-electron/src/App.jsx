@@ -416,6 +416,10 @@ class App extends React.Component {
       for (const market of supportedMarkets) {
         this.pendingOrders[market] = prevPendingOrders[market] || {};
       }
+    } else {
+      for (const market of supportedMarkets) {
+        this.pendingOrders[market] = {};
+      }
     }
   }
 
