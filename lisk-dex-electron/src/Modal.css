@@ -35,14 +35,28 @@
     border: 1px solid lightgray;
     border-radius: 6px;
     background: white;
-    width: 600px;
+    width: 740px;
     min-height: 300px;
     left: 50%;
     top: 20%;
-    margin-left: -300px;
+    margin-left: -370px;
     display: none;
 }
 
 .modal-container.modal-container-active {
     display: block;
+}
+
+.modal-header {
+    margin-top: 4px;
+    color: black;
+    font-weight: bold;
+    font-size: 20px;
+    text-align: center;
+    display: block;
+}
+
+.modal-body {
+    color: black;
+    margin: 20px;
 }

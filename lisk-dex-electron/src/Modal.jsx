@@ -7,9 +7,15 @@ export default function Modal (props) {
     return (
         <div>
             <div className={containerClass}>
-                <div className='modal-header'/>
-                <div className='modal-body'/>
-                <div className='modal-footer'/>
+                <div className='modal-header'>
+                    {props.header}
+                </div>
+                <div className='modal-body'>
+                    {props.children}
+                </div>
+                <div className='modal-footer'>
+                    {props.footer}
+                </div>
             </div>
             <div className={coverClass} onClick={props.closeModal}/>
         </div>

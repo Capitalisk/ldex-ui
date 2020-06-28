@@ -797,7 +797,7 @@ class App extends React.Component {
               <YourOrders orders={this.state.yourOrders} orderCanceled={this.orderCancel} handleCancelFail={this.orderCancelFail} />
             </div>
             <div className="market-name-and-stats">
-              <MarketList markets={this.state.configuration.markets} activeMarket={this.state.activeMarket} refreshInterval={this.state.configuration.refreshInterval} />
+              <MarketList configuration={this.state.configuration} activeMarket={this.state.activeMarket}/>
             </div>
           </div>
         </userContext.Provider>
