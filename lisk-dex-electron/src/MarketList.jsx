@@ -102,7 +102,7 @@ x        <div style={{ padding: '10px' }}>
                       marketSymbol === this.props.activeMarket ?
                           marketSymbol.toUpperCase()
                           :
-                          <a onClick={this.onMarketChange} href={`#market=${marketSymbol}`}>{marketSymbol.toUpperCase()}></a>
+                          <a onClick={this.onMarketChange} href={`#market=${marketSymbol}`}>{marketSymbol.toUpperCase()}</a>
                     }
                   </b>
                   &nbsp;&nbsp;
