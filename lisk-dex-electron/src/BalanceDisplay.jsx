@@ -19,15 +19,25 @@ export default class BalanceDisplay extends React.Component {
 
   render() {
     return (
-      <div style={{ color: '#FFFFFF', marginBottom: '10px' }}>
-        Balance:
-        {' '}
-        <span style={{ fontWeight: 'bold' }}>
-          {this.props.balance == null ? '0' : formatThousands(Math.round((this.props.balance * 100) / this.props.whole) / 100)}
-          {' '}
-          {this.props.asset.toUpperCase()}
-        </span>
-      </div>
+        <div>
+          <div style={{ color: '#FFFFFF', marginBottom: '10px' }}>
+            WalletAddress :
+            {' '}
+            <span style={{ fontWeight: 'bold' }}>
+                {' '}
+                {this.props.walletAddress}
+            </span>
+          </div>
+          <div style={{ color: '#FFFFFF', marginBottom: '10px' }}>
+            Balance:
+            {' '}
+            <span style={{ fontWeight: 'bold' }}>
+              {this.props.balance == null ? '0' : formatThousands(Math.round((this.props.balance * 100) / this.props.whole) / 100)}
+              {' '}
+              {this.props.asset.toUpperCase()}
+            </span>
+          </div>
+        </div>
     );
   }
 }

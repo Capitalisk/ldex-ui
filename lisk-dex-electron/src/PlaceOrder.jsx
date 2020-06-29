@@ -311,7 +311,21 @@ export default class PlaceOrder extends React.Component {
   }
 
   render() {
-    const canTrade = this.context.keys[this.context.activeAssets[0]] && this.context.keys[this.context.activeAssets[1]];
+    const totalKeys = Object.keys(this.context.keys).length;
+
+    let walletAddress1 = 'Not Available';
+    let walletAddress2 = 'Not Available';
+
+    if ( totalKeys > 0) {
+      walletAddress1 = this.context.keys[this.context.activeAssets[0]].address;
+      if (totalKeys === 1) {
+        walletAddress2 = walletAddress1;
+      } else {
+        walletAddress2 = this.context.keys[this.context.activeAssets[1]].address;
+      }
+    }
+
+    const canTrade = totalKeys === 2;
     const estimate = this.getEstimatedReturns();
     return (
       <div style={{ padding: '5px' }}>
@@ -321,9 +335,9 @@ export default class PlaceOrder extends React.Component {
           <button type="button" className="tab-button" disabled={!this.state.marketMode} onClick={this.switchMode}>Limit</button>
         </div>
         {this.props.side === 'bid' && this.context.keys[this.context.activeAssets[1]]
-          && <BalanceDisplay whole={10 ** 8} asset={this.context.activeAssets[1]} balance={this.props.assetBalance} />}
+          && <BalanceDisplay whole={10 ** 8} asset={this.context.activeAssets[1]} balance={this.props.assetBalance} walletAddress={walletAddress2}/>}
         {this.props.side === 'ask' && this.context.keys[this.context.activeAssets[0]]
-          && <BalanceDisplay whole={10 ** 8} asset={this.context.activeAssets[0]} balance={this.props.assetBalance} />}
+          && <BalanceDisplay whole={10 ** 8} asset={this.context.activeAssets[0]} balance={this.props.assetBalance} walletAddress={walletAddress1}/>}
         {canTrade
           && (
           <form onSubmit={this.handleSubmit}>
