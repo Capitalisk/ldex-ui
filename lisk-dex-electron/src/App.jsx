@@ -616,7 +616,6 @@ class App extends React.Component {
 
     let combinedStateUpdate = {};
     if (atLeastOneKey) {
-      await this.setState({ keys, signedIn: true, displaySigninModal: false });
       let newOrderBookState;
       try {
         newOrderBookState = await this.fetchOrderBookState();
@@ -635,7 +634,7 @@ class App extends React.Component {
         console.error(error);
         this.notify('Failed to fetch asset balances - Check your connection.', true);
       }
-      await this.setState(combinedStateUpdate);
+      await this.setState({...combinedStateUpdate, keys, signedIn: true, displaySigninModal: false});
     }
   }
 

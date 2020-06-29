@@ -1,5 +1,6 @@
 import React from 'react';
 import './SignInModal.css';
+import './progress.css';
 import * as cryptography from '@liskhq/lisk-cryptography';
 import { Mnemonic } from '@liskhq/lisk-passphrase';
 
@@ -10,6 +11,7 @@ export default class SignInModal extends React.Component {
     this.state = {
       passphrase: '',
       addresses: {},
+      signingIn: false,
     };
   }
 
@@ -45,6 +47,7 @@ export default class SignInModal extends React.Component {
     for (const asset of this.props.enabledAssets) {
       payload[asset] = this.state[asset];
     }
+    this.setState({signingIn : true});
     this.props.passphraseSubmit(payload);
   }
 
@@ -95,9 +98,13 @@ export default class SignInModal extends React.Component {
     }
     return (
       <>
+
         <div className="modal-background" />
         <div id="sign-in-modal" className="modal-foreground">
           <form onSubmit={this.handleSubmit}>
+            {this.state.signingIn && <div className="progress">
+              <div className="indeterminate"></div>
+            </div> }
             <div style={{ textAlign: 'right', width: '100%' }}>
               <button type="button" className="button-secondary" onClick={this.props.close}>Close</button>
             </div>

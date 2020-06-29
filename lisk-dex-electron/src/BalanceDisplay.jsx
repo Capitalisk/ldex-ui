@@ -23,7 +23,7 @@ export default class BalanceDisplay extends React.Component {
         Balance:
         {' '}
         <span style={{ fontWeight: 'bold' }}>
-          {this.props.balance == null ? '...' : formatThousands(Math.round((this.props.balance * 100) / this.props.whole) / 100)}
+          {this.props.balance == null ? '0' : formatThousands(Math.round((this.props.balance * 100) / this.props.whole) / 100)}
           {' '}
           {this.props.asset.toUpperCase()}
         </span>
