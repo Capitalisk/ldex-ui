@@ -53,7 +53,7 @@ export default class MarketList extends React.PureComponent {
       const secondChain = dexConfig.chains[chains[1]];
 
       Object.entries(dexConfig.processedHeights).forEach(
-        ([chainName, value]) => { dexConfig.chains[chainName] = value; },
+        ([chainName, value]) => { dexConfig.chains[chainName].processedHeights = value; },
       );
 
       const getBasicTableRow = (firstCellValue, secondCellValue) => (
