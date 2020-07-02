@@ -1,61 +1,61 @@
 .btn {
-    padding: 5px 15px;
-    font-size: 18px;
-    border: none;
-    border-radius: 4px;
+  padding: 5px 15px;
+  font-size: 18px;
+  border: none;
+  border-radius: 4px;
 }
 
 .btn-primary {
-    color: white;
-    background-color: blue;
+  color: white;
+  background-color: blue;
 }
 
 .btn-primary:hover {
-    background-color: darkblue;
+  background-color: darkblue;
 }
 
 .modal-cover {
-    position: fixed;
-    top: 0;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    background: rgba(0,0,0,.6);
-    z-index: 1040;
-    display: none;
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: rgba(0,0,0,.6);
+  z-index: 1040;
+  display: none;
 }
 
 .modal-cover.modal-cover-active {
-    display: block;
+  display: block;
 }
 
 .modal-container {
-    z-index: 1050;
-    position: fixed;
-    border: 1px solid lightgray;
-    border-radius: 6px;
-    background: white;
-    width: 740px;
-    left: 50%;
-    top: 20%;
-    margin-left: -370px;
-    display: none;
+  z-index: 1050;
+  position: fixed;
+  border: 1px solid lightgray;
+  border-radius: 6px;
+  background: white;
+  width: 740px;
+  left: 50%;
+  top: 20%;
+  margin-left: -370px;
+  display: none;
 }
 
 .modal-container.modal-container-active {
-    display: block;
+  display: block;
 }
 
 .modal-header {
-    margin-top: 4px;
-    color: black;
-    font-weight: bold;
-    font-size: 20px;
-    text-align: center;
-    display: block;
+  margin-top: 4px;
+  color: black;
+  font-weight: bold;
+  font-size: 20px;
+  text-align: center;
+  display: block;
 }
 
 .modal-body {
-    color: black;
-    margin: 20px;
+  color: black;
+  margin: 20px;
 }

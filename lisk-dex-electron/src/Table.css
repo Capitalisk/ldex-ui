@@ -1,11 +1,11 @@
 table {
-    border-collapse: collapse;
+  border-collapse: collapse;
 }
 
 table, th, td {
-    border: 1px solid black;
+  border: 1px solid black;
 }
 
 td {
-    padding-left: 8px;
+  padding-left: 8px;
 }

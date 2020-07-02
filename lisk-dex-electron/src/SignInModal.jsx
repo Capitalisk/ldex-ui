@@ -102,13 +102,15 @@ export default class SignInModal extends React.Component {
         <div className="modal-background" />
         <div id="sign-in-modal" className="modal-foreground">
           <form onSubmit={this.handleSubmit}>
+            <div className="sign-in-progress-area">
+              {this.state.signingIn && (
+                <div className="progress">
+                <div className="indeterminate" />
+                </div>
+              )}
+            </div>
             <div style={{ textAlign: 'right', width: '100%' }}>
               <button type="button" className="button-secondary" onClick={this.props.close}>Close</button>
-              {this.state.signingIn && (
-              <div className="progress">
-                <div className="indeterminate" />
-              </div>
-              )}
             </div>
             <h2>Sign in using your blockchain passphrases.</h2>
             <p>

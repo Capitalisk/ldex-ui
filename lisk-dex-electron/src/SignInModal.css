@@ -1,25 +1,33 @@
 #sign-in-modal {
-    position: fixed;
-    box-sizing: border-box;
-    z-index: 200;
-    top: calc(50% - 321px);
-    left: 25%;
-    width: 50%;
-    padding: 40px;
-    background-color: rgb(27, 27, 27);
-    height: 642px;
-    overflow-y: auto;
+  position: fixed;
+  box-sizing: border-box;
+  z-index: 200;
+  top: calc(50% - 321px);
+  left: 25%;
+  width: 50%;
+  padding: 40px;
+  background-color: rgb(27, 27, 27);
+  height: 642px;
+  overflow-y: auto;
 }
 
 .sign-in-textarea {
-    height: 46px;
-    width: 100%;
-    font-size: 20px;
-    background-color: rgb(36, 35, 35);
-    color: white;
-    font-family: 'Courier New', Courier, monospace;
-    margin-top: 10px;
-    margin-bottom: 8px;
+  height: 46px;
+  width: 100%;
+  font-size: 20px;
+  background-color: rgb(36, 35, 35);
+  color: white;
+  font-family: 'Courier New', Courier, monospace;
+  margin-top: 10px;
+  margin-bottom: 8px;
+}
+
+.sign-in-progress-area {
+  position: absolute;
+  top: 10px;
+  height: 20px;
+  width: 90%;
+  left: 5%;
 }
 
 @media only screen and (max-width: 950px), only screen and (max-height: 700px) {

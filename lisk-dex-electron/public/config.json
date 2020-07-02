@@ -25,7 +25,7 @@
   "markets": {
     "lsh/lsk": {
       "dexApiUrl": "https://ldex.exchange/dex/lsh-lsk/api",
-      "assets"  : ["lsh", "lsk"],
+      "assets": ["lsh", "lsk"],
       "orderBookDepth": 20
     }
   }

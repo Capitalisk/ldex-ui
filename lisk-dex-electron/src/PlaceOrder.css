@@ -1,21 +1,21 @@
 .action-name {
-    font-size: 20px;
-    color: rgb(136, 136, 141);
-    margin-bottom: 15px;
+  font-size: 20px;
+  color: rgb(136, 136, 141);
+  margin-bottom: 15px;
 }
 
 .order-val-input {
-    background-color: rgb(47, 46, 49);
-    color: white;
-    font-family: 'Courier New', Courier, monospace;
-    font-size: 18px;
-    margin-top: 6px;
-    height: 20px;
-    padding: 5px;
-    width: 90%;
-    border: 1px solid grey;
-    outline-color: rgb(194, 194, 194);
-    margin-bottom: 10px;
+  background-color: rgb(47, 46, 49);
+  color: white;
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 18px;
+  margin-top: 6px;
+  height: 20px;
+  padding: 5px;
+  width: 90%;
+  border: 1px solid grey;
+  outline-color: rgb(194, 194, 194);
+  margin-bottom: 10px;
 }
 
 .place-buy-order-button {
