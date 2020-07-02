@@ -8,7 +8,7 @@ import Tooltip from './Tooltip';
 import {
   getCleanOrderBook, estimateBestReturnsForSeller, estimatedBestReturnsForBuyer, EstimationStatus,
 } from './Utils';
-import InfoIcon from "./InfoIcon";
+import InfoIcon from './InfoIcon';
 
 export default class PlaceOrder extends React.Component {
   static contextType = userContext;
@@ -250,7 +250,9 @@ export default class PlaceOrder extends React.Component {
               const error = new Error(`Failed to post market order because of error: ${err.message}`);
               error.response = err.response;
               error.order = this.generateOrder(tx, 'market', sourceChain, targetChain, side);
-              this.props.orderSubmitError && this.props.orderSubmitError(error);
+              if (this.props.orderSubmitError) {
+                this.props.orderSubmitError(error);
+              }
               this.setState({ isSubmitting: false });
               return;
             }
@@ -298,7 +300,9 @@ export default class PlaceOrder extends React.Component {
               const error = new Error(`Failed to post limit order because of error: ${err.message}`);
               error.response = err.response;
               error.order = this.generateOrder(tx, 'limit', sourceChain, targetChain, side, parseFloat(price));
-              this.props.orderSubmitError && this.props.orderSubmitError(error);
+              if (this.props.orderSubmitError) {
+                this.props.orderSubmitError(error);
+              }
               this.setState({ isSubmitting: false });
               return;
             }
@@ -316,7 +320,7 @@ export default class PlaceOrder extends React.Component {
     let walletAddress1 = 'Not Available';
     let walletAddress2 = 'Not Available';
 
-    if ( totalKeys > 0) {
+    if (totalKeys > 0) {
       walletAddress1 = this.context.keys[this.context.activeAssets[0]].address;
       if (totalKeys === 1) {
         walletAddress2 = walletAddress1;
@@ -335,9 +339,9 @@ export default class PlaceOrder extends React.Component {
           <button type="button" className="tab-button" disabled={!this.state.marketMode} onClick={this.switchMode}>Limit</button>
         </div>
         {this.props.side === 'bid' && this.context.keys[this.context.activeAssets[1]]
-          && <BalanceDisplay whole={10 ** 8} asset={this.context.activeAssets[1]} balance={this.props.assetBalance} walletAddress={walletAddress2}/>}
+          && <BalanceDisplay whole={10 ** 8} asset={this.context.activeAssets[1]} balance={this.props.assetBalance} walletAddress={walletAddress2} />}
         {this.props.side === 'ask' && this.context.keys[this.context.activeAssets[0]]
-          && <BalanceDisplay whole={10 ** 8} asset={this.context.activeAssets[0]} balance={this.props.assetBalance} walletAddress={walletAddress1}/>}
+          && <BalanceDisplay whole={10 ** 8} asset={this.context.activeAssets[0]} balance={this.props.assetBalance} walletAddress={walletAddress1} />}
         {canTrade
           && (
           <form onSubmit={this.handleSubmit}>

@@ -27,7 +27,7 @@ export default class UserOrder extends React.Component {
         data: `${targetChain},close,${orderId}`,
         passphrase,
       });
-      let order = this.props.order;
+      const { order } = this.props;
       try {
         await axios.post(`${broadcastURL}/transactions`, tx);
       } catch (error) {

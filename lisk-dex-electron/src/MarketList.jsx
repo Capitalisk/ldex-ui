@@ -131,7 +131,6 @@ export default class MarketList extends React.PureComponent {
   render() {
     return (
       <>
-        x
         {' '}
         <div style={{ padding: '10px' }}>
           <Modal modalOpened={this.state.modalOpened} closeModal={this.modalClose}>

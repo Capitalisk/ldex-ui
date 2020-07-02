@@ -254,8 +254,8 @@ class App extends React.Component {
   }
 
   orderCancelFail = async (error) => {
-    let errorDetails = this._prepareErrorMessage(error);
-    let message = `Failed to cancel the order with id ${error.orderToCancel.id} - ${errorDetails}.`;
+    const errorDetails = this._prepareErrorMessage(error);
+    const message = `Failed to cancel the order with id ${error.orderToCancel.id} - ${errorDetails}.`;
     this.notify(message, true);
   }
 
@@ -279,7 +279,7 @@ class App extends React.Component {
     }
     this.notify(message);
 
-    await this.setState(({yourOrders}) => ({
+    await this.setState(({ yourOrders }) => ({
       yourOrders,
     }));
   }
@@ -306,7 +306,7 @@ class App extends React.Component {
 
   orderSubmitError = async (error) => {
     const { order } = error;
-    let errorDetails = this._prepareErrorMessage(error);
+    const errorDetails = this._prepareErrorMessage(error);
 
     const { unitValue } = this.state.configuration.assets[order.sourceChain];
     const chainSymbol = order.sourceChain.toUpperCase();
@@ -334,7 +334,7 @@ class App extends React.Component {
     order.submitExpiryHeight = order.submitHeight + this.state.configuration
       .markets[this.state.activeMarket].dexOptions.chains[order.sourceChain].requiredConfirmations + heightSafetyMargin;
 
-    await this.setState(({yourOrders}) => {
+    await this.setState(({ yourOrders }) => {
       const yourOrderMap = {};
       for (const yourOrder of yourOrders) {
         yourOrderMap[yourOrder.id] = yourOrder;
@@ -569,7 +569,7 @@ class App extends React.Component {
     }
     try {
       const assetBalances = await this.fetchAssetBalances();
-      combinedStateUpdate = {...combinedStateUpdate, ...assetBalances};
+      combinedStateUpdate = { ...combinedStateUpdate, ...assetBalances };
     } catch (error) {
       console.error(error);
       this.notify('Failed to update asset balances - Check your connection.', true);
@@ -625,16 +625,18 @@ class App extends React.Component {
 
         return;
       }
-      combinedStateUpdate = {...newOrderBookState};
+      combinedStateUpdate = { ...newOrderBookState };
 
       try {
         const assetBalances = await this.fetchAssetBalances();
-        combinedStateUpdate = {...combinedStateUpdate, ...assetBalances};
+        combinedStateUpdate = { ...combinedStateUpdate, ...assetBalances };
       } catch (error) {
         console.error(error);
         this.notify('Failed to fetch asset balances - Check your connection.', true);
       }
-      await this.setState({...combinedStateUpdate, keys, signedIn: true, displaySigninModal: false});
+      await this.setState({
+        ...combinedStateUpdate, keys, signedIn: true, displaySigninModal: false,
+      });
     }
   }
 
@@ -683,7 +685,7 @@ class App extends React.Component {
             }
           }
           return null;
-        })
+        }),
       );
       return {
         baseAssetBalance: balances[0],
@@ -718,18 +720,18 @@ class App extends React.Component {
   getPropsFromURL() {
     const locationHash = window.location.hash.slice(1);
     const locationProps = locationHash.split('&')
-    .map((part) => part.split('='))
-    .reduce(
-      (propAccumulator, keyValuePair) => {
-        propAccumulator[keyValuePair[0]] = keyValuePair[1];
-        return propAccumulator;
-      },
-      {}
-    );
+      .map((part) => part.split('='))
+      .reduce(
+        (propAccumulator, keyValuePair) => {
+          propAccumulator[keyValuePair[0]] = keyValuePair[1];
+          return propAccumulator;
+        },
+        {},
+      );
     return locationProps;
   }
 
-  locationHashChange = (event) => {
+  locationHashChange = (_event) => {
     const locationProps = this.getPropsFromURL();
     if (locationProps.market) {
       this.activateMarket(locationProps.market);
@@ -776,7 +778,15 @@ class App extends React.Component {
               <div className="sell-orders">
                 <OrderBook side="asks" orderBookData={this.state.orderBookData} assets={this.state.activeAssets} />
               </div>
-              {this.state.lastTradePrice == null ? <div className="price-display"></div> : <div className="price-display">Price:{' '}{this.state.lastTradePrice}{' '}{this.state.activeAssets[1].toUpperCase()}</div>}
+              {this.state.lastTradePrice == null ? <div className="price-display" /> : (
+                <div className="price-display">
+                  Price:
+                  {' '}
+                  {this.state.lastTradePrice}
+                  {' '}
+                  {this.state.activeAssets[1].toUpperCase()}
+                </div>
+              )}
               <div className="buy-orders">
                 <OrderBook side="bids" orderBookData={this.state.orderBookData} assets={this.state.activeAssets} />
               </div>
