@@ -83,7 +83,7 @@ export default class MarketList extends React.PureComponent {
             <tbody>
               <tr style={{ textTransform: 'uppercase' }}>
                 <th> </th>
-                {chains.map((chain) => <th>{chain}</th>)}
+                {chains.map((chain) => <th key={chain}>{chain}</th>)}
               </tr>
               {
               Object.keys(firstChain).map((chainInfoKey) => {
@@ -91,7 +91,7 @@ export default class MarketList extends React.PureComponent {
                   const firstChainValues = firstChain[chainInfoKey].join('\r\n');
                   const secondChainValues = secondChain[chainInfoKey].join('\r\n');
                   return (
-                    <tr>
+                    <tr key={chainInfoKey}>
                       <td style={{ fontWeight: 'bold' }}>{marketInfoDescriptor[chainInfoKey].name}</td>
                       <td style={{ whiteSpace: 'pre' }}>{firstChainValues}</td>
                       <td style={{ whiteSpace: 'pre' }}>{secondChainValues}</td>
@@ -112,7 +112,7 @@ export default class MarketList extends React.PureComponent {
                   secondChainValue /= keyDescriptor.div;
                 }
                 return (
-                  <tr>
+                  <tr key={chainInfoKey}>
                     <td style={{ fontWeight: 'bold' }}>{keyDescriptor.name}</td>
                     <td>{firstChainValue}</td>
                     <td>{secondChainValue}</td>
