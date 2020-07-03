@@ -33,12 +33,14 @@
     "lsh/lsk": {
       "dexApiUrl": "http://18.206.164.187:7011",
       "assets": ["lsh", "lsk"],
-      "orderBookDepth": 20
+      "orderBookDepth": 20,
+      "priceHistoryAPI": "blockchain"
     },
     "clsk/lsk": {
       "dexApiUrl": "http://18.206.164.187:7021",
       "assets": ["clsk", "lsk"],
-      "orderBookDepth": 20
+      "orderBookDepth": 20,
+      "priceHistoryAPI": "blockchain"
     }
   }
 }

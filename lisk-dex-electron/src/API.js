@@ -34,6 +34,10 @@ export async function getProcessedHeights(instance) {
   return status.processedHeights;
 }
 
+export async function getPriceHistory(instance) {
+  return (await instance.get('/prices/recent')).data;
+}
+
 export async function getConfig(instance) {
   if (process.env.REACT_APP_PRODUCTION) {
     return (await instance.get('config.json')).data;

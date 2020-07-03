@@ -107,7 +107,7 @@ class PriceHistoryChart extends React.PureComponent {
           style={{ position: 'relative', zIndex: 110 }}
         >
           <CartesianGrid strokeDasharray="3 3" stroke="#222222" />
-          <XAxis dataKey="timestamp" tick={<TimeAxisTick />} label={{ value: 'Chain time (seconds)', dy: 30, fill: '#999999' }} />
+          <XAxis dataKey="baseTimestamp" tick={<TimeAxisTick />} label={{ value: 'Chain time (seconds)', dy: 30, fill: '#999999' }} />
           <YAxis label={{
             value: `Price (${assetSymbol})`, angle: -90, fill: '#999999', dx: -25,
           }}

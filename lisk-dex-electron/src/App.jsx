@@ -17,6 +17,7 @@ import {
   getPendingTransfers,
   getRecentTransfers,
   getProcessedHeights,
+  getPriceHistory,
   getClient,
   getConfig,
 } from './API';
@@ -129,7 +130,18 @@ class App extends React.Component {
     return 0;
   }
 
-  async fetchPriceHistoryState() {
+  async fetchPriceHistoryStateFromDEX() {
+    const dexClient = this.getDexClient();
+    const priceHistory = await getPriceHistory(dexClient);
+    priceHistory.reverse();
+    const priceDecimalPrecision = this.getPriceDecimalPrecision();
+    return {
+      priceHistory,
+      priceDecimalPrecision,
+    };
+  }
+
+  async fetchPriceHistoryStateFromBlockchains() {
     const [quoteChainTxns, baseChainTxns] = await Promise.all(
       this.state.activeAssets.map(async (assetSymbol) => {
         const asset = this.state.configuration.assets[assetSymbol];
@@ -226,7 +238,7 @@ class App extends React.Component {
 
       const price = Number((fullBaseAmount / fullQuoteAmount).toFixed(priceDecimalPrecision));
       priceHistory.push({
-        timestamp: txnPair.base[txnPair.base.length - 1].timestamp,
+        baseTimestamp: txnPair.base[txnPair.base.length - 1].timestamp,
         price,
         volume: Math.round(fullBaseAmount / 1000000) / 100,
       });
@@ -234,12 +246,10 @@ class App extends React.Component {
 
     priceHistory.reverse();
 
-    const newState = {
+    return {
       priceHistory,
       priceDecimalPrecision,
     };
-
-    return newState;
   }
 
   orderCancelFail = async (error) => {
@@ -542,8 +552,12 @@ class App extends React.Component {
     return newState;
   }
 
+  getActiveMarketOptions() {
+    return this.state.configuration.markets[this.state.activeMarket];
+  }
+
   getPriceDecimalPrecision() {
-    const { dexOptions } = this.state.configuration.markets[this.state.activeMarket];
+    const { dexOptions } = this.getActiveMarketOptions();
     return dexOptions.priceDecimalPrecision == null ? DEFAULT_PRICE_DECIMAL_PRECISION : dexOptions.priceDecimalPrecision;
   }
 
@@ -600,10 +614,17 @@ class App extends React.Component {
   async updateUIWithNewData() {
     await this.updatePendingOrders();
     let combinedStateUpdate = {};
+    const dexOptions = this.getActiveMarketOptions();
     try {
+      let fetchHistoryPromise;
+      if (dexOptions.priceHistoryAPI === 'dex') {
+        fetchHistoryPromise = this.fetchPriceHistoryStateFromDEX();
+      } else {
+        fetchHistoryPromise = this.fetchPriceHistoryStateFromBlockchains();
+      }
       const [newOrderBookState, newPriceHistoryState] = await Promise.all([
         this.fetchOrderBookState(),
-        this.fetchPriceHistoryState(),
+        fetchHistoryPromise,
       ]);
       combinedStateUpdate = { ...newOrderBookState, ...newPriceHistoryState };
     } catch (error) {
