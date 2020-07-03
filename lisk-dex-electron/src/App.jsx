@@ -758,9 +758,10 @@ class App extends React.Component {
         if (asset in assetInfos) {
           const targetEndpoint = this.state.configuration.assets[asset].apiUrl;
           try {
-            const data = await client.get(`${targetEndpoint}/accounts?address=${assetInfos[asset].address}`);
-            if (data.data.data.length > 0) {
-              return data.data.data[0].balance;
+            const response = await client.get(`${targetEndpoint}/accounts?address=${assetInfos[asset].address}`);
+            const balanceList = Array.isArray(response.data) ? response.data : response.data.data;
+            if (balanceList.length > 0) {
+              return balanceList[0].balance;
             }
           } catch (error) {
             console.error(error);
