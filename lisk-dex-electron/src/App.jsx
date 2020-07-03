@@ -662,6 +662,16 @@ class App extends React.Component {
       }
     }
 
+    // The keys need to be updated on the state before we fetch the order book.
+    await this.setState((state) => ({
+      quoteAssetBalance: null,
+      baseAssetBalance: null,
+      keys: {
+        ...state.keys,
+        ...newKeys
+      },
+    }));
+
     let combinedStateUpdate = {};
     if (atLeastOneKey) {
       let newOrderBookState;
@@ -675,28 +685,17 @@ class App extends React.Component {
       }
       combinedStateUpdate = { ...newOrderBookState };
 
-      await this.setState({
-        quoteAssetBalance: null,
-        baseAssetBalance: null,
-      });
-
       try {
-        const assetBalances = await this.fetchAssetBalances({...this.state.keys, ...newKeys});
+        const assetBalances = await this.fetchAssetBalances(this.state.keys);
         combinedStateUpdate = { ...combinedStateUpdate, ...assetBalances };
       } catch (error) {
         console.error(error);
         this.notify('Failed to fetch asset balances - Check your connection.', true);
       }
-      await this.setState(
-        (state) => ({
-          ...combinedStateUpdate,
-          keys: {
-            ...state.keys,
-            ...newKeys,
-          },
-          displaySigninModal: false,
-        })
-      );
+      await this.setState({
+        ...combinedStateUpdate,
+        displaySigninModal: false,
+      });
     }
   }
 
@@ -708,8 +707,9 @@ class App extends React.Component {
     this.setState({ displaySigninModal: false });
   }
 
-  signOut = () => {
-    this.setState({ keys: {}, yourOrders: [] });
+  signOut = async () => {
+    await this.setState({ keys: {}, yourOrders: [] });
+    await this.updateUIWithNewData();
   }
 
   setDisplayLeaveWarning = (val) => {
