@@ -48,7 +48,6 @@ class App extends React.Component {
       enabledAssets: [],
       priceHistory: [],
       displaySigninModal: false,
-      signInFailure: false,
       displayLeaveWarning: false,
       maxBid: 0,
       minAsk: 0,
@@ -642,7 +641,7 @@ class App extends React.Component {
   }
 
   showSignIn = () => {
-    this.setState({ displaySigninModal: true, signInFailure: false });
+    this.setState({ displaySigninModal: true });
   }
 
   passphraseSubmit = async (payload) => {
@@ -654,8 +653,8 @@ class App extends React.Component {
         const passphrase = payload[asset].trim();
         if (!Mnemonic.validateMnemonic(passphrase, Mnemonic.wordlists.english)) {
           delete newKeys[asset];
-          await this.setState({ signInFailure: true });
-          return;
+
+          return false;
         }
         const { address } = cryptography.getAddressAndPublicKeyFromPassphrase(passphrase);
         newKeys[asset] = { address, passphrase };
@@ -681,7 +680,7 @@ class App extends React.Component {
         console.error(error);
         this.notify('Failed to fetch order book - Check your connection.', true);
 
-        return;
+        return false;
       }
       combinedStateUpdate = { ...newOrderBookState };
 
@@ -696,7 +695,11 @@ class App extends React.Component {
         ...combinedStateUpdate,
         displaySigninModal: false,
       });
+
+      return true;
     }
+
+    return false;
   }
 
   walletGenerated = (address) => {
@@ -825,7 +828,7 @@ class App extends React.Component {
     return (
       <>
         <userContext.Provider value={{ ...this.state }}>
-          {this.state.displaySigninModal && <SignInModal failure={this.state.signInFailure} passphraseSubmit={this.passphraseSubmit} enabledAssets={this.state.activeAssets} close={this.closeSignInModal} walletGenerated={this.walletGenerated} />}
+          {this.state.displaySigninModal && <SignInModal passphraseSubmit={this.passphraseSubmit} enabledAssets={this.state.activeAssets} close={this.closeSignInModal} walletGenerated={this.walletGenerated} />}
           {this.state.displayLeaveWarning && <LeaveWarning setDisplayLeaveWarning={this.setDisplayLeaveWarning} />}
           <div className="top-bar">
             <div>

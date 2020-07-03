@@ -11,6 +11,7 @@ export default class SignInModal extends React.Component {
     this.state = {
       passphrase: '',
       addresses: {},
+      failure: false,
       signingIn: false,
     };
   }
@@ -41,14 +42,17 @@ export default class SignInModal extends React.Component {
     });
   }
 
-  handleSubmit = (event) => {
+  handleSubmit = async (event) => {
     event.preventDefault();
     const payload = {};
     for (const asset of this.props.enabledAssets) {
       payload[asset] = this.state[asset];
     }
-    this.setState({ signingIn: true });
-    this.props.passphraseSubmit(payload);
+    await this.setState({ signingIn: true });
+    const success = await this.props.passphraseSubmit(payload);
+    if (!success) {
+      await this.setState({ signingIn: false, failure: true });
+    }
   }
 
   handleWalletCreate = (event) => {
@@ -68,8 +72,10 @@ export default class SignInModal extends React.Component {
   }
 
   render() {
-    const styles = { border: '1px solid red' };
-    if (!this.props.failure) {
+    const styles = {};
+    if (this.state.failure) {
+      styles.border = '1px solid red';
+    } else {
       styles.border = '1px solid grey';
     }
     const passphraseTextareas = [];
@@ -98,7 +104,6 @@ export default class SignInModal extends React.Component {
     }
     return (
       <>
-
         <div className="modal-background" />
         <div id="sign-in-modal" className="modal-foreground">
           <form onSubmit={this.handleSubmit}>
