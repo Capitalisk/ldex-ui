@@ -13,19 +13,15 @@ export default class SignInState extends React.Component {
     let addressCount = 0;
     // eslint-disable-next-line guard-for-in
     for (const asset in this.props.keys) {
-      addressesInfo += `${this.props.keys[asset].address} (${asset.toUpperCase()}) `;
-      addressCount++;
+      if (this.props.keys[asset]) {
+        addressesInfo += `${this.props.keys[asset].address} (${asset.toUpperCase()}) `;
+        addressCount++;
+      }
     }
     return (
       <>
-        {!this.props.signedIn
-          && (
-          <button type="button" onClick={this.props.showSignIn} className="button-primary">
-            Sign in
-          </button>
-          )}
-        {this.props.signedIn && addressCount < 3 && (
-          <span style={{ fontSize: '12px', marginRight: '10px' }}>
+        {addressCount >= 1 && (
+          <span style={{ fontSize: '12px', marginRight: '10px' , display: 'inline-block', verticalAlign: 'top', marginTop: '10px' }}>
             Signed in
             <span className="sign-in-state-address">
               {' '}
@@ -35,15 +31,9 @@ export default class SignInState extends React.Component {
             </span>
           </span>
         )}
-        {this.props.signedIn && addressCount >= 3 && (
-          <span style={{ fontSize: '12px', marginRight: '10px' }}>Signed in</span>
-        )}
-        {this.props.signedIn
-          && (
-          <button type="button" onClick={this.props.signOut} className="button-primary">
-            Sign out
-          </button>
-        )}
+        <button type="button" onClick={this.props.showSignIn} className="button-primary">
+          Sign in
+        </button>
       </>
     );
   }

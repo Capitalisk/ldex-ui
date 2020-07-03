@@ -36,15 +36,38 @@
   border-radius: 6px;
   background: white;
   width: 740px;
-  left: 50%;
+  left: calc(50% - 370px);
   top: 20%;
-  margin-left: -370px;
   display: none;
 }
 
 .modal-container.modal-container-active {
   display: block;
 }
+
+.modal-close-button {
+  display: none;
+  position: absolute;
+  top: 10px;
+  right: 10px;
+}
+
+@media only screen and (max-width: 950px), only screen and (max-height: 700px) {
+  .modal-container {
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    border-radius: 0;
+    overflow: auto;
+    font-size: 9px;
+  }
+
+  .modal-close-button {
+    display: block;
+  }
+}
+
 
 .modal-header {
   margin-top: 4px;

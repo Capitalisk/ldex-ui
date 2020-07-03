@@ -315,19 +315,18 @@ export default class PlaceOrder extends React.Component {
   }
 
   render() {
-    const totalKeys = Object.keys(this.context.keys).length;
-
-    let walletAddress1 = 'Not Available';
-    let walletAddress2 = 'Not Available';
-
-    if (totalKeys > 0) {
-      walletAddress1 = this.context.keys[this.context.activeAssets[0]].address;
-      if (totalKeys === 1) {
-        walletAddress2 = walletAddress1;
-      } else {
-        walletAddress2 = this.context.keys[this.context.activeAssets[1]].address;
-      }
+    let totalKeys = 0;
+    const quoteAssetInfo = this.context.keys[this.context.activeAssets[0]];
+    const baseAssetInfo = this.context.keys[this.context.activeAssets[1]];
+    if (quoteAssetInfo) {
+      totalKeys++;
     }
+    if (baseAssetInfo) {
+      totalKeys++;
+    }
+
+    let walletAddress1 = quoteAssetInfo ? quoteAssetInfo.address : 'Not Available';
+    let walletAddress2 = baseAssetInfo ? baseAssetInfo.address : 'Not Available';
 
     const canTrade = totalKeys === 2;
     const estimate = this.getEstimatedReturns();

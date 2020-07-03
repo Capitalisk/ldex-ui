@@ -7,6 +7,9 @@ export default function Modal(props) {
   return (
     <div>
       <div className={containerClass}>
+        <div style={{ textAlign: 'right', width: '100%' }}>
+          <button type="button" className="modal-close-button button-secondary" onClick={props.closeModal}>Close</button>
+        </div>
         <div className="modal-header">
           {props.header}
         </div>

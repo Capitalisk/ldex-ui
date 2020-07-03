@@ -59,7 +59,6 @@ class App extends React.Component {
       // to prevent cross-chain replay attacks, the user can specify a key for each chain that they are trading on.
       // the address will be used when the asset is being used as the destination chain.
       notifications: [],
-      signedIn: false,
       keys: {},
       windowWidth: 0,
       windowHeight: 0,
@@ -614,12 +613,14 @@ class App extends React.Component {
 
       return;
     }
-    try {
-      const assetBalances = await this.fetchAssetBalances();
-      combinedStateUpdate = { ...combinedStateUpdate, ...assetBalances };
-    } catch (error) {
-      console.error(error);
-      this.notify('Failed to update asset balances - Check your connection.', true);
+    if (this.isSignedIn(true)) {
+      try {
+        const assetBalances = await this.fetchAssetBalances(this.state.keys);
+        combinedStateUpdate = { ...combinedStateUpdate, ...assetBalances};
+      } catch (error) {
+        console.error(error);
+        this.notify('Failed to update asset balances - Check your connection.', true);
+      }
     }
     if (combinedStateUpdate.priceHistory.length) {
       combinedStateUpdate.lastTradePrice = combinedStateUpdate.priceHistory[combinedStateUpdate.priceHistory.length - 1].price;
@@ -645,19 +646,19 @@ class App extends React.Component {
   }
 
   passphraseSubmit = async (payload) => {
-    const keys = {};
+    const newKeys = {};
     let atLeastOneKey = false;
     for (const asset in payload) {
       if (payload[asset] !== undefined) {
         atLeastOneKey = true;
         const passphrase = payload[asset].trim();
         if (!Mnemonic.validateMnemonic(passphrase, Mnemonic.wordlists.english)) {
-          delete keys[asset];
+          delete newKeys[asset];
           await this.setState({ signInFailure: true });
           return;
         }
         const { address } = cryptography.getAddressAndPublicKeyFromPassphrase(passphrase);
-        keys[asset] = { address, passphrase };
+        newKeys[asset] = { address, passphrase };
       }
     }
 
@@ -674,16 +675,28 @@ class App extends React.Component {
       }
       combinedStateUpdate = { ...newOrderBookState };
 
+      await this.setState({
+        quoteAssetBalance: null,
+        baseAssetBalance: null,
+      });
+
       try {
-        const assetBalances = await this.fetchAssetBalances();
+        const assetBalances = await this.fetchAssetBalances({...this.state.keys, ...newKeys});
         combinedStateUpdate = { ...combinedStateUpdate, ...assetBalances };
       } catch (error) {
         console.error(error);
         this.notify('Failed to fetch asset balances - Check your connection.', true);
       }
-      await this.setState({
-        ...combinedStateUpdate, keys, signedIn: true, displaySigninModal: false,
-      });
+      await this.setState(
+        (state) => ({
+          ...combinedStateUpdate,
+          keys: {
+            ...state.keys,
+            ...newKeys,
+          },
+          displaySigninModal: false,
+        })
+      );
     }
   }
 
@@ -696,7 +709,7 @@ class App extends React.Component {
   }
 
   signOut = () => {
-    this.setState({ signedIn: false, keys: {}, yourOrders: [] });
+    this.setState({ keys: {}, yourOrders: [] });
   }
 
   setDisplayLeaveWarning = (val) => {
@@ -714,34 +727,48 @@ class App extends React.Component {
     window.removeEventListener('hashchange', this.locationHashChange, false);
   }
 
-  async fetchAssetBalances() {
-    if (this.state.signedIn === true) {
-      const client = axios.create();
-      client.defaults.timeout = 10000;
-      const balances = await Promise.all(
-        this.state.activeAssets.map(async (asset) => {
-          if (asset in this.state.keys) {
-            const targetEndpoint = this.state.configuration.assets[asset].apiUrl;
-            try {
-              const data = await client.get(`${targetEndpoint}/accounts?address=${this.state.keys[asset].address}`);
-              if (data.data.data.length > 0) {
-                return data.data.data[0].balance;
-              }
-            } catch (error) {
-              console.error(error);
-            }
-          }
-          return null;
-        }),
-      );
-      return {
-        baseAssetBalance: balances[0],
-        quoteAssetBalance: balances[1],
-      };
+  isSignedIn(any) {
+    if (!this.state.activeAssets[0] || !this.state.activeAssets[1]) {
+      return false;
     }
+    let quoteAssetInfo = this.state.keys[this.state.activeAssets[0]];
+    let baseAssetInfo = this.state.keys[this.state.activeAssets[1]];
+    if (any) {
+      return quoteAssetInfo || baseAssetInfo;
+    }
+    return quoteAssetInfo && baseAssetInfo;
+  }
+
+  getActiveKeys() {
+    const activeKeyMap = {};
+    this.state.activeAssets.forEach((assetSymbol) => {
+      activeKeyMap[assetSymbol] = this.state.keys[assetSymbol];
+    });
+    return activeKeyMap;
+  }
+
+  async fetchAssetBalances(assetInfos) {
+    const client = axios.create();
+    client.defaults.timeout = 10000;
+    const balances = await Promise.all(
+      this.state.activeAssets.map(async (asset) => {
+        if (asset in assetInfos) {
+          const targetEndpoint = this.state.configuration.assets[asset].apiUrl;
+          try {
+            const data = await client.get(`${targetEndpoint}/accounts?address=${assetInfos[asset].address}`);
+            if (data.data.data.length > 0) {
+              return data.data.data[0].balance;
+            }
+          } catch (error) {
+            console.error(error);
+          }
+        }
+        return null;
+      }),
+    );
     return {
-      baseAssetBalance: null,
-      quoteAssetBalance: null,
+      baseAssetBalance: balances[0] || 0,
+      quoteAssetBalance: balances[1] || 0,
     };
   }
 
@@ -808,7 +835,14 @@ class App extends React.Component {
               <a className="feedback-link" style={{ fontSize: '14px' }} href={this.state.configuration.feedbackLink.url} rel="noopener noreferrer" target="_blank">{this.state.configuration.feedbackLink.text}</a>
             </div>
             <div>
-              <SignInState className="sign-in-state" showSignIn={this.showSignIn} keys={this.state.keys} signedIn={this.state.signedIn} signOut={this.signOut} />
+              <SignInState className="sign-in-state" showSignIn={this.showSignIn} keys={this.getActiveKeys()} signedIn={this.isSignedIn()} signOut={this.signOut} />
+              {' '}
+              &nbsp;
+              {this.isSignedIn(true) && (
+                <button type="button" onClick={this.signOut} className="button-sign-out">
+                  Sign out
+                </button>
+              )}
             </div>
           </div>
           <div className="container">

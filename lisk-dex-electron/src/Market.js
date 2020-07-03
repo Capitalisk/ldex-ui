@@ -26,7 +26,7 @@ const marketInfoDescriptor = {
     div: 100000000,
   },
   exchangeFeeBase: {
-    name: 'Exchange base fee',
+    name: 'Exchange fee base',
     desc: 'It is the base transaction fee (flat fee; e.g. 0.1 LSK/LSH)',
     div: 100000000,
   },

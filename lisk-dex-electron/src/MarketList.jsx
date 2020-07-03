@@ -35,26 +35,12 @@ export default class MarketList extends React.PureComponent {
     event.preventDefault();
   }
 
-  onMarketChange= (e) => {
-    const confirmed = window.confirm('You will be logged out of current session, are you sure you want to change the market selection? ');
-    if (!confirmed) {
-      e.preventDefault();
-    } else {
-      this.props.signOut();
-    }
-  }
-
   getModalContentFromConfig(config) {
     if (config) {
       const dexConfig = config.markets[this.props.activeMarket].dexOptions;
-      // const ignoreKeysFromConfig = ['orderBookHash, processedHeights', 'chainsWhitelist'];
       const chains = Object.keys(dexConfig.chains);
       const firstChain = dexConfig.chains[chains[0]];
       const secondChain = dexConfig.chains[chains[1]];
-
-      Object.entries(dexConfig.processedHeights).forEach(
-        ([chainName, value]) => { dexConfig.chains[chainName].processedHeights = value; },
-      );
 
       const getBasicTableRow = (firstCellValue, secondCellValue) => (
         <tr>
@@ -75,7 +61,7 @@ export default class MarketList extends React.PureComponent {
           <table style={{ border: 'none', width: '60%' }}>
             <tbody>
               {getBasicTableRow('Version', dexConfig.version)}
-              {getBasicTableRow('Base-chain', dexConfig.baseChain)}
+              {getBasicTableRow('Base chain', dexConfig.baseChain)}
               {getBasicTableRow('Price decimal precision', dexConfig.priceDecimalPrecision)}
             </tbody>
           </table>
@@ -103,9 +89,9 @@ export default class MarketList extends React.PureComponent {
                 const keyDescriptor = marketInfoDescriptor[chainInfoKey];
                 if ('mult' in keyDescriptor) {
                   firstChainValue *= keyDescriptor.mult;
-                  firstChainValue += ' %';
+                  firstChainValue += '%';
                   secondChainValue *= keyDescriptor.mult;
-                  secondChainValue += ' %';
+                  secondChainValue += '%';
                 }
                 if ('div' in keyDescriptor) {
                   firstChainValue /= keyDescriptor.div;
@@ -145,7 +131,7 @@ export default class MarketList extends React.PureComponent {
                     {
                       marketSymbol === this.props.activeMarket
                         ? marketSymbol.toUpperCase()
-                        : <a onClick={this.onMarketChange} href={`#market=${marketSymbol}`}>{marketSymbol.toUpperCase()}</a>
+                        : <a href={`#market=${marketSymbol}`}>{marketSymbol.toUpperCase()}</a>
                     }
                   </b>
                   &nbsp;&nbsp;

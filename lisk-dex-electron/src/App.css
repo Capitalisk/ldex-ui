@@ -7,6 +7,18 @@ a {
   color: #44AADD;
 }
 
+.button-sign-out {
+  cursor: pointer;
+  font-size: 20px;
+  color: #FFFFFF;
+  border: 0;
+  padding: 5px 15px 5px 15px;
+  outline: none;
+  width: 105px;
+  vertical-align: top;
+  background: #880000;
+}
+
 .container {
   display: grid;
   height: calc(100% - 50px);
