@@ -3,6 +3,7 @@
   align-items: flex-start;
   flex-direction: column-reverse;
   height: 100%;
+  overflow-x: hidden;
   overflow-y: scroll;
 }
 
@@ -11,6 +12,7 @@
   align-items: flex-start;
   flex-direction: column;
   height: 100%;
+  overflow-x: hidden;
   overflow-y: scroll;
 }
 

@@ -247,6 +247,11 @@ a {
   }
 }
 
+div {
+  scrollbar-color: #212424 rgba(0, 0, 0, 0.3);
+  scrollbar-width: thin;
+}
+
 div::-webkit-scrollbar {
   width: 12px;
 }
