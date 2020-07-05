@@ -4,7 +4,7 @@ const marketInfoDescriptor = {
     desc: 'It is the version of lisk-dex for this market',
   },
   walletAddress: {
-    name: 'Wallet address',
+    name: 'DEX address',
     desc: 'It is the address of the DEX market on each of the two blockchains',
   },
   multisigMembers: {
