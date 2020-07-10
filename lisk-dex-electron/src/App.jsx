@@ -328,10 +328,16 @@ class App extends React.Component {
 
   orderSubmit = async (order) => {
     const dexClient = this.getDexClient();
-    const processedHeights = await getProcessedHeights(dexClient);
+    let processedHeights;
+    try {
+      processedHeights = await getProcessedHeights(dexClient);
+    } catch (error) {
+      console.error(error);
+      processedHeights = {};
+    }
 
     const heightSafetyMargin = this.state.configuration.assets[order.sourceChain].processingHeightExpiry;
-    order.submitHeight = processedHeights[order.sourceChain];
+    order.submitHeight = processedHeights[order.sourceChain] || Infinity;
     order.submitExpiryHeight = order.submitHeight + this.state.configuration
       .markets[this.state.activeMarket].dexOptions.chains[order.sourceChain].requiredConfirmations + heightSafetyMargin;
     order.status = 'pending';
@@ -339,12 +345,16 @@ class App extends React.Component {
     this.pendingOrders[this.state.activeMarket][order.id] = order;
     this.savePendingOrders();
 
+    const pendingMarketOrders = Object.values(this.pendingOrders[this.state.activeMarket] || {});
+
     await this.setState(({ yourOrders }) => {
       const yourOrderMap = {};
       for (const yourOrder of yourOrders) {
         yourOrderMap[yourOrder.id] = yourOrder;
       }
-      yourOrderMap[order.id] = order;
+      for (const pendingOrder of pendingMarketOrders) {
+        yourOrderMap[pendingOrder.id] = pendingOrder;
+      }
       return {
         yourOrders: Object.values(yourOrderMap),
       };
@@ -574,10 +584,8 @@ class App extends React.Component {
             completedOrders: [],
           };
         }
-
-        const processedHeights = await getProcessedHeights(dexClient);
-
         try {
+          const processedHeights = await getProcessedHeights(dexClient);
           const processedOrExpiredTransfers = await Promise.all(
             pendingOrders.map(async (order) => {
               const currentHeight = processedHeights[order.sourceChain];

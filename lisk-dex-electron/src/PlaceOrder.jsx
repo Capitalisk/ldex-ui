@@ -243,7 +243,7 @@ export default class PlaceOrder extends React.Component {
             passphrase,
           });
           (async () => {
-            this.setState({ isSubmitting: true });
+            await this.setState({ isSubmitting: true });
             try {
               await axios.post(`${broadcastURL}/transactions`, tx);
             } catch (err) {
@@ -253,10 +253,10 @@ export default class PlaceOrder extends React.Component {
               if (this.props.orderSubmitError) {
                 this.props.orderSubmitError(error);
               }
-              this.setState({ isSubmitting: false });
+              await this.setState({ isSubmitting: false });
               return;
             }
-            this.setState({ isSubmitting: false });
+            await this.setState({ isSubmitting: false });
             this.handleTransactionSubmit(tx, 'market', sourceChain, targetChain, side);
           })();
         }
@@ -293,7 +293,7 @@ export default class PlaceOrder extends React.Component {
             passphrase,
           });
           (async () => {
-            this.setState({ isSubmitting: true });
+            await this.setState({ isSubmitting: true });
             try {
               await axios.post(`${broadcastURL}/transactions`, tx);
             } catch (err) {
@@ -303,10 +303,10 @@ export default class PlaceOrder extends React.Component {
               if (this.props.orderSubmitError) {
                 this.props.orderSubmitError(error);
               }
-              this.setState({ isSubmitting: false });
+              await this.setState({ isSubmitting: false });
               return;
             }
-            this.setState({ isSubmitting: false });
+            await this.setState({ isSubmitting: false });
             this.handleTransactionSubmit(tx, 'limit', sourceChain, targetChain, side, parseFloat(price));
           })();
         }
