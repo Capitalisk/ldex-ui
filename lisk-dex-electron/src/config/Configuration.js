@@ -7,7 +7,7 @@ import { getClient } from '../API';
 
 const assets = Dictionary(Record({
   name: String,
-  apiUrl: String,
+  apiUrls: Array(String),
   apiMaxPageSize: Number,
   unitValue: Number,
   processingHeightExpiry: Number,
@@ -15,7 +15,7 @@ const assets = Dictionary(Record({
 
 const markets = Dictionary(Record({
   assets: Array(String),
-  apiUrl: String,
+  apiUrls: Array(String),
 }));
 
 const UnprocessedDEXConfiguration = Record({
@@ -42,14 +42,14 @@ const DEXConfiguration = Record({
   refreshInterval: Number,
   assets: Dictionary(Record({
     name: String,
-    apiUrl: String,
+    apiUrls: Array(String),
     apiMaxPageSize: Number,
     unitValue: Number,
     processingHeightExpiry: Number,
   })),
   markets: Dictionary(Record({
     assets: Array(String),
-    apiUrl: String,
+    apiUrls: Array(String),
     marketOptions: Record({
       version: String,
       baseChain: String,
@@ -73,14 +73,27 @@ export default async function processConfiguration(config) {
   // Throws an exception if check fails for given config object
   const _config = UnprocessedDEXConfiguration.check(config);
 
-  for (let i = 0; i < Object.keys(config.markets).length; i += 1) {
-    const market = config.markets[Object.keys(config.markets)[i]];
+  const assetSymbols = Object.keys(_config.assets);
+
+  // Select a random URL for each asset.
+  for (const assetSymbol of assetSymbols) {
+    const asset = _config.assets[assetSymbol];
+    const randomIndex = Math.floor(Math.random() * asset.apiUrls.length);
+    asset.apiUrl = asset.apiUrls[randomIndex];
+  }
+
+  const marketSymbols = Object.keys(config.markets);
+
+  for (const marketSymbol of marketSymbols) {
+    const market = config.markets[marketSymbol];
+    const randomIndex = Math.floor(Math.random() * market.apiUrls.length);
+    market.apiUrl = market.apiUrls[randomIndex];
     const client = getClient(market.apiUrl);
     const { data } = await client.get('/status');
     if (!(data && data.chains)) {
       throw new Error(`DEX API ${market.apiUrl} returned an invalid response.`);
     }
-    _config.markets[Object.keys(config.markets)[i]].marketOptions = data;
+    market.marketOptions = data;
   }
   console.log('Loaded configuration: ');
   console.log(_config);

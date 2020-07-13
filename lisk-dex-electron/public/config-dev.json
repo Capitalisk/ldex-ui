@@ -9,21 +9,21 @@
   "assets": {
     "lsk": {
       "name": "Lisk testnet",
-      "apiUrl": "https://test-02.liskapi.io/api",
+      "apiUrls": ["https://test-02.liskapi.io/api"],
       "unitValue": 100000000,
       "apiMaxPageSize": 100,
       "processingHeightExpiry": 5
     },
     "lsh": {
       "name": "Leasehold testnet",
-      "apiUrl": "http://18.206.164.187:7010/api",
+      "apiUrls": ["http://18.206.164.187:7010/api"],
       "unitValue": 100000000,
       "apiMaxPageSize": 100,
       "processingHeightExpiry": 5
     },
     "clsk": {
       "name": "Capitalisk testnet",
-      "apiUrl": "http://18.206.164.187:7020/api",
+      "apiUrls": ["http://18.206.164.187:7020/api"],
       "unitValue": 100000000,
       "apiMaxPageSize": 100,
       "processingHeightExpiry": 5
@@ -31,13 +31,13 @@
   },
   "markets": {
     "lsh/lsk": {
-      "apiUrl": "http://18.206.164.187:7011",
+      "apiUrls": ["http://18.206.164.187:7011"],
       "assets": ["lsh", "lsk"],
       "orderBookDepth": 20,
       "priceHistoryAPI": "blockchain"
     },
     "clsk/lsk": {
-      "apiUrl": "http://18.206.164.187:7021",
+      "apiUrls": ["http://18.206.164.187:7021"],
       "assets": ["clsk", "lsk"],
       "orderBookDepth": 20,
       "priceHistoryAPI": "blockchain"

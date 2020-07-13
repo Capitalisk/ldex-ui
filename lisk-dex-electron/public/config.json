@@ -9,14 +9,14 @@
   "assets": {
     "lsk": {
       "name": "Lisk",
-      "apiUrl": "https://ldex.exchange/chain/lsk/api",
+      "apiUrls": ["https://ldex.exchange/chain/lsk/api"],
       "unitValue": 100000000,
       "apiMaxPageSize": 100,
       "processingHeightExpiry": 5
     },
     "lsh": {
       "name": "Leasehold",
-      "apiUrl": "https://ldex.exchange/chain/lsh/api",
+      "apiUrls": ["https://ldex.exchange/chain/lsh/api"],
       "unitValue": 100000000,
       "apiMaxPageSize": 100,
       "processingHeightExpiry": 5
@@ -24,7 +24,7 @@
   },
   "markets": {
     "lsh/lsk": {
-      "apiUrl": "https://ldex.exchange/dex/lsh-lsk/api",
+      "apiUrls": ["https://ldex.exchange/dex/lsh-lsk/api"],
       "assets": ["lsh", "lsk"],
       "orderBookDepth": 20,
       "priceHistoryAPI": "blockchain"
