@@ -101,7 +101,7 @@ export default class PlaceOrder extends React.Component {
     }
     return (
       <span>
-        <span>{verboseEstimation}</span>
+        <span style={{ display: 'inline-block' }}>{verboseEstimation}</span>
         &nbsp;&nbsp;
         <InfoIcon alt="info" width="18px" onClick={this.openEstimateInfoModal} />
       </span>
@@ -350,7 +350,7 @@ export default class PlaceOrder extends React.Component {
           {actionDescription}
         </Modal>
         <Modal modalOpened={this.state.isEstimateInfoModalOpen} closeModal={this.closeEstimateInfoModal}>
-          This is an estimate of how many tokens you can expect to receive.
+          The trade estimator gives you a breakdown of the number of tokens which you can expect to receive based on the values that you provide. It also makes projections about the expected status of your order.
           <ul>
             <li>A (pending) status means that some of the order cannot be filled immediately and will stay pending inside the order book until it is matched with future counteroffers.</li>
             <li>A (refund) status means that a portion of the order cannot be filled immediately and some tokens will be refunded back to your wallet - It is recommended that you reduce the size of your order to avoid this situation.</li>
