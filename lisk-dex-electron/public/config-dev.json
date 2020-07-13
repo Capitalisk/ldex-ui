@@ -1,8 +1,8 @@
 {
-  "appTitle": "Lisk DEX",
+  "appTitle": "LDEX",
   "feedbackLink": {
     "text": "Report bug / send feedback",
-    "url": "https://github.com/Jaxkr/lisk-dex-ui/issues/new"
+    "url": "https://github.com/Leasehold/ldex-ui/issues/new"
   },
   "notificationDuration": 10000,
   "refreshInterval": 15000,
