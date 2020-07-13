@@ -6,14 +6,14 @@ export default class Tooltip extends React.Component {
     super(props);
 
     this.state = {
-      displayTooltip: true, // TODO 222
+      displayTooltip: false,
     };
     this.hideTooltip = this.hideTooltip.bind(this);
     this.showTooltip = this.showTooltip.bind(this);
   }
 
   hideTooltip() {
-    this.setState({ displayTooltip: true }); // TODO 222
+    this.setState({ displayTooltip: false });
   }
 
   showTooltip() {
@@ -24,23 +24,21 @@ export default class Tooltip extends React.Component {
     const { message } = this.props;
     const { position } = this.props;
     return (
-      <span className="tooltip-container">
+      <span
+        className="tooltip"
+        onMouseOut={this.hideTooltip}
+      >
+        {this.state.displayTooltip
+        && (
+        <div className={`tooltip-bubble tooltip-${position}`}>
+          <div className="tooltip-message">{message}</div>
+        </div>
+        )}
         <span
-          className="tooltip"
-          onMouseOut={this.hideTooltip}
+          className="tooltip-trigger"
+          onMouseOver={this.showTooltip}
         >
-          {this.state.displayTooltip
-          && (
-          <div className={`tooltip-bubble tooltip-${position}`}>
-            <div className="tooltip-message">{message}</div>
-          </div>
-          )}
-          <span
-            className="tooltip-trigger"
-            onMouseOver={this.showTooltip}
-          >
-            {this.props.children}
-          </span>
+          {this.props.children}
         </span>
       </span>
     );

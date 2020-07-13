@@ -23,7 +23,7 @@ export default class BalanceDisplay extends React.Component {
         <div style={{ color: '#FFFFFF', marginBottom: '10px' }}>
           Wallet address:
           {' '}
-          <span style={{ fontWeight: 'bold' }}>
+          <span className="place-order-wallet-address" style={{ fontWeight: 'bold' }}>
             {' '}
             {this.props.walletAddress}
           </span>
@@ -31,7 +31,7 @@ export default class BalanceDisplay extends React.Component {
         <div style={{ color: '#FFFFFF', marginBottom: '10px' }}>
           Balance:
           {' '}
-          <span style={{ fontWeight: 'bold' }}>
+          <span className="place-order-balance" style={{ fontWeight: 'bold' }}>
             {this.props.balance == null ? 'Loading...' : `${formatThousands(Math.round((this.props.balance * 100) / this.props.whole) / 100)} ${this.props.asset.toUpperCase()}`}
           </span>
         </div>

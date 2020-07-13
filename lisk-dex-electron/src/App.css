@@ -49,14 +49,17 @@ a {
 }
 
 .buy-panel {
+  position: relative;
   grid-column: 1;
   grid-row: 2 / 3;
   background-color: #1a1c1c;
   border-bottom: 1px dashed black;
   overflow-y: auto;
+  overflow-x: hidden;
 }
 
 .sell-panel {
+  position: relative;
   grid-column: 1;
   grid-row: 1 / 2;
   background-color: #1a1c1c;
@@ -195,7 +198,7 @@ a {
 
 @media only screen and (max-width: 950px) {
   .container {
-    height: 1400px;
+    height: 1650px;
     grid-template-columns: 50% 50%;
     grid-template-rows: 16% 20% 22% 22% 20%;
   }
@@ -225,6 +228,12 @@ a {
   .buy-panel {
     grid-column: 1;
     grid-row: 4;
+  }
+
+  .place-order-wallet-address, .place-order-balance {
+    display: inline-block;
+    width: 100%;
+    font-size: 12px;
   }
 
   .order-book-container {
