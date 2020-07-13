@@ -37,7 +37,7 @@ export default class MarketList extends React.PureComponent {
 
   getModalContentFromConfig(config) {
     if (config) {
-      const dexConfig = config.markets[this.props.activeMarket].dexOptions;
+      const dexConfig = config.markets[this.props.activeMarket].marketOptions;
       const chains = Object.keys(dexConfig.chains);
       const firstChain = dexConfig.chains[chains[0]];
       const secondChain = dexConfig.chains[chains[1]];

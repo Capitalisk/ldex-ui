@@ -123,11 +123,11 @@ export default class PlaceOrder extends React.Component {
 
   validateOrder() {
     let success = true;
-    const { dexOptions } = this.context.configuration.markets[this.context.activeMarket];
-    const { priceDecimalPrecision } = dexOptions;
+    const { marketOptions } = this.context.configuration.markets[this.context.activeMarket];
+    const { priceDecimalPrecision } = marketOptions;
     const sourceAsset = this.props.side === 'bid' ? this.context.activeAssets[1] : this.context.activeAssets[0];
     const { unitValue } = this.context.configuration.assets[sourceAsset];
-    const minOrderAmount = dexOptions.chains[sourceAsset].minOrderAmount / unitValue;
+    const minOrderAmount = marketOptions.chains[sourceAsset].minOrderAmount / unitValue;
     const errors = {
       price: null,
       amount: null,
@@ -220,13 +220,13 @@ export default class PlaceOrder extends React.Component {
       let targetChain;
       let broadcastURL;
       if (this.props.side === 'bid') {
-        dexAddress = this.context.configuration.markets[this.context.activeMarket].dexOptions.chains[this.context.activeAssets[1]].walletAddress;
+        dexAddress = this.context.configuration.markets[this.context.activeMarket].marketOptions.chains[this.context.activeAssets[1]].walletAddress;
         destAddress = this.context.keys[this.context.activeAssets[0]].address;
         passphrase = this.context.keys[this.context.activeAssets[1]].passphrase;
         [targetChain, sourceChain] = this.context.activeAssets;
         broadcastURL = this.context.configuration.assets[this.context.activeAssets[1]].apiUrl;
       } else if (this.props.side === 'ask') {
-        dexAddress = this.context.configuration.markets[this.context.activeMarket].dexOptions.chains[this.context.activeAssets[0]].walletAddress;
+        dexAddress = this.context.configuration.markets[this.context.activeMarket].marketOptions.chains[this.context.activeAssets[0]].walletAddress;
         destAddress = this.context.keys[this.context.activeAssets[1]].address;
         passphrase = this.context.keys[this.context.activeAssets[0]].passphrase;
         [sourceChain, targetChain] = this.context.activeAssets;
@@ -269,13 +269,13 @@ export default class PlaceOrder extends React.Component {
       let targetChain;
       let broadcastURL;
       if (this.props.side === 'bid') {
-        dexAddress = this.context.configuration.markets[this.context.activeMarket].dexOptions.chains[this.context.activeAssets[1]].walletAddress;
+        dexAddress = this.context.configuration.markets[this.context.activeMarket].marketOptions.chains[this.context.activeAssets[1]].walletAddress;
         destAddress = this.context.keys[this.context.activeAssets[0]].address;
         passphrase = this.context.keys[this.context.activeAssets[1]].passphrase;
         [targetChain, sourceChain] = this.context.activeAssets;
         broadcastURL = this.context.configuration.assets[this.context.activeAssets[1]].apiUrl;
       } else if (this.props.side === 'ask') {
-        dexAddress = this.context.configuration.markets[this.context.activeMarket].dexOptions.chains[this.context.activeAssets[0]].walletAddress;
+        dexAddress = this.context.configuration.markets[this.context.activeMarket].marketOptions.chains[this.context.activeAssets[0]].walletAddress;
         destAddress = this.context.keys[this.context.activeAssets[1]].address;
         passphrase = this.context.keys[this.context.activeAssets[0]].passphrase;
         [sourceChain, targetChain] = this.context.activeAssets;

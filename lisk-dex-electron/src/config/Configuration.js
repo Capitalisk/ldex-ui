@@ -15,7 +15,7 @@ const assets = Dictionary(Record({
 
 const markets = Dictionary(Record({
   assets: Array(String),
-  dexApiUrl: String,
+  apiUrl: String,
 }));
 
 const UnprocessedDEXConfiguration = Record({
@@ -30,7 +30,7 @@ const UnprocessedDEXConfiguration = Record({
   assets,
 });
 
-// A ready-to-use DEX configuration with the dexOptions (which is fetched from the dexApiUrl) populated.
+// A ready-to-use DEX configuration with the marketOptions (which is fetched from the apiUrl) populated.
 // eslint-disable-next-line no-unused-vars
 const DEXConfiguration = Record({
   appTitle: String,
@@ -49,8 +49,8 @@ const DEXConfiguration = Record({
   })),
   markets: Dictionary(Record({
     assets: Array(String),
-    dexApiUrl: String,
-    dexOptions: Record({
+    apiUrl: String,
+    marketOptions: Record({
       version: String,
       baseChain: String,
       priceDecimalPrecision: Number,
@@ -75,12 +75,12 @@ export default async function processConfiguration(config) {
 
   for (let i = 0; i < Object.keys(config.markets).length; i += 1) {
     const market = config.markets[Object.keys(config.markets)[i]];
-    const client = getClient(market.dexApiUrl);
+    const client = getClient(market.apiUrl);
     const { data } = await client.get('/status');
     if (!(data && data.chains)) {
-      throw new Error(`DEX API ${market.dexApiUrl} returned an invalid response.`);
+      throw new Error(`DEX API ${market.apiUrl} returned an invalid response.`);
     }
-    _config.markets[Object.keys(config.markets)[i]].dexOptions = data;
+    _config.markets[Object.keys(config.markets)[i]].marketOptions = data;
   }
   console.log('Loaded configuration: ');
   console.log(_config);

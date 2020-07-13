@@ -70,7 +70,7 @@ class App extends React.Component {
   }
 
   getDexClient() {
-    return getClient(this.state.configuration.markets[this.state.activeMarket].dexApiUrl);
+    return getClient(this.state.configuration.markets[this.state.activeMarket].apiUrl);
   }
 
   async loadConfiguration() {
@@ -147,8 +147,8 @@ class App extends React.Component {
         const asset = this.state.configuration.assets[assetSymbol];
         const client = axios.create();
         const targetEndpoint = asset.apiUrl;
-        const { dexOptions } = this.state.configuration.markets[this.state.activeMarket];
-        const dexWalletAddress = dexOptions.chains[assetSymbol].walletAddress;
+        const { marketOptions } = this.state.configuration.markets[this.state.activeMarket];
+        const dexWalletAddress = marketOptions.chains[assetSymbol].walletAddress;
         const result = await client.get(
           `${targetEndpoint}/transactions?senderId=${
             dexWalletAddress
@@ -220,17 +220,17 @@ class App extends React.Component {
       return txnPair.base.length >= expectedBaseCount && txnPair.quote.length >= expectedQuoteCount;
     });
 
-    const { dexOptions } = this.state.configuration.markets[this.state.activeMarket];
+    const { marketOptions } = this.state.configuration.markets[this.state.activeMarket];
     const priceDecimalPrecision = this.getPriceDecimalPrecision();
 
     for (const txnPair of txnPairsList) {
-      const baseChainOptions = dexOptions.chains[this.state.activeAssets[1]];
+      const baseChainOptions = marketOptions.chains[this.state.activeAssets[1]];
       const baseChainFeeBase = baseChainOptions.exchangeFeeBase;
       const baseChainFeeRate = baseChainOptions.exchangeFeeRate;
       const baseTotalFee = baseChainFeeBase * txnPair.base.length;
       const fullBaseAmount = txnPair.base.reduce((accumulator, txn) => accumulator + Number(txn.amount) / (1 - baseChainFeeRate), 0) + baseTotalFee;
 
-      const quoteChainOptions = dexOptions.chains[this.state.activeAssets[0]];
+      const quoteChainOptions = marketOptions.chains[this.state.activeAssets[0]];
       const quoteChainFeeBase = quoteChainOptions.exchangeFeeBase;
       const quoteChainFeeRate = quoteChainOptions.exchangeFeeRate;
       const quoteTotalFee = quoteChainFeeBase * txnPair.quote.length;
@@ -339,7 +339,7 @@ class App extends React.Component {
     const heightSafetyMargin = this.state.configuration.assets[order.sourceChain].processingHeightExpiry;
     order.submitHeight = processedHeights[order.sourceChain] || Infinity;
     order.submitExpiryHeight = order.submitHeight + this.state.configuration
-      .markets[this.state.activeMarket].dexOptions.chains[order.sourceChain].requiredConfirmations + heightSafetyMargin;
+      .markets[this.state.activeMarket].marketOptions.chains[order.sourceChain].requiredConfirmations + heightSafetyMargin;
     order.status = 'pending';
 
     this.pendingOrders[this.state.activeMarket][order.id] = order;
@@ -360,7 +360,7 @@ class App extends React.Component {
       };
     });
 
-    const orderDexAddress = this.state.configuration.markets[this.state.activeMarket].dexOptions.chains[order.sourceChain].walletAddress;
+    const orderDexAddress = this.state.configuration.markets[this.state.activeMarket].marketOptions.chains[order.sourceChain].walletAddress;
     const { unitValue } = this.state.configuration.assets[order.sourceChain];
     const chainSymbol = order.sourceChain.toUpperCase();
 
@@ -567,15 +567,15 @@ class App extends React.Component {
   }
 
   getPriceDecimalPrecision() {
-    const { dexOptions } = this.getActiveMarketOptions();
-    return dexOptions.priceDecimalPrecision == null ? DEFAULT_PRICE_DECIMAL_PRECISION : dexOptions.priceDecimalPrecision;
+    const { marketOptions } = this.getActiveMarketOptions();
+    return marketOptions.priceDecimalPrecision == null ? DEFAULT_PRICE_DECIMAL_PRECISION : marketOptions.priceDecimalPrecision;
   }
 
   async updatePendingOrders() {
     const pendingMarketSymbols = Object.keys(this.pendingOrders);
     const marketCompletedOrders = await Promise.all(
       pendingMarketSymbols.map(async (market) => {
-        const dexClient = getClient(this.state.configuration.markets[market].dexApiUrl);
+        const dexClient = getClient(this.state.configuration.markets[market].apiUrl);
         const pendingOrders = Object.values(this.pendingOrders[market]);
 
         if (!pendingOrders.length) {
@@ -622,10 +622,10 @@ class App extends React.Component {
   async updateUIWithNewData() {
     await this.updatePendingOrders();
     let combinedStateUpdate = {};
-    const dexOptions = this.getActiveMarketOptions();
+    const marketOptions = this.getActiveMarketOptions();
     try {
       let fetchHistoryPromise;
-      if (dexOptions.priceHistoryAPI === 'dex') {
+      if (marketOptions.priceHistoryAPI === 'dex') {
         fetchHistoryPromise = this.fetchPriceHistoryStateFromDEX();
       } else {
         fetchHistoryPromise = this.fetchPriceHistoryStateFromBlockchains();

@@ -15,7 +15,7 @@ export default class UserOrder extends React.Component {
   cancelOrder = async () => {
     const confirmed = window.confirm('Are you sure you want to cancel this limit order?');
     if (confirmed) {
-      const dexAddress = this.context.configuration.markets[this.context.activeMarket].dexOptions.chains[this.props.order.sourceChain].walletAddress;
+      const dexAddress = this.context.configuration.markets[this.context.activeMarket].marketOptions.chains[this.props.order.sourceChain].walletAddress;
       const { passphrase } = this.context.keys[this.props.order.sourceChain];
       const { targetChain } = this.props.order;
       const orderId = this.props.order.id;

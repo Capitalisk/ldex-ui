@@ -24,7 +24,7 @@
   },
   "markets": {
     "lsh/lsk": {
-      "dexApiUrl": "https://ldex.exchange/dex/lsh-lsk/api",
+      "apiUrl": "https://ldex.exchange/dex/lsh-lsk/api",
       "assets": ["lsh", "lsk"],
       "orderBookDepth": 20,
       "priceHistoryAPI": "blockchain"
