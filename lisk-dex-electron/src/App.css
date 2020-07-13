@@ -7,6 +7,11 @@ a {
   color: #44AADD;
 }
 
+li {
+  padding-top: 5px;
+  padding-bottom: 5px;
+}
+
 .button-sign-out {
   cursor: pointer;
   font-size: 20px;
@@ -253,6 +258,10 @@ a {
 
   .feedback-link {
     display: none;
+  }
+
+  .market-info-container {
+    font-size: 9px;
   }
 }
 

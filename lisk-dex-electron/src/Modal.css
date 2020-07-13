@@ -37,8 +37,9 @@
   background: white;
   width: 740px;
   left: calc(50% - 370px);
-  top: 20%;
+  top: 50%;
   display: none;
+  transform: translateY(-50%);
 }
 
 .modal-container.modal-container-active {
@@ -56,11 +57,12 @@
   .modal-container {
     width: 100%;
     height: 100%;
+    padding-top: 50px;
     top: 0;
     left: 0;
     border-radius: 0;
     overflow: auto;
-    font-size: 9px;
+    transform: none;
   }
 
   .modal-close-button {

@@ -57,7 +57,7 @@ export default class MarketList extends React.PureComponent {
       );
 
       return (
-        <div>
+        <div className="market-info-container">
           <table style={{ border: 'none', width: '60%' }}>
             <tbody>
               {getBasicTableRow('Version', dexConfig.version)}

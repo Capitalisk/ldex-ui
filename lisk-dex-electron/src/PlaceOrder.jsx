@@ -4,7 +4,7 @@ import * as transactions from '@liskhq/lisk-transactions';
 import axios from 'axios';
 import BalanceDisplay from './BalanceDisplay';
 import userContext from './context';
-import Tooltip from './Tooltip';
+import Modal from './Modal';
 import {
   getCleanOrderBook, estimateBestReturnsForSeller, estimatedBestReturnsForBuyer, EstimationStatus,
 } from './Utils';
@@ -21,6 +21,7 @@ export default class PlaceOrder extends React.Component {
       marketMode: true,
       isSubmitting: false,
       errors: {},
+      isActionInfoModalOpen: false,
     };
   }
 
@@ -34,23 +35,28 @@ export default class PlaceOrder extends React.Component {
     });
   }
 
-  showEstimateInfo = (statuses) => {
-    if (this.props.showEstimateInfo) {
-      const messageParts = ['This is an estimate of how many tokens you can expect to receive.'];
-      if (statuses.includes('pending')) {
-        messageParts.push(
-          'A (pending) status means that some of the order cannot be filled immediately and will stay pending inside the order book until it is matched with future counteroffers.',
-        );
-      }
-      if (statuses.includes('refund')) {
-        messageParts.push(
-          'A (refund) status means that a portion of the order cannot be filled immediately and some tokens will be refunded back to your wallet - It is recommended that you reduce the size of your order to avoid this situation.',
-        );
-      }
-      // this.props.showEstimateInfo(messageParts.join(' '));
-      return messageParts.join(' ');
-    }
-    return '';
+  openActionInfoModal = () => {
+    this.setState({
+      isActionInfoModalOpen: true,
+    });
+  }
+
+  closeActionInfoModal = () => {
+    this.setState({
+      isActionInfoModalOpen: false,
+    });
+  }
+
+  openEstimateInfoModal = () => {
+    this.setState({
+      isEstimateInfoModalOpen: true,
+    });
+  }
+
+  closeEstimateInfoModal = () => {
+    this.setState({
+      isEstimateInfoModalOpen: false,
+    });
   }
 
   getOrderType() {
@@ -97,9 +103,7 @@ export default class PlaceOrder extends React.Component {
       <span>
         <span>{verboseEstimation}</span>
         &nbsp;&nbsp;
-        <Tooltip message={this.showEstimateInfo(statuses)} position="right">
-          <InfoIcon alt="info" width="18px" />
-        </Tooltip>
+        <InfoIcon alt="info" width="18px" onClick={this.openEstimateInfoModal} />
       </span>
     );
   }
@@ -330,9 +334,33 @@ export default class PlaceOrder extends React.Component {
 
     const canTrade = totalKeys === 2;
     const estimate = this.getEstimatedReturns();
+    let actionTitle;
+    let actionDescription;
+    if (this.props.side === 'bid') {
+      actionTitle = `BUY ${this.context.activeAssets[0].toUpperCase()}`;
+      actionDescription = `The BUY panel lets you convert your ${this.context.activeAssets[1].toUpperCase()} into ${this.context.activeAssets[0].toUpperCase()}.`
+    } else {
+      actionTitle = `SELL ${this.context.activeAssets[0].toUpperCase()}`;
+      actionDescription = `The SELL panel lets you convert your ${this.context.activeAssets[0].toUpperCase()} into ${this.context.activeAssets[1].toUpperCase()}.`
+    }
+
     return (
       <div style={{ padding: '5px' }}>
-        <div className="action-name">{this.props.side === 'bid' ? 'BUY' : 'SELL'}</div>
+        <Modal modalOpened={this.state.isActionInfoModalOpen} closeModal={this.closeActionInfoModal}>
+          {actionDescription}
+        </Modal>
+        <Modal modalOpened={this.state.isEstimateInfoModalOpen} closeModal={this.closeEstimateInfoModal}>
+          This is an estimate of how many tokens you can expect to receive.
+          <ul>
+            <li>A (pending) status means that some of the order cannot be filled immediately and will stay pending inside the order book until it is matched with future counteroffers.</li>
+            <li>A (refund) status means that a portion of the order cannot be filled immediately and some tokens will be refunded back to your wallet - It is recommended that you reduce the size of your order to avoid this situation.</li>
+          </ul>
+        </Modal>
+        <span className="action-name">{actionTitle}</span>
+        &nbsp;&nbsp;
+        <span style={{ display: 'inline-block', marginTop: '2px', verticalAlign: 'top' }}>
+          <InfoIcon onClick={this.openActionInfoModal} alt="info" width="18px" />
+        </span>
         <div className="market-limit-tabs" style={{ marginBottom: '10px' }}>
           <button type="button" className="tab-button" disabled={this.state.marketMode} onClick={this.switchMode}>Market</button>
           <button type="button" className="tab-button" disabled={!this.state.marketMode} onClick={this.switchMode}>Limit</button>

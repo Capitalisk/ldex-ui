@@ -1,16 +1,14 @@
 .tooltip {
   display: inline-block;
   position: relative;
-  width: 50%;
-  vertical-align: middle;
+  vertical-align: top;
 }
 .tooltip-trigger {
   display: inline-block;
   text-decoration: underline;
 }
 .tooltip-bubble {
-  width: calc(100% - 30px);
-  left: 25px;
+  width: 150px;
   position: absolute;
   z-index: 10;
 }
@@ -18,19 +16,33 @@
   content: '';
   position: absolute;
 }
-.tooltip-right {
-  top: 50%;
-  left: 22px;
-  padding-left: 9px;
-  transform: translateY(-51%);
+.tooltip-top {
+  bottom: 102%;
+  left: 50%;
+  padding-bottom: 9px;
+  transform: translateX(-50%);
 }
-.tooltip-right::after {
-  border-right: 9px solid #fff;
-  border-top: 9px solid transparent;
-  border-bottom: 9px solid transparent;
-  top: 50%;
-  left: 0;
-  transform: translateY(-50%);
+.tooltip-top::after {
+  border-left: 9px solid transparent;
+  border-right: 9px solid transparent;
+  border-top: 9px solid #fff;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+}
+.tooltip-bottom {
+  top: 100%;
+  left: 50%;
+  padding-top: 9px;
+  transform: translateX(-50%);
+}
+.tooltip-bottom::after {
+  border-left: 9px solid transparent;
+  border-right: 9px solid transparent;
+  border-bottom: 9px solid #fff;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
 }
 .tooltip-message {
   background: #fff;
@@ -43,7 +55,7 @@
 }
 
 @media only screen and (max-width: 950px) {
-  .tooltip {
-    display: none;
+  .tooltip-bubble {
+    width: 140px;
   }
 }
