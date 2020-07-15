@@ -7,6 +7,10 @@
   overflow-y: scroll;
 }
 
+.wrapAskOrderList {
+  height: 90%;
+}
+
 .bidOrderList {
   display: flex;
   align-items: flex-start;
@@ -16,6 +20,9 @@
   overflow-y: scroll;
 }
 
+.wrapBidOrderList {
+  height: 96%;
+}
 .emptyAsk {
   padding-top: 10px;
   padding-bottom: 10px;
