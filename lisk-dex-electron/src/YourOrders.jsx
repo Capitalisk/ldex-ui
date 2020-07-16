@@ -76,7 +76,7 @@ export default class YourOrders extends React.Component {
               width: '50%', margin: 0, padding: 0,
             }}
             >
-              <div style={{ height: '10%', textAlign: 'center', marginTop: '10px' }}>{askMessage}</div>
+              <div style={{ height: '10%', textAlign: 'center', marginTop: '10px' }}>{bidsMessage}</div>
               <div style={{ overflowY: 'scroll', height: '90%' }}>
                 {bids.slice().reverse().map((order) => (
                   <UserOrder
@@ -93,7 +93,7 @@ export default class YourOrders extends React.Component {
               width: '50%', margin: 0, padding: 0,
             }}
             >
-              <div style={{ height: '10%', textAlign: 'center', marginTop: '10px' }}>{bidsMessage}</div>
+              <div style={{ height: '10%', textAlign: 'center', marginTop: '10px' }}>{askMessage}</div>
               <div style={{ overflowY: 'scroll', height: '90%' }}>
                 {asks.map((order) => (
                   <UserOrder
