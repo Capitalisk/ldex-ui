@@ -41,6 +41,7 @@ export default class YourOrders extends React.Component {
 
   render() {
     const orders = [...this.props.orders];
+
     orders.sort((a, b) => {
       const statusA = statusValues[a.status];
       const statusB = statusValues[b.status];
@@ -62,6 +63,7 @@ export default class YourOrders extends React.Component {
     });
     const bids = orders.filter((order) => order.side === 'bid').slice().reverse();
     const asks = orders.filter((order) => order.side === 'ask');
+
     return (
       <>
         <div style={{ padding: '5px' }}>
