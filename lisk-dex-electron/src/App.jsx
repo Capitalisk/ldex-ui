@@ -415,13 +415,13 @@ class App extends React.Component {
   getTransferType(pendingTransfer) {
     const transactionData = pendingTransfer.transaction.asset.data || '';
     return transactionData.charAt(0);
-  };
+  }
 
   getOriginOrderId(pendingTransfer) {
     const transactionData = pendingTransfer.transaction.asset.data || '';
     const header = transactionData.split(':')[0];
     return header.split(',')[2] || null;
-  };
+  }
 
   savePendingOrders() {
     window.localStorage.pendingOrders = JSON.stringify(this.pendingOrders);
@@ -447,7 +447,7 @@ class App extends React.Component {
     const quoteAsset = this.state.activeAssets[0];
     const baseAsset = this.state.activeAssets[1];
 
-    const activeMarket = this.state.activeMarket;
+    const { activeMarket } = this.state;
     const { orderBookDepth } = this.state.configuration.markets[activeMarket] || {};
 
     const apiResults = [
@@ -508,7 +508,7 @@ class App extends React.Component {
     }
 
     for (const order of yourOpenOrders) {
-      let pendingOrder = this.pendingOrders[activeMarket][order.id];
+      const pendingOrder = this.pendingOrders[activeMarket][order.id];
       if (pendingOrder) {
         if (pendingOrder.status === 'pending') {
           delete this.pendingOrders[activeMarket][order.id];
@@ -592,9 +592,9 @@ class App extends React.Component {
               if (currentHeight >= order.submitExpiryHeight) {
                 return order.id;
               }
-              let result = await getRecentTransfers(dexClient, order.id);
+              const result = await getRecentTransfers(dexClient, order.id);
               return result && result.length ? order.id : null;
-            })
+            }),
           );
           const completedOrders = processedOrExpiredTransfers.filter((result) => result != null);
 
@@ -607,11 +607,11 @@ class App extends React.Component {
         }
         return {
           market,
-          completedOrders: []
+          completedOrders: [],
         };
-      })
+      }),
     );
-    for (const {market, completedOrders} of marketCompletedOrders) {
+    for (const { market, completedOrders } of marketCompletedOrders) {
       for (const orderId of completedOrders) {
         delete this.pendingOrders[market][orderId];
       }
@@ -644,7 +644,7 @@ class App extends React.Component {
     if (this.isSignedIn(true)) {
       try {
         const assetBalances = await this.fetchAssetBalances(this.state.keys);
-        combinedStateUpdate = { ...combinedStateUpdate, ...assetBalances};
+        combinedStateUpdate = { ...combinedStateUpdate, ...assetBalances };
       } catch (error) {
         console.error(error);
         this.notify('Failed to update asset balances - Check your connection.', true);
@@ -696,7 +696,7 @@ class App extends React.Component {
       baseAssetBalance: null,
       keys: {
         ...state.keys,
-        ...newKeys
+        ...newKeys,
       },
     }));
 
@@ -763,8 +763,8 @@ class App extends React.Component {
     if (!this.state.activeAssets[0] || !this.state.activeAssets[1]) {
       return false;
     }
-    let quoteAssetInfo = this.state.keys[this.state.activeAssets[0]];
-    let baseAssetInfo = this.state.keys[this.state.activeAssets[1]];
+    const quoteAssetInfo = this.state.keys[this.state.activeAssets[0]];
+    const baseAssetInfo = this.state.keys[this.state.activeAssets[1]];
     if (any) {
       return quoteAssetInfo || baseAssetInfo;
     }

@@ -90,7 +90,7 @@ export default class YourOrders extends React.Component {
               </div>
             </div>
             <div style={{
-              width: '50%', margin: 0, padding: 0
+              width: '50%', margin: 0, padding: 0,
             }}
             >
               <div style={{ height: '10%', textAlign: 'center', marginTop: '10px' }}>{bidsMessage}</div>
