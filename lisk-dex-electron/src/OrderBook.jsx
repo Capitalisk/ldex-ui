@@ -30,7 +30,7 @@ export default class OrderBook extends React.Component {
       if (orders && orders.length > 0) {
         return (
           <div style={{ height: '-webkit-fill-available', paddingTop: '10px' }}>
-            <div style={{ height: '10%', textAlign: 'center' }}>Asks</div>
+            <div style={{ height: '8%', textAlign: 'center' }}>Asks</div>
             <div className="askOrderList wrapAskOrderList">{orders}</div>
           </div>
         );
@@ -59,7 +59,7 @@ export default class OrderBook extends React.Component {
         return (
           <div style={{ height: '-webkit-fill-available', paddingBottom: '10px' }}>
             <div className="bidOrderList wrapBidOrderList">{orders}</div>
-            <div style={{ height: '4%', textAlign: 'center' }}>Bids</div>
+            <div style={{ height: '6%', textAlign: 'center', paddingTop: '2%' }}>Bids</div>
           </div>
         );
       }

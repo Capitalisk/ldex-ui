@@ -61,8 +61,8 @@ export default class YourOrders extends React.Component {
       });
       const bids = orders.filter((order) => order.side === 'bid').slice().reverse();
       const asks = orders.filter((order) => order.side === 'ask');
-      const askMessage = asks.length === 0 ? 'No sell orders placed' : 'Sell';
-      const bidsMessage = asks.length === 0 ? 'No buy orders placed' : 'Buy';
+      const askMessage = asks.length === 0 ? 'No sell orders placed' : 'Selling';
+      const bidsMessage = asks.length === 0 ? 'No buy orders placed' : 'Buying';
       return (
         <>
           <div style={{ padding: '5px' }}>
