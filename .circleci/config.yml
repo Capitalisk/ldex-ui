@@ -18,7 +18,7 @@ jobs:
       - persist_to_workspace:
           root: .
           paths:
-            - lisk-dex-electron/build
+            - build
 
   win-linux:
     docker:
@@ -28,7 +28,7 @@ jobs:
       - checkout:
            path: ~/repo
       - attach_workspace:
-          at: ~/repo
+          at: ~/repo/lisk-dex-electron
       - run:
           name: Install packages
           command: |
