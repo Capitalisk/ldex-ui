@@ -52,7 +52,7 @@ jobs:
       - checkout:
             path: ~/repo
       - attach_workspace:
-          at: ~/repo
+          at: ~/repo/lisk-dex-electron
       - run:
           name: Install node@v12.17.0
           command: |
