@@ -15,10 +15,6 @@ jobs:
             npm run build-prod
             npm run lint
             npm test
-      - persist_to_workspace:
-          root: .
-          paths:
-            - build
 
   win-linux:
     docker:
@@ -27,13 +23,12 @@ jobs:
     steps:
       - checkout:
            path: ~/repo
-      - attach_workspace:
-          at: ~/repo/lisk-dex-electron
       - run:
-          name: Install packages
+          name: Install and Build
           command: |
             set +e
             npm install
+            npm run build-prod
       - run:
           name: Create Build Artifact
           command: |
@@ -51,8 +46,6 @@ jobs:
     steps:
       - checkout:
             path: ~/repo
-      - attach_workspace:
-          at: ~/repo/lisk-dex-electron
       - run:
           name: Install node@v12.17.0
           command: |
@@ -66,10 +59,11 @@ jobs:
             rm -rf ~./node-gyp
             node -v
       - run:
-          name: Install packages
+          name: Install and Build
           command: |
             set +e
             npm install
+            npm run build-prod
       - run:
           name: Create Build Artifact
           command: |
