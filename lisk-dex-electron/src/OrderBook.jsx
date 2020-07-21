@@ -42,8 +42,8 @@ export default class OrderBook extends React.Component {
       );
     }
     if (this.props.side === 'bids') {
-      const groupedBidsOrders = Values(this.props.orderBookData.bids, 'price', 'valueRemaining');
-      const orders = groupedBidsOrders.map((bid) => (
+      const groupedBidOrders = Values(this.props.orderBookData.bids, 'price', 'valueRemaining');
+      const orders = groupedBidOrders.map((bid) => (
         <OrderBookEntry
           whole={10 ** 8} // 10 ** 8 beddow in one LSK
           key={bid.price}

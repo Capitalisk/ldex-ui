@@ -1,50 +1,50 @@
 version: 2.1
-jobs: 
+jobs:
   build-and-test:
     docker:
       - image: mhart/alpine-node
-    working_directory: ~/repo/lisk-dex-electron  
+    working_directory: ~/repo/lisk-dex-electron
     steps:
-      - checkout:  
+      - checkout:
            path: ~/repo
       - run:
           name: Build and Test project
           command: |
             set +e
             npm install
-            npm run build     
+            npm run build-prod
             npm run lint
             npm test
 
   win-linux:
     docker:
       - image: electronuserland/builder:wine
-    working_directory: ~/repo/lisk-dex-electron  
+    working_directory: ~/repo/lisk-dex-electron
     steps:
-      - checkout:  
+      - checkout:
            path: ~/repo
       - run:
-          name: Build project
+          name: Install and Build
           command: |
             set +e
-            npm install     
-            npm run build
+            npm install
+            npm run build-prod
       - run:
-          name: Create Build Artifact 
+          name: Create Build Artifact
           command: |
             set +e
             npm run multi-dist
             ci-scripts/artifacts-isolator.sh
-      - store_artifacts:  
+      - store_artifacts:
           path: ~/repo/lisk-dex-electron/dist/artifacts
           destination: artifacts
 
   mac:
     macos:
       xcode: 11.3.0
-    working_directory: ~/repo/lisk-dex-electron  
+    working_directory: ~/repo/lisk-dex-electron
     steps:
-      - checkout:  
+      - checkout:
             path: ~/repo
       - run:
           name: Install node@v12.17.0
@@ -59,21 +59,21 @@ jobs:
             rm -rf ~./node-gyp
             node -v
       - run:
-          name: Build project
+          name: Install and Build
           command: |
             set +e
-            npm install    
-            npm run build
+            npm install
+            npm run build-prod
       - run:
-          name: Create Build Artifact 
+          name: Create Build Artifact
           command: |
             set +e
             npm run dist
             ci-scripts/artifacts-isolator.sh
-      - store_artifacts:  
+      - store_artifacts:
           path: ~/repo/lisk-dex-electron/dist/artifacts
-          destination: artifacts          
-          
+          destination: artifacts
+
 workflows:
     test-and-deploy:
       jobs:
