@@ -80,6 +80,7 @@ li {
   background-color: #15191a;
   line-height: 30px;
   text-align: center;
+  font-size: 14px;
 }
 
 .sell-orders {
@@ -90,6 +91,7 @@ li {
   background-color: #15191a;
   line-height: 30px;
   text-align: center;
+  font-size: 14px;
 }
 
 .buy-orders {

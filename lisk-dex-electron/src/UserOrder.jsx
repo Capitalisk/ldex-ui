@@ -62,6 +62,7 @@ export default class UserOrder extends React.Component {
         {this.props.order.price != null && (
         <div>
           Price:
+          {' '}
           {this.props.order.price.toFixed(4)}
         </div>
         )}

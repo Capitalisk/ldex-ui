@@ -79,6 +79,7 @@ export default class YourOrders extends React.Component {
               height: '30px',
               lineHeight: '30px',
               textAlign: 'center',
+              fontSize: '14px',
             }}>
               Buying
             </div>
@@ -97,6 +98,7 @@ export default class YourOrders extends React.Component {
               height: '30px',
               lineHeight: '30px',
               textAlign: 'center',
+              fontSize: '14px',
             }}>
               Selling
             </div>
