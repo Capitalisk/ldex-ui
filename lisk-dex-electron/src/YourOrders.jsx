@@ -13,8 +13,7 @@ const statusValues = {
 export default class YourOrders extends React.Component {
   constructor(props) {
     super(props);
-    this.state = {
-    };
+    this.state = {};
   }
 
   handleChange = (event) => {
@@ -66,24 +65,48 @@ export default class YourOrders extends React.Component {
 
     return (
       <>
-        <div style={{ padding: '5px' }}>
-          <div className="action-name">YOUR ORDERS</div>
+        <div className="your-orders-header">
+          YOUR ORDERS
         </div>
         <div style={{
           width: '100%', margin: 0, padding: 0, display: 'flex',
         }}
         >
           <div style={{
-            width: '50%', margin: 0, padding: 0, overflowY: 'scroll',
-          }}
-          >
-            {bids.slice().reverse().map((order) => <UserOrder key={order.id} side="bid" order={order} orderCanceled={this.handleCancel} failedToCancelOrder={this.handleCancelFail} />)}
+            width: '50%', margin: 0, padding: 0,
+          }}>
+            <div style={{
+              height: '30px',
+              lineHeight: '30px',
+              textAlign: 'center',
+            }}>
+              Buying
+            </div>
+            <div style={{
+              width: '100%', height: 'calc(100% - 30px)', margin: 0, padding: 0, overflowY: 'scroll',
+            }}
+            >
+              {!!bids.length && bids.slice().reverse().map((order) => <UserOrder key={order.id} side="bid" order={order} orderCanceled={this.handleCancel} failedToCancelOrder={this.handleCancelFail} />)}
+              {!bids.length && <div style={{ display: 'flex', height: '100%', color: '#999999', alignItems: 'center', justifyContent: 'center' }}>No buy orders</div>}
+            </div>
           </div>
           <div style={{
-            width: '50%', margin: 0, padding: 0, overflowY: 'scroll',
-          }}
-          >
-            {asks.map((order) => <UserOrder key={order.id} side="ask" order={order} orderCanceled={this.handleCancel} failedToCancelOrder={this.handleCancelFail} />)}
+            width: '50%', margin: 0, padding: 0,
+          }}>
+            <div style={{
+              height: '30px',
+              lineHeight: '30px',
+              textAlign: 'center',
+            }}>
+              Selling
+            </div>
+            <div style={{
+              width: '100%', height: 'calc(100% - 30px)', margin: 0, padding: 0, overflowY: 'scroll',
+            }}
+            >
+              {!!asks.length && asks.map((order) => <UserOrder key={order.id} side="ask" order={order} orderCanceled={this.handleCancel} failedToCancelOrder={this.handleCancelFail} />)}
+              {!asks.length && <div style={{ display: 'flex', height: '100%', color: '#999999', alignItems: 'center', justifyContent: 'center' }}>No sell orders</div>}
+            </div>
           </div>
         </div>
       </>

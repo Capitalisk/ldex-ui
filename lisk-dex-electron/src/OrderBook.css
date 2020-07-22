@@ -16,6 +16,10 @@
   overflow-y: scroll;
 }
 
+.askOrderListEmpty, .bidOrderListEmpty {
+  justify-content: center;
+}
+
 .emptyAsk {
   padding-top: 10px;
   padding-bottom: 10px;

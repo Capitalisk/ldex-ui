@@ -329,8 +329,8 @@ export default class PlaceOrder extends React.Component {
       totalKeys++;
     }
 
-    let walletAddress1 = quoteAssetInfo ? quoteAssetInfo.address : 'Not Available';
-    let walletAddress2 = baseAssetInfo ? baseAssetInfo.address : 'Not Available';
+    const walletAddress1 = quoteAssetInfo ? quoteAssetInfo.address : 'Not Available';
+    const walletAddress2 = baseAssetInfo ? baseAssetInfo.address : 'Not Available';
 
     const canTrade = totalKeys === 2;
     const estimate = this.getEstimatedReturns();
@@ -338,10 +338,10 @@ export default class PlaceOrder extends React.Component {
     let actionDescription;
     if (this.props.side === 'bid') {
       actionTitle = `BUY ${this.context.activeAssets[0].toUpperCase()}`;
-      actionDescription = `The BUY panel lets you convert your ${this.context.activeAssets[1].toUpperCase()} into ${this.context.activeAssets[0].toUpperCase()}.`
+      actionDescription = `The BUY panel lets you convert your ${this.context.activeAssets[1].toUpperCase()} into ${this.context.activeAssets[0].toUpperCase()}.`;
     } else {
       actionTitle = `SELL ${this.context.activeAssets[0].toUpperCase()}`;
-      actionDescription = `The SELL panel lets you convert your ${this.context.activeAssets[0].toUpperCase()} into ${this.context.activeAssets[1].toUpperCase()}.`
+      actionDescription = `The SELL panel lets you convert your ${this.context.activeAssets[0].toUpperCase()} into ${this.context.activeAssets[1].toUpperCase()}.`;
     }
 
     return (
