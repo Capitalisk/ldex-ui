@@ -889,6 +889,7 @@ class App extends React.Component {
               <PlaceOrder side="bid" orderSubmit={this.orderSubmit} orderSubmitError={this.orderSubmitError} showEstimateInfo={this.showEstimateInfo} assetBalance={this.state.quoteAssetBalance} />
             </div>
             <div className="order-book-container">
+              <div className="sell-orders-title">Asks</div>
               <div className="sell-orders">
                 <OrderBook side="asks" orderBookData={this.state.orderBookData} assets={this.state.activeAssets} />
               </div>
@@ -904,6 +905,7 @@ class App extends React.Component {
               <div className="buy-orders">
                 <OrderBook side="bids" orderBookData={this.state.orderBookData} assets={this.state.activeAssets} />
               </div>
+              <div className="buy-orders-title">Bids</div>
             </div>
             <div className="price-chart">
               <PriceHistoryChart

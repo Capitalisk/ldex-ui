@@ -29,14 +29,11 @@ export default class OrderBook extends React.Component {
       ));
       if (orders && orders.length > 0) {
         return (
-          <div style={{ height: '-webkit-fill-available', paddingTop: '10px' }}>
-            <div style={{ height: '8%', textAlign: 'center' }}>Asks</div>
-            <div className="askOrderList wrapAskOrderList">{orders}</div>
-          </div>
+          <div className="askOrderList">{orders}</div>
         );
       }
       return (
-        <div className="askOrderList">
+        <div className="askOrderList askOrderListEmpty">
           <div className="emptyAsk">No asks available</div>
         </div>
       );
@@ -57,14 +54,11 @@ export default class OrderBook extends React.Component {
       ));
       if (orders && orders.length > 0) {
         return (
-          <div style={{ height: '-webkit-fill-available', paddingBottom: '10px' }}>
-            <div className="bidOrderList wrapBidOrderList">{orders}</div>
-            <div style={{ height: '6%', textAlign: 'center', paddingTop: '2%' }}>Bids</div>
-          </div>
+          <div className="bidOrderList">{orders}</div>
         );
       }
       return (
-        <div className="bidOrderList">
+        <div className="bidOrderList bidOrderListEmpty">
           <div className="emptyBid">No bids available</div>
         </div>
       );
