@@ -29,10 +29,12 @@ export default class PlaceOrder extends React.Component {
     const { target } = event;
     const value = target.type === 'checkbox' ? target.checked : target.value;
     const { name } = target;
-
-    this.setState({
-      [name]: value,
-    });
+    const isNumber = value === '' || /^-?[\d.]+(?:e-?\d+)?$/.test(value);
+    if (isNumber) {
+      this.setState({
+        [name]: value,
+      });
+    }
   }
 
   openActionInfoModal = () => {
@@ -140,7 +142,7 @@ export default class PlaceOrder extends React.Component {
       errors.amount = 'The order amount must be a number.';
       success = false;
     } else if (this.state.amount > this.props.assetBalance) {
-      errors.amount = 'Insufficient balance !!';
+      errors.amount = 'Insufficient balance!';
       success = false;
     } else if (!this.state.marketMode) {
       if (Number.isNaN(this.state.price) || this.state.price === '') {
@@ -382,7 +384,7 @@ export default class PlaceOrder extends React.Component {
                 <br />
                 {this.state.errors.price && <div className="error-message">{this.state.errors.price}</div>}
                 <div className="price-container">
-                  <input name="price" className="order-val-input" type="number" title="Decimal number" value={this.state.price} onChange={this.handleChange} />
+                  <input name="price" className="order-val-input" type="text" title="Decimal number" value={this.state.price} onChange={this.handleChange} />
                   <div className="input-chain-symbol">{(this.context.activeAssets[1] || '').toUpperCase()}</div>
                 </div>
               </>
@@ -392,7 +394,7 @@ export default class PlaceOrder extends React.Component {
             <br />
             {this.state.errors.amount && <div className="error-message">{this.state.errors.amount}</div>}
             <div className="amount-container">
-              <input name="amount" className="order-val-input" type="number" title="Decimal number" value={this.state.amount} onChange={this.handleChange} />
+              <input name="amount" className="order-val-input" type="text" title="Decimal number" value={this.state.amount} onChange={this.handleChange} />
               <div className="input-chain-symbol">{(this.props.side === 'ask' ? this.context.activeAssets[0] : this.context.activeAssets[1] || '').toUpperCase()}</div>
             </div>
             {
