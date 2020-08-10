@@ -29,7 +29,7 @@ export default class PlaceOrder extends React.Component {
     const { target } = event;
     const value = target.type === 'checkbox' ? target.checked : target.value;
     const { name } = target;
-    const isNumber = value === '' || /^-?[\d.]+(?:e-?\d+)?$/.test(value);
+    const isNumber = value === '' || /^([\d]+\.?|[\d]*\.[\d]+)$/.test(value);
     if (isNumber) {
       this.setState({
         [name]: value,
