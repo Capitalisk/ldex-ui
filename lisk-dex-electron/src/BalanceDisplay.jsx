@@ -1,7 +1,7 @@
 import React from 'react';
 import userContext from './context';
-import { formatThousands } from './Utils';
 import './App.css';
+import { formatThousands } from './Utils';
 
 export default class BalanceDisplay extends React.Component {
   static contextType = userContext;
@@ -32,7 +32,7 @@ export default class BalanceDisplay extends React.Component {
           Balance:
           {' '}
           <span className="place-order-balance" style={{ fontWeight: 'bold' }}>
-            {this.props.balance == null ? 'Loading...' : `${formatThousands(Math.round((this.props.balance * 100) / this.props.whole) / 100)} ${this.props.asset.toUpperCase()}`}
+            {this.props.balance == null ? 'Loading...' : `${formatThousands(this.props.balance)} ${this.props.asset.toUpperCase()}`}
           </span>
         </div>
       </div>
