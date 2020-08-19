@@ -130,7 +130,6 @@ export default class PlaceOrder extends React.Component {
 
   validateOrder() {
     const baseFee = this.getBaseFee();
-    let success = true;
     const { marketOptions } = this.context.configuration.markets[this.context.activeMarket];
     const { priceDecimalPrecision } = marketOptions;
     const sourceAsset = this.props.side === 'bid' ? this.context.activeAssets[1] : this.context.activeAssets[0];
@@ -138,43 +137,50 @@ export default class PlaceOrder extends React.Component {
     const actualAssetBalance = this.getAssetBalance() - sourceAssetBaseFee;
     const { unitValue } = this.context.configuration.assets[sourceAsset];
     const minOrderAmount = marketOptions.chains[sourceAsset].minOrderAmount / unitValue;
-    const price = parseFloat(this.state.price);
-    const amount = parseFloat(this.state.amount);
-    const errors = {
-      price: null,
-      amount: null,
-    };
-    if (Number.isNaN(this.state.amount) || this.state.amount === '') {
-      errors.amount = 'The order amount must be a number.';
-      success = false;
-    } else if (amount > actualAssetBalance) {
-      errors.amount = 'Insufficient balance!';
-      success = false;
-    } else if (amount < minOrderAmount) {
-      errors.amount = `The specified amount was less than the minimum order amount allowed by this DEX market which is ${
-        minOrderAmount
-      } ${sourceAsset.toUpperCase()}.`;
-      success = false;
-    } else if (!this.state.marketMode) {
-      if (Number.isNaN(this.state.price) || this.state.price === '') {
-        errors.price = 'The order price must be a number.';
-        success = false;
-      } else if (price === 0) {
-        errors.price = 'The order price cannot be 0.';
-        success = false;
-      } else if (priceDecimalPrecision != null && (price.toString().split('.')[1] || '').length > priceDecimalPrecision) {
-        errors.price = `The order price for this DEX market cannot have more than ${priceDecimalPrecision} decimal place${priceDecimalPrecision === 1 ? '' : 's'}.`;
-        success = false;
+    const isLimitOrder = !this.state.marketMode;
+
+    function validateAmount(amount) {
+      const numericAmount = parseFloat(amount);
+      let amountError = null;
+      if (Number.isNaN(amount) || amount === '') {
+        amountError = 'The order amount must be a number.';
+      } else if (numericAmount > actualAssetBalance) {
+        amountError = 'Insufficient balance!';
+      } else if (numericAmount < minOrderAmount) {
+        amountError = `The specified amount was less than the minimum order amount allowed by this DEX market which is ${
+          minOrderAmount
+        } ${sourceAsset.toUpperCase()}.`;
       }
+      return amountError;
     }
 
+    function validatePrice(price) {
+      const numericPrice = parseFloat(price);
+      let priceError = null;
+      if (Number.isNaN(price) || price === '') {
+        priceError = 'The order price must be a number.';
+      } else if (numericPrice === 0) {
+        priceError = 'The order price cannot be 0.';
+      } else if (priceDecimalPrecision != null && (numericPrice.toString().split('.')[1] || '').length > priceDecimalPrecision) {
+        priceError = `The order price for this DEX market cannot have more than ${priceDecimalPrecision} decimal place${priceDecimalPrecision === 1 ? '' : 's'}.`;
+      }
+      return priceError;
+    }
 
-    if (!success) {
+    const amountError = validateAmount(this.state.amount);
+    const priceError = isLimitOrder && validatePrice(this.state.price);
+    const validated = !(amountError || priceError);
+
+    if (!validated) {
+      const errors = {
+        amount: amountError,
+        price: priceError,
+      };
       this.setState({
         errors,
       });
     }
-    return success;
+    return validated;
   }
 
   clearErrors() {
