@@ -150,6 +150,11 @@ export default class PlaceOrder extends React.Component {
     } else if (amount > actualAssetBalance) {
       errors.amount = 'Insufficient balance!';
       success = false;
+    } else if (amount < minOrderAmount) {
+      errors.amount = `The specified amount was less than the minimum order amount allowed by this DEX market which is ${
+        minOrderAmount
+      } ${sourceAsset.toUpperCase()}.`;
+      success = false;
     } else if (!this.state.marketMode) {
       if (Number.isNaN(this.state.price) || this.state.price === '') {
         errors.price = 'The order price must be a number.';
@@ -161,12 +166,8 @@ export default class PlaceOrder extends React.Component {
         errors.price = `The order price for this DEX market cannot have more than ${priceDecimalPrecision} decimal place${priceDecimalPrecision === 1 ? '' : 's'}.`;
         success = false;
       }
-    } else if (amount < minOrderAmount) {
-      errors.amount = `The specified amount was less than the minimum order amount allowed by this DEX market which is ${
-        minOrderAmount
-      } ${sourceAsset.toUpperCase()}.`;
-      success = false;
     }
+
 
     if (!success) {
       this.setState({
