@@ -9,6 +9,7 @@ import {
   getCleanOrderBook, estimateBestReturnsForSeller, estimatedBestReturnsForBuyer, EstimationStatus,
 } from './Utils';
 import InfoIcon from './InfoIcon';
+import marketInfoDescriptor from './Market';
 
 export default class PlaceOrder extends React.Component {
   static contextType = userContext;
@@ -29,10 +30,12 @@ export default class PlaceOrder extends React.Component {
     const { target } = event;
     const value = target.type === 'checkbox' ? target.checked : target.value;
     const { name } = target;
-
-    this.setState({
-      [name]: value,
-    });
+    const isNumber = value === '' || /^([\d]+\.?|[\d]*\.[\d]+)$/.test(value);
+    if (isNumber) {
+      this.setState({
+        [name]: value,
+      });
+    }
   }
 
   openActionInfoModal = () => {
@@ -126,50 +129,58 @@ export default class PlaceOrder extends React.Component {
   }
 
   validateOrder() {
-    let success = true;
+    const baseFee = this.getBaseFees();
     const { marketOptions } = this.context.configuration.markets[this.context.activeMarket];
     const { priceDecimalPrecision } = marketOptions;
     const sourceAsset = this.props.side === 'bid' ? this.context.activeAssets[1] : this.context.activeAssets[0];
+    const sourceAssetBaseFee = baseFee[sourceAsset];
+    const actualAssetBalance = this.getAssetBalance() - sourceAssetBaseFee;
     const { unitValue } = this.context.configuration.assets[sourceAsset];
     const minOrderAmount = marketOptions.chains[sourceAsset].minOrderAmount / unitValue;
-    const errors = {
-      price: null,
-      amount: null,
-    };
-    if (!this.state.marketMode) {
-      if (Number.isNaN(this.state.price) || this.state.price === '') {
-        errors.price = 'The order price must be a number.';
-        success = false;
-      } else {
-        const price = parseFloat(this.state.price);
-        if (price === 0) {
-          errors.price = 'The order price cannot be 0.';
-          success = false;
-        } else if (priceDecimalPrecision != null && (this.state.price.toString().split('.')[1] || '').length > priceDecimalPrecision) {
-          errors.price = `The order price for this DEX market cannot have more than ${priceDecimalPrecision} decimal place${priceDecimalPrecision === 1 ? '' : 's'}.`;
-          success = false;
-        }
-      }
-    }
-    if (Number.isNaN(this.state.amount) || this.state.amount === '') {
-      errors.amount = 'The order amount must be a number.';
-      success = false;
-    } else {
-      const amount = parseFloat(this.state.amount);
-      if (amount < minOrderAmount) {
-        errors.amount = `The specified amount was less than the minimum order amount allowed by this DEX market which is ${
+    const isLimitOrder = !this.state.marketMode;
+
+    function validateAmount(amount) {
+      const numericAmount = parseFloat(amount);
+      let amountError = null;
+      if (Number.isNaN(amount) || amount === '') {
+        amountError = 'The order amount must be a number.';
+      } else if (numericAmount > actualAssetBalance) {
+        amountError = 'Insufficient balance!';
+      } else if (numericAmount < minOrderAmount) {
+        amountError = `The specified amount was less than the minimum order amount allowed by this DEX market which is ${
           minOrderAmount
         } ${sourceAsset.toUpperCase()}.`;
-        success = false;
       }
+      return amountError;
     }
 
-    if (!success) {
+    function validatePrice(price) {
+      const numericPrice = parseFloat(price);
+      let priceError = null;
+      if (Number.isNaN(price) || price === '') {
+        priceError = 'The order price must be a number.';
+      } else if (numericPrice === 0) {
+        priceError = 'The order price cannot be 0.';
+      } else if (priceDecimalPrecision != null && (numericPrice.toString().split('.')[1] || '').length > priceDecimalPrecision) {
+        priceError = `The order price for this DEX market cannot have more than ${priceDecimalPrecision} decimal place${priceDecimalPrecision === 1 ? '' : 's'}.`;
+      }
+      return priceError;
+    }
+
+    const amountError = validateAmount(this.state.amount);
+    const priceError = isLimitOrder && validatePrice(this.state.price);
+    const validated = !(amountError || priceError);
+
+    if (!validated) {
+      const errors = {
+        amount: amountError,
+        price: priceError,
+      };
       this.setState({
         errors,
       });
     }
-    return success;
+    return validated;
   }
 
   clearErrors() {
@@ -318,6 +329,23 @@ export default class PlaceOrder extends React.Component {
     }
   }
 
+  getAssetBalance() {
+    const whole = 10 ** 8;
+    return Math.round((this.props.assetBalance * 100) / whole) / 100;
+  }
+
+  getBaseFees() {
+    const dexConfig = this.props.configuration.markets[this.props.activeMarket].marketOptions;
+    const chains = Object.keys(dexConfig.chains);
+    const firstChain = dexConfig.chains[chains[0]];
+    const secondChain = dexConfig.chains[chains[1]];
+    const baseFeeKey = 'exchangeFeeBase';
+    const keyDescriptor = marketInfoDescriptor[baseFeeKey];
+    const firstChainBaseFee = firstChain[baseFeeKey] / keyDescriptor.div;
+    const secondChainBaseFee = secondChain[baseFeeKey] / keyDescriptor.div;
+    return { [chains[0]]: firstChainBaseFee, [chains[1]]: secondChainBaseFee };
+  }
+
   render() {
     let totalKeys = 0;
     const quoteAssetInfo = this.context.keys[this.context.activeAssets[0]];
@@ -366,9 +394,9 @@ export default class PlaceOrder extends React.Component {
           <button type="button" className="tab-button" disabled={!this.state.marketMode} onClick={this.switchMode}>Limit</button>
         </div>
         {this.props.side === 'bid' && this.context.keys[this.context.activeAssets[1]]
-          && <BalanceDisplay whole={10 ** 8} asset={this.context.activeAssets[1]} balance={this.props.assetBalance} walletAddress={walletAddress2} />}
+          && <BalanceDisplay asset={this.context.activeAssets[1]} balance={this.getAssetBalance()} walletAddress={walletAddress2} />}
         {this.props.side === 'ask' && this.context.keys[this.context.activeAssets[0]]
-          && <BalanceDisplay whole={10 ** 8} asset={this.context.activeAssets[0]} balance={this.props.assetBalance} walletAddress={walletAddress1} />}
+          && <BalanceDisplay asset={this.context.activeAssets[0]} balance={this.getAssetBalance()} walletAddress={walletAddress1} />}
         {canTrade
           && (
           <form onSubmit={this.handleSubmit}>
