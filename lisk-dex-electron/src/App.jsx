@@ -453,8 +453,11 @@ class App extends React.Component {
     const apiResults = [
       getOrderBook(dexClient, orderBookDepth == null ? DEFAULT_ORDER_BOOK_DEPTH : orderBookDepth),
     ];
+    let quoteWalletAddress;
+    let baseWalletAddress;
+
     if (this.state.keys[quoteAsset]) {
-      const quoteWalletAddress = this.state.keys[quoteAsset].address;
+      quoteWalletAddress = this.state.keys[quoteAsset].address;
       apiResults.push(getAsksFromWallet(dexClient, quoteWalletAddress));
       apiResults.push(getPendingTransfers(dexClient, quoteAsset, quoteWalletAddress));
     } else {
@@ -462,7 +465,7 @@ class App extends React.Component {
       apiResults.push(Promise.resolve([]));
     }
     if (this.state.keys[baseAsset]) {
-      const baseWalletAddress = this.state.keys[baseAsset].address;
+      baseWalletAddress = this.state.keys[baseAsset].address;
       apiResults.push(getBidsFromWallet(dexClient, baseWalletAddress));
       apiResults.push(getPendingTransfers(dexClient, baseAsset, baseWalletAddress));
     } else {
@@ -497,7 +500,9 @@ class App extends React.Component {
       pendingTransferOrderIds.add(originOrderId);
     }
 
-    const pendingOrdersForActiveMarket = Object.values(this.pendingOrders[activeMarket]);
+    const pendingOrdersForActiveMarket = Object.values(this.pendingOrders[activeMarket]).filter((pendingOrder) => {
+      return pendingOrder.senderId === quoteWalletAddress || pendingOrder.senderId === baseWalletAddress;
+    });
     for (const pendingOrder of pendingOrdersForActiveMarket) {
       if (pendingTransferOrderIds.has(pendingOrder.id)) {
         pendingOrder.status = 'processing';
