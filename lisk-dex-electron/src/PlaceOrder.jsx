@@ -129,7 +129,7 @@ export default class PlaceOrder extends React.Component {
   }
 
   validateOrder() {
-    const baseFee = this.getBaseFee();
+    const baseFee = this.getBaseFees();
     const { marketOptions } = this.context.configuration.markets[this.context.activeMarket];
     const { priceDecimalPrecision } = marketOptions;
     const sourceAsset = this.props.side === 'bid' ? this.context.activeAssets[1] : this.context.activeAssets[0];
@@ -334,7 +334,7 @@ export default class PlaceOrder extends React.Component {
     return Math.round((this.props.assetBalance * 100) / whole) / 100;
   }
 
-  getBaseFee() {
+  getBaseFees() {
     const dexConfig = this.props.configuration.markets[this.props.activeMarket].marketOptions;
     const chains = Object.keys(dexConfig.chains);
     const firstChain = dexConfig.chains[chains[0]];
