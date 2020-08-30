@@ -6,7 +6,10 @@ import BalanceDisplay from './BalanceDisplay';
 import userContext from './context';
 import Modal from './Modal';
 import {
-  getCleanOrderBook, estimateBestReturnsForSeller, estimatedBestReturnsForBuyer, EstimationStatus,
+  getCleanOrderBook,
+  estimateBestReturnsForSeller,
+  estimatedBestReturnsForBuyer,
+  EstimationStatus, getNumericAssetBalance,
 } from './Utils';
 import InfoIcon from './InfoIcon';
 import marketInfoDescriptor from './Market';
@@ -67,7 +70,7 @@ export default class PlaceOrder extends React.Component {
   }
 
   getEstimatedReturns() {
-    const orderBook = getCleanOrderBook(this.context.orderBookData);
+    const orderBook = getCleanOrderBook(this.context.orderBookData, this.getSourceAsset());
     const amount = parseFloat(this.state.amount) || 0;
 
     const { asks } = orderBook;
@@ -91,15 +94,12 @@ export default class PlaceOrder extends React.Component {
 
   getEstimatedReturnsBreakDown(estimate) {
     let verboseEstimation = `${estimate.estimatedReturns.toFixed(4)} ${estimate.assetExchanged}`;
-    const statuses = [];
-    if (estimate.status === EstimationStatus.PARTIAL_MATCH || estimate.amountYetToBeSold > 0) {
+    if (estimate.status === EstimationStatus.NO_MATCH || EstimationStatus.PARTIAL_MATCH) {
       verboseEstimation += ` + ${estimate.amountYetToBeSold.toFixed(4)} ${estimate.assetExchangedAgainst}`;
       if (this.getOrderType() === 'market') {
         verboseEstimation += ' (refund)';
-        statuses.push('refund');
       } else {
         verboseEstimation += ' (pending)';
-        statuses.push('pending');
       }
     }
     return (
@@ -128,13 +128,15 @@ export default class PlaceOrder extends React.Component {
     this.setState((prevState) => ({ marketMode: !prevState.marketMode }));
   }
 
+  getSourceAsset = () => (this.props.side === 'bid' ? this.context.activeAssets[1] : this.context.activeAssets[0]);
+
   validateOrder() {
     const baseFee = this.getBaseFees();
     const { marketOptions } = this.context.configuration.markets[this.context.activeMarket];
     const { priceDecimalPrecision } = marketOptions;
-    const sourceAsset = this.props.side === 'bid' ? this.context.activeAssets[1] : this.context.activeAssets[0];
+    const sourceAsset = this.getSourceAsset();
     const sourceAssetBaseFee = baseFee[sourceAsset];
-    const actualAssetBalance = this.getAssetBalance() - sourceAssetBaseFee;
+    const actualAssetBalance = getNumericAssetBalance(this.props.assetBalance, sourceAsset) - sourceAssetBaseFee;
     const { unitValue } = this.context.configuration.assets[sourceAsset];
     const minOrderAmount = marketOptions.chains[sourceAsset].minOrderAmount / unitValue;
     const isLimitOrder = !this.state.marketMode;
@@ -329,11 +331,6 @@ export default class PlaceOrder extends React.Component {
     }
   }
 
-  getAssetBalance() {
-    const whole = 10 ** 8;
-    return Math.round((this.props.assetBalance * 100) / whole) / 100;
-  }
-
   getBaseFees() {
     const dexConfig = this.props.configuration.markets[this.props.activeMarket].marketOptions;
     const chains = Object.keys(dexConfig.chains);
@@ -394,9 +391,9 @@ export default class PlaceOrder extends React.Component {
           <button type="button" className="tab-button" disabled={!this.state.marketMode} onClick={this.switchMode}>Limit</button>
         </div>
         {this.props.side === 'bid' && this.context.keys[this.context.activeAssets[1]]
-          && <BalanceDisplay asset={this.context.activeAssets[1]} balance={this.getAssetBalance()} walletAddress={walletAddress2} />}
+          && <BalanceDisplay asset={this.context.activeAssets[1]} balance={this.props.assetBalance} walletAddress={walletAddress2} />}
         {this.props.side === 'ask' && this.context.keys[this.context.activeAssets[0]]
-          && <BalanceDisplay asset={this.context.activeAssets[0]} balance={this.getAssetBalance()} walletAddress={walletAddress1} />}
+          && <BalanceDisplay asset={this.context.activeAssets[0]} balance={this.props.assetBalance} walletAddress={walletAddress1} />}
         {canTrade
           && (
           <form onSubmit={this.handleSubmit}>

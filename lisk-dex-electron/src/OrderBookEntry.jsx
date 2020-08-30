@@ -1,6 +1,6 @@
 import React from 'react';
 import './OrderBookEntry.css';
-import { formatThousands } from './Utils';
+import {formatThousands, getLiteralAssetBalance} from './Utils';
 
 export default class OrderBookEntry extends React.Component {
   constructor(props) {
@@ -20,9 +20,9 @@ export default class OrderBookEntry extends React.Component {
   }
 
   render() {
+    const orderAssetBalance = getLiteralAssetBalance(this.props.size, this.props.symbol);
     const formattedPrice = this.props.price;
-    const size = (this.props.size / this.props.whole).toFixed(this.props.sizeDecimals);
-    const formattedSize = formatThousands(size);
+    const formattedAssetBalance = formatThousands(orderAssetBalance);
 
     return (
       <div style={{ background: this.bgCSS(), marginTop: '1px', marginBottom: '1px' }} className="orderLine">
@@ -30,7 +30,7 @@ export default class OrderBookEntry extends React.Component {
         {' '}
         &nbsp;|&nbsp;
         {' '}
-        {formattedSize}
+        {formattedAssetBalance}
         {' '}
         {(this.props.symbol || '').toUpperCase()}
       </div>

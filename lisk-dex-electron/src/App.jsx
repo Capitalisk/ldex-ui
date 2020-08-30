@@ -26,6 +26,7 @@ import Notification from './Notification';
 import userContext from './context';
 import LeaveWarning from './LeaveWarning';
 import processConfiguration from './config/Configuration';
+import { CryptoAsset, getNumericAssetBalance } from './Utils';
 
 const NOTIFICATIONS_MAX_QUEUE_LENGTH = 3;
 const DEFAULT_API_MAX_PAGE_SIZE = 100;
@@ -76,6 +77,7 @@ class App extends React.Component {
   async loadConfiguration() {
     const localClient = getClient('');
     const defaultConfiguration = await getConfig(localClient);
+    CryptoAsset.setConfig(defaultConfiguration.assets);
     const configuration = await processConfiguration(defaultConfiguration);
     const marketSymbols = Object.keys(configuration.markets);
     this.initPendingOrders(marketSymbols);
@@ -259,7 +261,6 @@ class App extends React.Component {
   }
 
   orderCancel = async (order) => {
-    const { unitValue } = this.state.configuration.assets[order.sourceChain];
     const chainSymbol = order.sourceChain.toUpperCase();
 
     order.status = 'canceling';
@@ -269,13 +270,13 @@ class App extends React.Component {
     let message;
     if (order.type === 'limit') {
       message = `A cancel order was submitted for the limit order with amount ${
-        Math.round(((order.value || order.size) * 100) / unitValue) / 100
+        getNumericAssetBalance(order.value || order.size, order.sourceChain)
       } ${chainSymbol} at price ${
         order.price
       }`;
     } else {
       message = `A cancel order was submitted for the market order with amount ${
-        Math.round(((order.value || order.size) * 100) / unitValue) / 100
+        getNumericAssetBalance(order.value || order.size, order.sourceChain)
       } ${chainSymbol}`;
     }
     this.notify(message);
@@ -309,18 +310,17 @@ class App extends React.Component {
     const { order } = error;
     const errorDetails = this._prepareErrorMessage(error);
 
-    const { unitValue } = this.state.configuration.assets[order.sourceChain];
     const chainSymbol = order.sourceChain.toUpperCase();
     let message;
     if (order.type === 'limit') {
       message = `Failed to submit the limit order with amount ${
-        Math.round(((order.value || order.size) * 100) / unitValue) / 100
+        getNumericAssetBalance(order.value || order.size, order.sourceChain)
       } ${chainSymbol} at price ${
         order.price
       } - ${errorDetails}.`;
     } else {
       message = `Failed to submit the market order with amount ${
-        Math.round(((order.value || order.size) * 100) / unitValue) / 100
+        getNumericAssetBalance(order.value || order.size, order.sourceChain)
       } ${chainSymbol} - ${errorDetails}.`;
     }
     this.notify(message, true);
@@ -361,13 +361,12 @@ class App extends React.Component {
     });
 
     const orderDexAddress = this.state.configuration.markets[this.state.activeMarket].marketOptions.chains[order.sourceChain].walletAddress;
-    const { unitValue } = this.state.configuration.assets[order.sourceChain];
     const chainSymbol = order.sourceChain.toUpperCase();
 
     let message;
     if (order.type === 'limit') {
       message = `A limit order with amount ${
-        Math.round(((order.value || order.size) * 100) / unitValue) / 100
+        getNumericAssetBalance(order.value || order.size, order.sourceChain)
       } ${chainSymbol} at price ${
         order.price
       } was submitted to the DEX address ${
@@ -375,7 +374,7 @@ class App extends React.Component {
       } on the ${chainSymbol} blockchain`;
     } else {
       message = `A market order with amount ${
-        Math.round(((order.value || order.size) * 100) / unitValue) / 100
+        getNumericAssetBalance(order.value || order.size, order.sourceChain)
       } ${chainSymbol} was submitted to the DEX address ${
         orderDexAddress
       } on the ${chainSymbol} blockchain`;
@@ -500,9 +499,7 @@ class App extends React.Component {
       pendingTransferOrderIds.add(originOrderId);
     }
 
-    const pendingOrdersForActiveMarket = Object.values(this.pendingOrders[activeMarket]).filter((pendingOrder) => {
-      return pendingOrder.senderId === quoteWalletAddress || pendingOrder.senderId === baseWalletAddress;
-    });
+    const pendingOrdersForActiveMarket = Object.values(this.pendingOrders[activeMarket]).filter((pendingOrder) => pendingOrder.senderId === quoteWalletAddress || pendingOrder.senderId === baseWalletAddress);
     for (const pendingOrder of pendingOrdersForActiveMarket) {
       if (pendingTransferOrderIds.has(pendingOrder.id)) {
         pendingOrder.status = 'processing';

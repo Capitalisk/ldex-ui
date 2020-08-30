@@ -4,6 +4,7 @@ import InfoIcon from './InfoIcon';
 import Modal from './Modal';
 import marketInfoDescriptor from './Market';
 import './Table.css';
+import {CryptoAsset} from "./Utils";
 
 export default class MarketList extends React.PureComponent {
   constructor(props) {
@@ -93,9 +94,9 @@ export default class MarketList extends React.PureComponent {
                   secondChainValue *= keyDescriptor.mult;
                   secondChainValue += '%';
                 }
-                if ('div' in keyDescriptor) {
-                  firstChainValue /= keyDescriptor.div;
-                  secondChainValue /= keyDescriptor.div;
+                if ('isUnitValue' in keyDescriptor) {
+                  firstChainValue /= CryptoAsset.getUnitValue(chains[0]);
+                  secondChainValue /= CryptoAsset.getUnitValue(chains[1]);
                 }
                 return (
                   <tr key={chainInfoKey}>

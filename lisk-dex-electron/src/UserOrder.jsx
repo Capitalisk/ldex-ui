@@ -3,6 +3,7 @@ import './UserOrder.css';
 import * as transactions from '@liskhq/lisk-transactions';
 import axios from 'axios';
 import userContext from './context';
+import { getLiteralAssetBalance } from './Utils';
 
 export default class UserOrder extends React.Component {
   static contextType = userContext;
@@ -43,7 +44,9 @@ export default class UserOrder extends React.Component {
   render() {
     const amountRemaining = this.props.order.side === 'ask' ? this.props.order.sizeRemaining : this.props.order.valueRemaining;
     const amount = this.props.order.side === 'ask' ? this.props.order.size : this.props.order.value;
-
+    const asset = this.props.order.sourceChain;
+    const amountRemainingVerbose = getLiteralAssetBalance(amountRemaining, asset);
+    const amountVerbose = getLiteralAssetBalance(amount, asset);
     const orderStatusClass = `order-${this.props.order.status || 'default'}`;
 
     return (
@@ -53,9 +56,9 @@ export default class UserOrder extends React.Component {
           width: '100%', fontSize: '14px', backgroundColor: this.props.side === 'bid' ? '#286113' : '#700d0d', borderBottom: '1px solid black', padding: '2px', boxSizing: 'border-box',
         }}
       >
-        {(amountRemaining / (10 ** 8)).toFixed(4)}
+        {amountRemainingVerbose}
         /
-        {(amount / (10 ** 8)).toFixed(4)}
+        {amountVerbose}
         {(this.props.order.status === 'ready' || this.props.order.status === 'matching') && <button type="button" className="cancel-order-button" onClick={this.cancelOrder}>Cancel</button>}
         {this.props.order.status !== 'ready' && <div className="lds-dual-ring" style={{ float: 'right', marginRight: '10px' }} />}
         <br />

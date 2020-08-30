@@ -1,3 +1,35 @@
+// Eventually store all config in singleton class and make it accessible everywhere
+const CryptoAsset = (() => {
+  let assetConfig = { };
+
+  return {
+    getConfig(assetName) {
+      return assetConfig[assetName];
+    },
+    setConfig(assets) {
+      assetConfig = assets;
+    },
+    getUnitValue(assetName) {
+      return assetConfig[assetName] && assetConfig[assetName].unitValue;
+    },
+  };
+})();
+
+// returns number
+const getNumericAssetBalance = (assetAmount, assetName, decimal = 2) => {
+  // eslint-disable-next-line no-restricted-properties
+  const uptoDecimalPlaces = Math.pow(10, decimal);
+  const unitValue = CryptoAsset.getUnitValue(assetName);
+  return Math.round((assetAmount * uptoDecimalPlaces) / unitValue) / uptoDecimalPlaces;
+};
+
+// returns string
+const getLiteralAssetBalance = (assetAmount, assetName, decimals = 4) => {
+  const unitValue = CryptoAsset.getUnitValue(assetName);
+  return parseFloat((assetAmount / unitValue).toFixed(decimals));
+};
+
+
 const formatThousands = (num, separator) => {
   const sign = num < 0 ? '-' : '';
   num = Math.abs(num);
@@ -103,28 +135,24 @@ const estimatedBestReturnsForBuyer = (amount, price, asks, isMarketOrder) => {
   return { amountYetToBeSold, estimatedReturns, status };
 };
 
-const getCleanOrderBook = (contextOrderBook) => {
-  const calculateAmount = (size, whole) => parseFloat((size / whole).toFixed(4));
+const getCleanOrderBook = (contextOrderBook, assetName) => {
   const asks = [];
   const bids = [];
   for (const ask of contextOrderBook.asks) {
     const size = ask.sizeRemaining;
-    const whole = 10 ** 8;
-    const amount = calculateAmount(size, whole);
+    const amount = getLiteralAssetBalance(size, assetName);
     const { price } = ask;
     asks.push({ amount, price });
   }
   for (const bid of contextOrderBook.bids) {
     const size = bid.valueRemaining;
-    const whole = 10 ** 8;
-    const amount = calculateAmount(size, whole);
+    const amount = getLiteralAssetBalance(size, assetName);
     const { price } = bid;
     bids.push({ amount, price });
   }
   return { asks, bids };
 };
 
-
 export {
-  formatThousands, Keys, Values, estimateBestReturnsForSeller, estimatedBestReturnsForBuyer, EstimationStatus, getCleanOrderBook,
+  formatThousands, Keys, Values, estimateBestReturnsForSeller, estimatedBestReturnsForBuyer, EstimationStatus, getCleanOrderBook, CryptoAsset, getNumericAssetBalance, getLiteralAssetBalance,
 };

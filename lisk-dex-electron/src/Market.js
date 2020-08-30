@@ -18,17 +18,17 @@ const marketInfoDescriptor = {
   minOrderAmount: {
     name: 'Min order amount',
     desc: 'It is the minimum order size allowed on each blockchain',
-    div: 100000000,
+    isUnitValue: true,
   },
   minPartialTake: {
     name: 'Min partial take',
     desc: 'It is the minimum amount that can be taken from a counter offer',
-    div: 100000000,
+    isUnitValue: true,
   },
   exchangeFeeBase: {
     name: 'Exchange fee base',
     desc: 'It is the base transaction fee (flat fee; e.g. 0.1 LSK/LSH)',
-    div: 100000000,
+    isUnitValue: true,
   },
   exchangeFeeRate: {
     name: 'Exchange fee rate',
