@@ -135,18 +135,18 @@ const estimatedBestReturnsForBuyer = (amount, price, asks, isMarketOrder) => {
   return { amountYetToBeSold, estimatedReturns, status };
 };
 
-const getCleanOrderBook = (contextOrderBook, assetName) => {
+const getCleanOrderBook = (contextOrderBook, sourceAsset, targetAsset) => {
   const asks = [];
   const bids = [];
   for (const ask of contextOrderBook.asks) {
     const size = ask.sizeRemaining;
-    const amount = getLiteralAssetBalance(size, assetName);
+    const amount = getLiteralAssetBalance(size, sourceAsset);
     const { price } = ask;
     asks.push({ amount, price });
   }
   for (const bid of contextOrderBook.bids) {
     const size = bid.valueRemaining;
-    const amount = getLiteralAssetBalance(size, assetName);
+    const amount = getLiteralAssetBalance(size, targetAsset);
     const { price } = bid;
     bids.push({ amount, price });
   }

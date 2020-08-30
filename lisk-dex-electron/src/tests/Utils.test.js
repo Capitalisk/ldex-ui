@@ -1,5 +1,10 @@
 import {
-  formatThousands, EstimationStatus, estimateBestReturnsForSeller, estimatedBestReturnsForBuyer, getCleanOrderBook,
+  formatThousands,
+  EstimationStatus,
+  estimateBestReturnsForSeller,
+  estimatedBestReturnsForBuyer,
+  getCleanOrderBook,
+  CryptoAsset,
 } from '../Utils';
 
 import { asks, bids } from './fixtures/orderbook/orderbook';
@@ -77,7 +82,15 @@ describe('Utils tests => ', () => {
         { price: 0.4000, amount: 62.6993 },
       ],
     };
-    const actualProcessedOrderBook = getCleanOrderBook(context.orderBookData);
+    CryptoAsset.setConfig({
+      lsk: {
+        unitValue: 100000000,
+      },
+      lsh: {
+        unitValue: 100000000,
+      },
+    });
+    const actualProcessedOrderBook = getCleanOrderBook(context.orderBookData, 'lsk', 'lsh');
     expect(actualProcessedOrderBook).toStrictEqual(expectedOrderBook);
   });
 });
