@@ -499,7 +499,9 @@ class App extends React.Component {
       pendingTransferOrderIds.add(originOrderId);
     }
 
-    const pendingOrdersForActiveMarket = Object.values(this.pendingOrders[activeMarket]).filter((pendingOrder) => pendingOrder.senderId === quoteWalletAddress || pendingOrder.senderId === baseWalletAddress);
+    const pendingOrdersForActiveMarket = Object.values(this.pendingOrders[activeMarket]).filter(
+      (pendingOrder) => pendingOrder.senderId === quoteWalletAddress || pendingOrder.senderId === baseWalletAddress,
+    );
     for (const pendingOrder of pendingOrdersForActiveMarket) {
       if (pendingTransferOrderIds.has(pendingOrder.id)) {
         pendingOrder.status = 'processing';
