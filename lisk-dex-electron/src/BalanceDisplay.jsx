@@ -21,7 +21,7 @@ export default class BalanceDisplay extends React.Component {
     return (
       <div>
         <div style={{ color: '#FFFFFF', marginBottom: '10px' }}>
-          Wallet address:
+          {`${this.props.asset.toUpperCase()} Wallet address:`}
           {' '}
           <span className="place-order-wallet-address" style={{ fontWeight: 'bold' }}>
             {' '}
