@@ -95,8 +95,8 @@ export default class MarketList extends React.PureComponent {
                   secondChainValue += '%';
                 }
                 if ('isUnitValue' in keyDescriptor) {
-                  firstChainValue /= CryptoAsset.getUnitValue(chains[0]);
-                  secondChainValue /= CryptoAsset.getUnitValue(chains[1]);
+                  firstChainValue /= CryptoAsset.getAssetUnitValue(chains[0]);
+                  secondChainValue /= CryptoAsset.getAssetUnitValue(chains[1]);
                 }
                 return (
                   <tr key={chainInfoKey}>

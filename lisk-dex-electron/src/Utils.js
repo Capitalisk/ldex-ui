@@ -9,7 +9,7 @@ const CryptoAsset = (() => {
     setConfig(assets) {
       assetConfig = assets;
     },
-    getUnitValue(assetName) {
+    getAssetUnitValue(assetName) {
       return assetConfig[assetName] && assetConfig[assetName].unitValue;
     },
   };
@@ -19,13 +19,13 @@ const CryptoAsset = (() => {
 const getNumericAssetBalance = (assetAmount, assetName, decimal = 2) => {
   // eslint-disable-next-line no-restricted-properties
   const uptoDecimalPlaces = Math.pow(10, decimal);
-  const unitValue = CryptoAsset.getUnitValue(assetName);
+  const unitValue = CryptoAsset.getAssetUnitValue(assetName);
   return Math.round((assetAmount * uptoDecimalPlaces) / unitValue) / uptoDecimalPlaces;
 };
 
 // returns string
 const getLiteralAssetBalance = (assetAmount, assetName, decimals = 4) => {
-  const unitValue = CryptoAsset.getUnitValue(assetName);
+  const unitValue = CryptoAsset.getAssetUnitValue(assetName);
   return parseFloat((assetAmount / unitValue).toFixed(decimals));
 };
 
