@@ -1,5 +1,5 @@
 // Eventually store all config in singleton class and make it accessible everywhere
-const CryptoAsset = (() => {
+const GlobalConfiguration = (() => {
   let assetConfig = { };
 
   return {
@@ -19,13 +19,13 @@ const CryptoAsset = (() => {
 const getNumericAssetBalance = (assetAmount, assetName, decimal = 2) => {
   // eslint-disable-next-line no-restricted-properties
   const uptoDecimalPlaces = Math.pow(10, decimal);
-  const unitValue = CryptoAsset.getAssetUnitValue(assetName);
+  const unitValue = GlobalConfiguration.getAssetUnitValue(assetName);
   return Math.round((assetAmount * uptoDecimalPlaces) / unitValue) / uptoDecimalPlaces;
 };
 
 // returns string
 const getLiteralAssetBalance = (assetAmount, assetName, decimals = 4) => {
-  const unitValue = CryptoAsset.getAssetUnitValue(assetName);
+  const unitValue = GlobalConfiguration.getAssetUnitValue(assetName);
   return parseFloat((assetAmount / unitValue).toFixed(decimals));
 };
 
@@ -154,5 +154,5 @@ const getCleanOrderBook = (contextOrderBook, sourceAsset, targetAsset) => {
 };
 
 export {
-  formatThousands, Keys, Values, estimateBestReturnsForSeller, estimatedBestReturnsForBuyer, EstimationStatus, getCleanOrderBook, CryptoAsset, getNumericAssetBalance, getLiteralAssetBalance,
+  formatThousands, Keys, Values, estimateBestReturnsForSeller, estimatedBestReturnsForBuyer, EstimationStatus, getCleanOrderBook, GlobalConfiguration, getNumericAssetBalance, getLiteralAssetBalance,
 };

@@ -26,7 +26,7 @@ import Notification from './Notification';
 import userContext from './context';
 import LeaveWarning from './LeaveWarning';
 import processConfiguration from './config/Configuration';
-import { CryptoAsset, getNumericAssetBalance } from './Utils';
+import { GlobalConfiguration, getNumericAssetBalance } from './Utils';
 
 const NOTIFICATIONS_MAX_QUEUE_LENGTH = 3;
 const DEFAULT_API_MAX_PAGE_SIZE = 100;
@@ -77,7 +77,7 @@ class App extends React.Component {
   async loadConfiguration() {
     const localClient = getClient('');
     const defaultConfiguration = await getConfig(localClient);
-    CryptoAsset.setConfig(defaultConfiguration.assets);
+    GlobalConfiguration.setConfig(defaultConfiguration.assets);
     const configuration = await processConfiguration(defaultConfiguration);
     const marketSymbols = Object.keys(configuration.markets);
     this.initPendingOrders(marketSymbols);

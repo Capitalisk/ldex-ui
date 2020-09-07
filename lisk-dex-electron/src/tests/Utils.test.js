@@ -4,7 +4,7 @@ import {
   estimateBestReturnsForSeller,
   estimatedBestReturnsForBuyer,
   getCleanOrderBook,
-  CryptoAsset,
+  GlobalConfiguration,
 } from '../Utils';
 
 import { asks, bids } from './fixtures/orderbook/orderbook';
@@ -82,7 +82,7 @@ describe('Utils tests => ', () => {
         { price: 0.4000, amount: 62.6993 },
       ],
     };
-    CryptoAsset.setConfig({
+    GlobalConfiguration.setConfig({
       lsk: {
         unitValue: 100000000,
       },

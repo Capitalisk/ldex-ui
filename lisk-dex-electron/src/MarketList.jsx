@@ -4,7 +4,7 @@ import InfoIcon from './InfoIcon';
 import Modal from './Modal';
 import marketInfoDescriptor from './Market';
 import './Table.css';
-import {CryptoAsset} from "./Utils";
+import { GlobalConfiguration } from './Utils';
 
 export default class MarketList extends React.PureComponent {
   constructor(props) {
@@ -95,8 +95,8 @@ export default class MarketList extends React.PureComponent {
                   secondChainValue += '%';
                 }
                 if ('isUnitValue' in keyDescriptor) {
-                  firstChainValue /= CryptoAsset.getAssetUnitValue(chains[0]);
-                  secondChainValue /= CryptoAsset.getAssetUnitValue(chains[1]);
+                  firstChainValue /= GlobalConfiguration.getAssetUnitValue(chains[0]);
+                  secondChainValue /= GlobalConfiguration.getAssetUnitValue(chains[1]);
                 }
                 return (
                   <tr key={chainInfoKey}>
