@@ -61,8 +61,14 @@ const GlobalConfiguration = (() => {
     getMarketPriceHistoryAPI(market) {
       return this.getMarket(market)?.priceHistoryAPI;
     },
+    getMarketOptions(market) {
+      return this.getMarket(market)?.marketOptions;
+    },
     getMarketChain(market, assetName) {
-      return this.getMarket(market)?.marketOptions?.chains[assetName];
+      return this.getMarketOptions(market)?.chains[assetName];
+    },
+    getMarketChainMinOrderAmount(market, assetName) {
+      return this.getMarketChain(market, assetName)?.minOrderAmount;
     },
     getMarketChainWalletAddress(market, assetName) {
       return this.getMarketChain(market, assetName)?.walletAddress;

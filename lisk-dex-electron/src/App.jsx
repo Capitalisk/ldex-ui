@@ -872,10 +872,10 @@ class App extends React.Component {
               {this.state.notifications.map((data) => <Notification key={data.id} data={data} />)}
             </div>
             <div className="sell-panel">
-              <PlaceOrder side="ask" configuration={this.state.configuration} activeMarket={this.state.activeMarket} orderSubmit={this.orderSubmit} orderSubmitError={this.orderSubmitError} showEstimateInfo={this.showEstimateInfo} assetBalance={this.state.baseAssetBalance} />
+              <PlaceOrder side="ask" activeMarket={this.state.activeMarket} orderSubmit={this.orderSubmit} orderSubmitError={this.orderSubmitError} showEstimateInfo={this.showEstimateInfo} assetBalance={this.state.baseAssetBalance} />
             </div>
             <div className="buy-panel">
-              <PlaceOrder side="bid" configuration={this.state.configuration} activeMarket={this.state.activeMarket} orderSubmit={this.orderSubmit} orderSubmitError={this.orderSubmitError} showEstimateInfo={this.showEstimateInfo} assetBalance={this.state.quoteAssetBalance} />
+              <PlaceOrder side="bid" activeMarket={this.state.activeMarket} orderSubmit={this.orderSubmit} orderSubmitError={this.orderSubmitError} showEstimateInfo={this.showEstimateInfo} assetBalance={this.state.quoteAssetBalance} />
             </div>
             <div className="order-book-container">
               <div className="sell-orders-title">Asks</div>
