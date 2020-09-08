@@ -330,10 +330,9 @@ export default class PlaceOrder extends React.Component {
   }
 
   getBaseFees() {
-    const dexConfig = GC.getMarketOptions(this.props.activeMarket);
-    const chains = Object.keys(dexConfig.chains);
-    const firstChain = dexConfig.chains[chains[0]];
-    const secondChain = dexConfig.chains[chains[1]];
+    const chains = GC.getMarketChains(this.props.activeMarket);
+    const firstChain = GC.getMarketChain(chains[0]);
+    const secondChain = GC.getMarketChain(chains[1]);
     const baseFeeKey = 'exchangeFeeBase';
     const keyDescriptor = marketInfoDescriptor[baseFeeKey];
     const firstChainBaseFee = firstChain[baseFeeKey] / keyDescriptor.div;
