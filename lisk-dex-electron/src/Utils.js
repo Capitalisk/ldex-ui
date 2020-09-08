@@ -1,16 +1,74 @@
 // Eventually store all config in singleton class and make it accessible everywhere
+
 const GlobalConfiguration = (() => {
-  let assetConfig = { };
+  let globalConfig = { };
 
   return {
-    getConfig(assetName) {
-      return assetConfig[assetName];
+    getConfig() {
+      return globalConfig;
     },
-    setConfig(assets) {
-      assetConfig = assets;
+    setConfig(config) {
+      globalConfig = config;
+    },
+    getAppTitle() {
+      return globalConfig.appTitle;
+    },
+    getNotificationDuration() {
+      return globalConfig.notificationDuration;
+    },
+    getRefreshInterval() {
+      return globalConfig.refreshInterval;
+    },
+    getFeedbackLink() {
+      return globalConfig.feedbackLink?.url;
+    },
+    getFeedbackText() {
+      return globalConfig.feedbackLink?.text;
+    },
+    getAssets() {
+      return globalConfig.assets && Object.keys(globalConfig.assets);
+    },
+    getAsset(assetName) {
+      return globalConfig.assets && globalConfig.assets[assetName];
+    },
+    getAssetApiUrl(assetName) {
+      return this.getAsset(assetName)?.apiUrl;
     },
     getAssetUnitValue(assetName) {
-      return assetConfig[assetName] && assetConfig[assetName].unitValue;
+      return this.getAsset(assetName)?.unitValue;
+    },
+    getAssetProcessingHeightExpiry(assetName) {
+      return this.getAsset(assetName)?.processingHeightExpiry;
+    },
+    getMarkets() {
+      return globalConfig.markets && Object.keys(globalConfig.markets);
+    },
+    getMarket(market) {
+      return globalConfig.markets && globalConfig.markets[market];
+    },
+    getDefaultActiveMarket() {
+      return this.getMarkets()[0];
+    },
+    getMarketAssets(market) {
+      return this.getMarket(market)?.assets;
+    },
+    getMarketApiUrl(market) {
+      return this.getMarket(market)?.apiUrl;
+    },
+    getMarketPriceDecimalPrecision(market) {
+      return this.getMarket(market)?.priceDecimalPrecision;
+    },
+    getMarketPriceHistoryAPI(market) {
+      return this.getMarket(market)?.priceHistoryAPI;
+    },
+    getMarketChain(market, assetName) {
+      return this.getMarket(market)?.marketOptions?.chains[assetName];
+    },
+    getMarketChainWalletAddress(market, assetName) {
+      return this.getMarketChain(market, assetName)?.walletAddress;
+    },
+    getMarketChainRequiredConfirmations(market, assetName) {
+      return this.getMarketChain(market, assetName)?.requiredConfirmations;
     },
   };
 })();

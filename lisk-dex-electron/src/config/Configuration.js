@@ -2,6 +2,7 @@ import {
   Number, String, Array, Record, Dictionary,
 } from 'runtypes';
 import { getClient } from '../API';
+import { GlobalConfiguration } from '../Utils';
 
 // All the information that the user needs to provide.
 
@@ -69,10 +70,9 @@ const DEXConfiguration = Record({
   })),
 });
 
-export default async function processConfiguration(config) {
+export default async function createRefinedGlobalConfig(config) {
   // Throws an exception if check fails for given config object
   const _config = UnprocessedDEXConfiguration.check(config);
-
   const assetSymbols = Object.keys(_config.assets);
 
   // Select a random URL for each asset.
@@ -95,7 +95,11 @@ export default async function processConfiguration(config) {
     }
     market.marketOptions = data;
   }
+
+  // Set after processing config
+  GlobalConfiguration.setConfig(_config);
+
+  //
   console.log('Loaded configuration: ');
   console.log(_config);
-  return _config;
 }
