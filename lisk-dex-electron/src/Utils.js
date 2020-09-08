@@ -55,14 +55,23 @@ const GlobalConfiguration = (() => {
     getMarketApiUrl(market) {
       return this.getMarket(market)?.apiUrl;
     },
-    getMarketPriceDecimalPrecision(market) {
-      return this.getMarket(market)?.priceDecimalPrecision;
-    },
     getMarketPriceHistoryAPI(market) {
       return this.getMarket(market)?.priceHistoryAPI;
     },
     getMarketOptions(market) {
       return this.getMarket(market)?.marketOptions;
+    },
+    getMarkeVersion(market) {
+      return this.getMarketOptions(market)?.version;
+    },
+    getMarketBaseChain(market) {
+      return this.getMarketOptions(market)?.baseChain;
+    },
+    getMarketPriceDecimalPrecision(market) {
+      return this.getMarketOptions(market)?.priceDecimalPrecision;
+    },
+    getMarketChains(market) {
+      return Object.keys(this.getMarketOptions(market).chains);
     },
     getMarketChain(market, assetName) {
       return this.getMarketOptions(market)?.chains[assetName];

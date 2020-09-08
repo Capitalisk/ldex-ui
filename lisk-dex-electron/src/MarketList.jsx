@@ -4,7 +4,7 @@ import InfoIcon from './InfoIcon';
 import Modal from './Modal';
 import marketInfoDescriptor from './Market';
 import './Table.css';
-import { GlobalConfiguration } from './Utils';
+import { GlobalConfiguration as GC } from './Utils';
 
 export default class MarketList extends React.PureComponent {
   constructor(props) {
@@ -36,12 +36,11 @@ export default class MarketList extends React.PureComponent {
     event.preventDefault();
   }
 
-  getModalContentFromConfig(config) {
-    if (config) {
-      const dexConfig = config.markets[this.props.activeMarket].marketOptions;
-      const chains = Object.keys(dexConfig.chains);
-      const firstChain = dexConfig.chains[chains[0]];
-      const secondChain = dexConfig.chains[chains[1]];
+  getModalContentFromConfig() {
+    if (GC.getConfig()) {
+      const chains = GC.getMarketChains(this.props.activeMarket);
+      const firstChain = GC.getMarketChain(this.props.activeMarket, chains[0]);
+      const secondChain = GC.getMarketChain(this.props.activeMarket, chains[1]);
 
       const getBasicTableRow = (firstCellValue, secondCellValue) => (
         <tr>
@@ -61,9 +60,9 @@ export default class MarketList extends React.PureComponent {
         <div className="market-info-container">
           <table style={{ border: 'none', width: '60%' }}>
             <tbody>
-              {getBasicTableRow('Version', dexConfig.version)}
-              {getBasicTableRow('Base chain', dexConfig.baseChain)}
-              {getBasicTableRow('Price decimal precision', dexConfig.priceDecimalPrecision)}
+              {getBasicTableRow('Version', GC.getMarkeVersion(this.props.activeMarket))}
+              {getBasicTableRow('Base chain', GC.getMarketBaseChain(this.props.activeMarket))}
+              {getBasicTableRow('Price decimal precision', GC.getMarketPriceDecimalPrecision(this.props.activeMarket))}
             </tbody>
           </table>
           <table style={{ width: '-webkit-fill-available', marginTop: '20px' }}>
@@ -95,8 +94,8 @@ export default class MarketList extends React.PureComponent {
                   secondChainValue += '%';
                 }
                 if ('isUnitValue' in keyDescriptor) {
-                  firstChainValue /= GlobalConfiguration.getAssetUnitValue(chains[0]);
-                  secondChainValue /= GlobalConfiguration.getAssetUnitValue(chains[1]);
+                  firstChainValue /= GC.getAssetUnitValue(chains[0]);
+                  secondChainValue /= GC.getAssetUnitValue(chains[1]);
                 }
                 return (
                   <tr key={chainInfoKey}>
@@ -121,11 +120,11 @@ export default class MarketList extends React.PureComponent {
         {' '}
         <div style={{ padding: '10px' }}>
           <Modal modalOpened={this.state.modalOpened} closeModal={this.modalClose}>
-            {this.getModalContentFromConfig(this.props.configuration)}
+            {this.getModalContentFromConfig()}
           </Modal>
           <div className="action-name">MARKETS</div>
           <div className="markets-container">
-            {Object.keys(this.props.configuration.markets).map((marketSymbol) => (
+            {GC.getMarkets().map((marketSymbol) => (
               <div key={marketSymbol}>
                 <p>
                   <b>
@@ -146,7 +145,7 @@ export default class MarketList extends React.PureComponent {
             <br />
             Data refreshed every
             {' '}
-            {Math.round(this.props.configuration.refreshInterval / 1000)}
+            {Math.round(GC.getRefreshInterval() / 1000)}
             {' '}
             seconds.
           </small>
