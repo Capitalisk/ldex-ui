@@ -83,11 +83,13 @@ describe('Utils tests => ', () => {
       ],
     };
     GlobalConfiguration.setConfig({
-      lsk: {
-        unitValue: 100000000,
-      },
-      lsh: {
-        unitValue: 100000000,
+      assets: {
+        lsk: {
+          unitValue: 100000000,
+        },
+        lsh: {
+          unitValue: 100000000,
+        },
       },
     });
     const actualProcessedOrderBook = getCleanOrderBook(context.orderBookData, 'lsk', 'lsh');
