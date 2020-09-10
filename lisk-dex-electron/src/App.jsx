@@ -83,8 +83,8 @@ class App extends React.Component {
     this.initPendingOrders(GC.getMarketNames());
     await this.setState({
       configuration: GC.getConfig(),
-      activeMarket: GC.getDefaultActiveMarket(),
-      activeAssets: GC.getMarketAssets(GC.getDefaultActiveMarket()),
+      activeMarket: GC.getDefaultActiveMarketName(),
+      activeAssets: GC.getMarketAssets(GC.getDefaultActiveMarketName()),
       enabledAssets: GC.getAssetNames(),
       configurationLoaded: true,
     });

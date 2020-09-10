@@ -46,7 +46,7 @@ const GlobalConfiguration = (() => {
     getMarket(market) {
       return globalConfig.markets && globalConfig.markets[market];
     },
-    getDefaultActiveMarket() {
+    getDefaultActiveMarketName() {
       return this.getMarketNames()[0];
     },
     getMarketAssets(market) {
