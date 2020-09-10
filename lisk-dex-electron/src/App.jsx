@@ -26,7 +26,7 @@ import Notification from './Notification';
 import userContext from './context';
 import LeaveWarning from './LeaveWarning';
 import createRefinedGlobalConfig from './config/Configuration';
-import { getNumericAssetBalance, GlobalConfiguration as GC } from './Utils';
+import { getNumericAssetBalance, GlobalConfiguration, GlobalConfiguration as GC } from './Utils';
 
 const NOTIFICATIONS_MAX_QUEUE_LENGTH = 3;
 const DEFAULT_API_MAX_PAGE_SIZE = 100;
@@ -77,13 +77,15 @@ class App extends React.Component {
   async loadConfiguration() {
     const localClient = getClient('');
     const defaultConfiguration = await getConfig(localClient);
-    await createRefinedGlobalConfig(defaultConfiguration);
-    this.initPendingOrders(GC.getMarkets());
+    const config = await createRefinedGlobalConfig(defaultConfiguration);
+    // set global config
+    GlobalConfiguration.setConfig(config);
+    this.initPendingOrders(GC.getMarketNames());
     await this.setState({
       configuration: GC.getConfig(),
       activeMarket: GC.getDefaultActiveMarket(),
       activeAssets: GC.getMarketAssets(GC.getDefaultActiveMarket()),
-      enabledAssets: GC.getAssets(),
+      enabledAssets: GC.getAssetNames(),
       configurationLoaded: true,
     });
   }

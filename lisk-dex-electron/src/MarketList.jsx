@@ -38,7 +38,7 @@ export default class MarketList extends React.PureComponent {
 
   getModalContentFromConfig() {
     if (GC.getConfig()) {
-      const chains = GC.getMarketChains(this.props.activeMarket);
+      const chains = GC.getMarketChainNames(this.props.activeMarket);
       const firstChain = GC.getMarketChain(this.props.activeMarket, chains[0]);
       const secondChain = GC.getMarketChain(this.props.activeMarket, chains[1]);
 
@@ -60,7 +60,7 @@ export default class MarketList extends React.PureComponent {
         <div className="market-info-container">
           <table style={{ border: 'none', width: '60%' }}>
             <tbody>
-              {getBasicTableRow('Version', GC.getMarkeVersion(this.props.activeMarket))}
+              {getBasicTableRow('Version', GC.getMarketVersion(this.props.activeMarket))}
               {getBasicTableRow('Base chain', GC.getMarketBaseChain(this.props.activeMarket))}
               {getBasicTableRow('Price decimal precision', GC.getMarketPriceDecimalPrecision(this.props.activeMarket))}
             </tbody>
@@ -124,7 +124,7 @@ export default class MarketList extends React.PureComponent {
           </Modal>
           <div className="action-name">MARKETS</div>
           <div className="markets-container">
-            {GC.getMarkets().map((marketSymbol) => (
+            {GC.getMarketNames().map((marketSymbol) => (
               <div key={marketSymbol}>
                 <p>
                   <b>

@@ -9,7 +9,7 @@ import {
   getCleanOrderBook,
   estimateBestReturnsForSeller,
   estimatedBestReturnsForBuyer,
-  EstimationStatus, getNumericAssetBalance, GlobalConfiguration as GC ,
+  EstimationStatus, getNumericAssetBalance, GlobalConfiguration as GC,
 } from './Utils';
 import InfoIcon from './InfoIcon';
 import marketInfoDescriptor from './Market';
@@ -235,7 +235,7 @@ export default class PlaceOrder extends React.Component {
       let targetChain;
       let broadcastURL;
       if (this.props.side === 'bid') {
-        dexAddress = GC.getMarketChainWalletAddress(this.context.activeMarket, this.context.activeAssets);
+        dexAddress = GC.getMarketChainWalletAddress(this.context.activeMarket, this.context.activeAssets[1]);
         destAddress = this.context.keys[this.context.activeAssets[0]].address;
         passphrase = this.context.keys[this.context.activeAssets[1]].passphrase;
         [targetChain, sourceChain] = this.context.activeAssets;
@@ -330,7 +330,7 @@ export default class PlaceOrder extends React.Component {
   }
 
   getBaseFees() {
-    const chains = GC.getMarketChains(this.props.activeMarket);
+    const chains = GC.getMarketChainNames(this.props.activeMarket);
     const firstChain = GC.getMarketChain(chains[0]);
     const secondChain = GC.getMarketChain(chains[1]);
     const baseFeeKey = 'exchangeFeeBase';

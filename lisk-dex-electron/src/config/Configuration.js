@@ -2,7 +2,6 @@ import {
   Number, String, Array, Record, Dictionary,
 } from 'runtypes';
 import { getClient } from '../API';
-import { GlobalConfiguration } from '../Utils';
 
 // All the information that the user needs to provide.
 
@@ -96,9 +95,7 @@ export default async function createRefinedGlobalConfig(config) {
     market.marketOptions = data;
   }
 
-  // Set after processing config
-  GlobalConfiguration.setConfig(_config);
-
+  return _config;
   //
   console.log('Loaded configuration: ');
   console.log(_config);

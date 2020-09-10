@@ -25,7 +25,7 @@ const GlobalConfiguration = (() => {
     getFeedbackText() {
       return globalConfig.feedbackLink?.text;
     },
-    getAssets() {
+    getAssetNames() {
       return globalConfig.assets && Object.keys(globalConfig.assets);
     },
     getAsset(assetName) {
@@ -40,14 +40,14 @@ const GlobalConfiguration = (() => {
     getAssetProcessingHeightExpiry(assetName) {
       return this.getAsset(assetName)?.processingHeightExpiry;
     },
-    getMarkets() {
+    getMarketNames() {
       return globalConfig.markets && Object.keys(globalConfig.markets);
     },
     getMarket(market) {
       return globalConfig.markets && globalConfig.markets[market];
     },
     getDefaultActiveMarket() {
-      return this.getMarkets()[0];
+      return this.getMarketNames()[0];
     },
     getMarketAssets(market) {
       return this.getMarket(market)?.assets;
@@ -61,7 +61,7 @@ const GlobalConfiguration = (() => {
     getMarketOptions(market) {
       return this.getMarket(market)?.marketOptions;
     },
-    getMarkeVersion(market) {
+    getMarketVersion(market) {
       return this.getMarketOptions(market)?.version;
     },
     getMarketBaseChain(market) {
@@ -70,7 +70,7 @@ const GlobalConfiguration = (() => {
     getMarketPriceDecimalPrecision(market) {
       return this.getMarketOptions(market)?.priceDecimalPrecision;
     },
-    getMarketChains(market) {
+    getMarketChainNames(market) {
       return Object.keys(this.getMarketOptions(market).chains);
     },
     getMarketChain(market, assetName) {
