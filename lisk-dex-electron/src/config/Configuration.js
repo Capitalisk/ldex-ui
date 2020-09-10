@@ -95,8 +95,7 @@ export default async function createRefinedGlobalConfig(config) {
     market.marketOptions = data;
   }
 
-  return _config;
-  //
   console.log('Loaded configuration: ');
   console.log(_config);
+  return _config;
 }
