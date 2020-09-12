@@ -23,10 +23,10 @@ const GlobalConfiguration = (() => {
       return globalConfig.refreshInterval;
     },
     getFeedbackLink() {
-      return globalConfig.feedbackLink?.url;
+      return globalConfig.feedbackLink.url;
     },
     getFeedbackText() {
-      return globalConfig.feedbackLink?.text;
+      return globalConfig.feedbackLink.text;
     },
     getAssetNames() {
       return globalConfig.assets && Object.keys(globalConfig.assets);
@@ -35,13 +35,13 @@ const GlobalConfiguration = (() => {
       return globalConfig.assets && globalConfig.assets[assetName];
     },
     getAssetApiUrl(assetName = required('assetName')) {
-      return this.getAsset(assetName)?.apiUrl;
+      return this.getAsset(assetName).apiUrl;
     },
     getAssetUnitValue(assetName = required('assetName')) {
-      return this.getAsset(assetName)?.unitValue;
+      return this.getAsset(assetName).unitValue;
     },
     getAssetProcessingHeightExpiry(assetName = required('assetName')) {
-      return this.getAsset(assetName)?.processingHeightExpiry;
+      return this.getAsset(assetName).processingHeightExpiry;
     },
     getMarketNames() {
       return globalConfig.markets && Object.keys(globalConfig.markets);
@@ -53,40 +53,40 @@ const GlobalConfiguration = (() => {
       return this.getMarketNames()[0];
     },
     getMarketAssets(market = required('market')) {
-      return this.getMarket(market)?.assets;
+      return this.getMarket(market).assets;
     },
     getMarketApiUrl(market = required('market')) {
-      return this.getMarket(market)?.apiUrl;
+      return this.getMarket(market).apiUrl;
     },
     getMarketPriceHistoryAPI(market = required('market')) {
-      return this.getMarket(market)?.priceHistoryAPI;
+      return this.getMarket(market).priceHistoryAPI;
     },
     getMarketOptions(market = required('market')) {
-      return this.getMarket(market)?.marketOptions;
+      return this.getMarket(market).marketOptions;
     },
     getMarketVersion(market = required('market')) {
-      return this.getMarketOptions(market)?.version;
+      return this.getMarketOptions(market).version;
     },
     getMarketBaseChain(market = required('market')) {
-      return this.getMarketOptions(market)?.baseChain;
+      return this.getMarketOptions(market).baseChain;
     },
     getMarketPriceDecimalPrecision(market = required('market')) {
-      return this.getMarketOptions(market)?.priceDecimalPrecision;
+      return this.getMarketOptions(market).priceDecimalPrecision;
     },
     getMarketChainNames(market = required('market')) {
       return Object.keys(this.getMarketOptions(market).chains);
     },
     getMarketChain(market = required('market'), assetName = required('assetName')) {
-      return this.getMarketOptions(market)?.chains[assetName];
+      return this.getMarketOptions(market).chains[assetName];
     },
     getMarketChainMinOrderAmount(market = required('market'), assetName = required('assetName')) {
-      return this.getMarketChain(market, assetName)?.minOrderAmount;
+      return this.getMarketChain(market, assetName).minOrderAmount;
     },
     getMarketChainWalletAddress(market = required('market'), assetName = required('assetName')) {
-      return this.getMarketChain(market, assetName)?.walletAddress;
+      return this.getMarketChain(market, assetName).walletAddress;
     },
     getMarketChainRequiredConfirmations(market = required('market'), assetName = required('assetName')) {
-      return this.getMarketChain(market, assetName)?.requiredConfirmations;
+      return this.getMarketChain(market, assetName).requiredConfirmations;
     },
   };
 })();
