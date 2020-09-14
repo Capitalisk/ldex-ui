@@ -1,3 +1,111 @@
+// Eventually store all config in singleton class and make it accessible everywhere
+function required(varName) {
+  throw new Error(`${varName} is required. `);
+}
+
+const GlobalConfiguration = (() => {
+  let globalConfig = { };
+
+  return {
+    getConfig() {
+      return globalConfig;
+    },
+    setConfig(config = required('config')) {
+      globalConfig = config;
+    },
+    getAppTitle() {
+      return globalConfig.appTitle;
+    },
+    getNotificationDuration() {
+      return globalConfig.notificationDuration;
+    },
+    getRefreshInterval() {
+      return globalConfig.refreshInterval;
+    },
+    getFeedbackLink() {
+      return globalConfig.feedbackLink.url;
+    },
+    getFeedbackText() {
+      return globalConfig.feedbackLink.text;
+    },
+    getAssetNames() {
+      return globalConfig.assets && Object.keys(globalConfig.assets);
+    },
+    getAsset(assetName = required('assetName')) {
+      return globalConfig.assets && globalConfig.assets[assetName];
+    },
+    getAssetApiUrl(assetName = required('assetName')) {
+      return this.getAsset(assetName).apiUrl;
+    },
+    getAssetUnitValue(assetName = required('assetName')) {
+      return this.getAsset(assetName).unitValue;
+    },
+    getAssetProcessingHeightExpiry(assetName = required('assetName')) {
+      return this.getAsset(assetName).processingHeightExpiry;
+    },
+    getMarketNames() {
+      return globalConfig.markets && Object.keys(globalConfig.markets);
+    },
+    getMarket(market) {
+      return globalConfig.markets && globalConfig.markets[market];
+    },
+    getDefaultActiveMarketName() {
+      return this.getMarketNames()[0];
+    },
+    getMarketAssets(market = required('market')) {
+      return this.getMarket(market).assets;
+    },
+    getMarketApiUrl(market = required('market')) {
+      return this.getMarket(market).apiUrl;
+    },
+    getMarketPriceHistoryAPI(market = required('market')) {
+      return this.getMarket(market).priceHistoryAPI;
+    },
+    getMarketOptions(market = required('market')) {
+      return this.getMarket(market).marketOptions;
+    },
+    getMarketVersion(market = required('market')) {
+      return this.getMarketOptions(market).version;
+    },
+    getMarketBaseChain(market = required('market')) {
+      return this.getMarketOptions(market).baseChain;
+    },
+    getMarketPriceDecimalPrecision(market = required('market')) {
+      return this.getMarketOptions(market).priceDecimalPrecision;
+    },
+    getMarketChainNames(market = required('market')) {
+      return Object.keys(this.getMarketOptions(market).chains);
+    },
+    getMarketChain(market = required('market'), assetName = required('assetName')) {
+      return this.getMarketOptions(market).chains[assetName];
+    },
+    getMarketChainMinOrderAmount(market = required('market'), assetName = required('assetName')) {
+      return this.getMarketChain(market, assetName).minOrderAmount;
+    },
+    getMarketChainWalletAddress(market = required('market'), assetName = required('assetName')) {
+      return this.getMarketChain(market, assetName).walletAddress;
+    },
+    getMarketChainRequiredConfirmations(market = required('market'), assetName = required('assetName')) {
+      return this.getMarketChain(market, assetName).requiredConfirmations;
+    },
+  };
+})();
+
+// returns number
+const getNumericAssetBalance = (assetAmount, assetName, decimal = 2) => {
+  // eslint-disable-next-line no-restricted-properties
+  const uptoDecimalPlaces = Math.pow(10, decimal);
+  const unitValue = GlobalConfiguration.getAssetUnitValue(assetName);
+  return Math.round((assetAmount * uptoDecimalPlaces) / unitValue) / uptoDecimalPlaces;
+};
+
+// returns string
+const getLiteralAssetBalance = (assetAmount, assetName, decimals = 4) => {
+  const unitValue = GlobalConfiguration.getAssetUnitValue(assetName);
+  return parseFloat((assetAmount / unitValue).toFixed(decimals));
+};
+
+
 const formatThousands = (num, separator) => {
   const sign = num < 0 ? '-' : '';
   num = Math.abs(num);
@@ -103,28 +211,24 @@ const estimatedBestReturnsForBuyer = (amount, price, asks, isMarketOrder) => {
   return { amountYetToBeSold, estimatedReturns, status };
 };
 
-const getCleanOrderBook = (contextOrderBook) => {
-  const calculateAmount = (size, whole) => parseFloat((size / whole).toFixed(4));
+const getCleanOrderBook = (contextOrderBook, sourceAsset, targetAsset) => {
   const asks = [];
   const bids = [];
   for (const ask of contextOrderBook.asks) {
     const size = ask.sizeRemaining;
-    const whole = 10 ** 8;
-    const amount = calculateAmount(size, whole);
+    const amount = getLiteralAssetBalance(size, sourceAsset);
     const { price } = ask;
     asks.push({ amount, price });
   }
   for (const bid of contextOrderBook.bids) {
     const size = bid.valueRemaining;
-    const whole = 10 ** 8;
-    const amount = calculateAmount(size, whole);
+    const amount = getLiteralAssetBalance(size, targetAsset);
     const { price } = bid;
     bids.push({ amount, price });
   }
   return { asks, bids };
 };
 
-
 export {
-  formatThousands, Keys, Values, estimateBestReturnsForSeller, estimatedBestReturnsForBuyer, EstimationStatus, getCleanOrderBook,
+  formatThousands, Keys, Values, estimateBestReturnsForSeller, estimatedBestReturnsForBuyer, EstimationStatus, getCleanOrderBook, GlobalConfiguration, getNumericAssetBalance, getLiteralAssetBalance,
 };

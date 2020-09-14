@@ -1,7 +1,7 @@
 import React from 'react';
 import userContext from './context';
 import './App.css';
-import { formatThousands } from './Utils';
+import { formatThousands, getNumericAssetBalance } from './Utils';
 
 export default class BalanceDisplay extends React.Component {
   static contextType = userContext;
@@ -18,6 +18,8 @@ export default class BalanceDisplay extends React.Component {
   }
 
   render() {
+    const approxBalance = this.props.balance && getNumericAssetBalance(this.props.balance, this.props.asset);
+    const formattedBalance = `${formatThousands(approxBalance)} ${this.props.asset.toUpperCase()}`;
     return (
       <div>
         <div style={{ color: '#FFFFFF', marginBottom: '10px' }}>
@@ -32,7 +34,7 @@ export default class BalanceDisplay extends React.Component {
           Balance:
           {' '}
           <span className="place-order-balance" style={{ fontWeight: 'bold' }}>
-            {this.props.balance == null ? 'Loading...' : `${formatThousands(this.props.balance)} ${this.props.asset.toUpperCase()}`}
+            {approxBalance == null ? 'Loading...' : formattedBalance}
           </span>
         </div>
       </div>

@@ -110,7 +110,7 @@ export default class SignInModal extends React.Component {
             <div className="sign-in-progress-area">
               {this.state.signingIn && (
                 <div className="progress">
-                <div className="indeterminate" />
+                  <div className="indeterminate" />
                 </div>
               )}
             </div>
