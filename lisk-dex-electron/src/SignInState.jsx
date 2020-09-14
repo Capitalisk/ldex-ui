@@ -21,7 +21,10 @@ export default class SignInState extends React.Component {
     return (
       <>
         {addressCount >= 1 && (
-          <span style={{ fontSize: '12px', marginRight: '10px' , display: 'inline-block', verticalAlign: 'top', marginTop: '10px' }}>
+          <span style={{
+            fontSize: '12px', marginRight: '10px', display: 'inline-block', verticalAlign: 'top', marginTop: '10px',
+          }}
+          >
             Signed in
             <span className="sign-in-state-address">
               {' '}

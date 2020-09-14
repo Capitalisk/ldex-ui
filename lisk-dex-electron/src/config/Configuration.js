@@ -69,10 +69,9 @@ const DEXConfiguration = Record({
   })),
 });
 
-export default async function processConfiguration(config) {
+export default async function createRefinedGlobalConfig(config) {
   // Throws an exception if check fails for given config object
   const _config = UnprocessedDEXConfiguration.check(config);
-
   const assetSymbols = Object.keys(_config.assets);
 
   // Select a random URL for each asset.
@@ -95,6 +94,7 @@ export default async function processConfiguration(config) {
     }
     market.marketOptions = data;
   }
+
   console.log('Loaded configuration: ');
   console.log(_config);
   return _config;

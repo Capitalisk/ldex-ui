@@ -74,13 +74,15 @@ export default class YourOrders extends React.Component {
         >
           <div style={{
             width: '50%', margin: 0, padding: 0,
-          }}>
+          }}
+          >
             <div style={{
               height: '30px',
               lineHeight: '30px',
               textAlign: 'center',
               fontSize: '14px',
-            }}>
+            }}
+            >
               Buying
             </div>
             <div style={{
@@ -88,18 +90,27 @@ export default class YourOrders extends React.Component {
             }}
             >
               {!!bids.length && bids.slice().reverse().map((order) => <UserOrder key={order.id} side="bid" order={order} orderCanceled={this.handleCancel} failedToCancelOrder={this.handleCancelFail} />)}
-              {!bids.length && <div style={{ display: 'flex', height: '100%', color: '#999999', alignItems: 'center', justifyContent: 'center' }}>No buy orders</div>}
+              {!bids.length && (
+              <div style={{
+                display: 'flex', height: '100%', color: '#999999', alignItems: 'center', justifyContent: 'center',
+              }}
+              >
+                No buy orders
+              </div>
+              )}
             </div>
           </div>
           <div style={{
             width: '50%', margin: 0, padding: 0,
-          }}>
+          }}
+          >
             <div style={{
               height: '30px',
               lineHeight: '30px',
               textAlign: 'center',
               fontSize: '14px',
-            }}>
+            }}
+            >
               Selling
             </div>
             <div style={{
@@ -107,7 +118,14 @@ export default class YourOrders extends React.Component {
             }}
             >
               {!!asks.length && asks.map((order) => <UserOrder key={order.id} side="ask" order={order} orderCanceled={this.handleCancel} failedToCancelOrder={this.handleCancelFail} />)}
-              {!asks.length && <div style={{ display: 'flex', height: '100%', color: '#999999', alignItems: 'center', justifyContent: 'center' }}>No sell orders</div>}
+              {!asks.length && (
+              <div style={{
+                display: 'flex', height: '100%', color: '#999999', alignItems: 'center', justifyContent: 'center',
+              }}
+              >
+                No sell orders
+              </div>
+              )}
             </div>
           </div>
         </div>

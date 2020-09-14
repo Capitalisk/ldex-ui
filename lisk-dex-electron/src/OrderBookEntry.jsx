@@ -1,6 +1,6 @@
 import React from 'react';
 import './OrderBookEntry.css';
-import {formatThousands, getLiteralAssetBalance} from './Utils';
+import { formatThousands, getLiteralAssetBalance } from './Utils';
 
 export default class OrderBookEntry extends React.Component {
   constructor(props) {

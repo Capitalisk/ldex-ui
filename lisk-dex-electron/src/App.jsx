@@ -25,8 +25,8 @@ import MarketList from './MarketList';
 import Notification from './Notification';
 import userContext from './context';
 import LeaveWarning from './LeaveWarning';
-import processConfiguration from './config/Configuration';
-import { CryptoAsset, getNumericAssetBalance } from './Utils';
+import createRefinedGlobalConfig from './config/Configuration';
+import { getNumericAssetBalance, GlobalConfiguration as GC } from './Utils';
 
 const NOTIFICATIONS_MAX_QUEUE_LENGTH = 3;
 const DEFAULT_API_MAX_PAGE_SIZE = 100;
@@ -71,23 +71,21 @@ class App extends React.Component {
   }
 
   getDexClient() {
-    return getClient(this.state.configuration.markets[this.state.activeMarket].apiUrl);
+    return getClient(GC.getMarketApiUrl(this.state.activeMarket));
   }
 
   async loadConfiguration() {
     const localClient = getClient('');
     const defaultConfiguration = await getConfig(localClient);
-    CryptoAsset.setConfig(defaultConfiguration.assets);
-    const configuration = await processConfiguration(defaultConfiguration);
-    const marketSymbols = Object.keys(configuration.markets);
-    this.initPendingOrders(marketSymbols);
-    const defaultMarketKey = marketSymbols[0];
-    this.defaultMarket = defaultMarketKey;
+    const config = await createRefinedGlobalConfig(defaultConfiguration);
+    // set global config
+    GC.setConfig(config);
+    this.initPendingOrders(GC.getMarketNames());
     await this.setState({
-      configuration,
-      activeMarket: defaultMarketKey,
-      activeAssets: configuration.markets[defaultMarketKey].assets,
-      enabledAssets: Object.keys(configuration.assets),
+      configuration: GC.getConfig(),
+      activeMarket: GC.getDefaultActiveMarketName(),
+      activeAssets: GC.getMarketAssets(GC.getDefaultActiveMarketName()),
+      enabledAssets: GC.getAssetNames(),
       configurationLoaded: true,
     });
   }
@@ -146,11 +144,10 @@ class App extends React.Component {
   async fetchPriceHistoryStateFromBlockchains() {
     const [quoteChainTxns, baseChainTxns] = await Promise.all(
       this.state.activeAssets.map(async (assetSymbol) => {
-        const asset = this.state.configuration.assets[assetSymbol];
+        const asset = GC.getAsset(assetSymbol);
         const client = axios.create();
         const targetEndpoint = asset.apiUrl;
-        const { marketOptions } = this.state.configuration.markets[this.state.activeMarket];
-        const dexWalletAddress = marketOptions.chains[assetSymbol].walletAddress;
+        const dexWalletAddress = GC.getMarketChainWalletAddress(this.state.activeMarket, assetSymbol);
         const result = await client.get(
           `${targetEndpoint}/transactions?senderId=${
             dexWalletAddress
@@ -222,17 +219,16 @@ class App extends React.Component {
       return txnPair.base.length >= expectedBaseCount && txnPair.quote.length >= expectedQuoteCount;
     });
 
-    const { marketOptions } = this.state.configuration.markets[this.state.activeMarket];
     const priceDecimalPrecision = this.getPriceDecimalPrecision();
 
     for (const txnPair of txnPairsList) {
-      const baseChainOptions = marketOptions.chains[this.state.activeAssets[1]];
+      const baseChainOptions = GC.getMarketChain(this.state.activeMarket, this.state.activeAssets[1]);
       const baseChainFeeBase = baseChainOptions.exchangeFeeBase;
       const baseChainFeeRate = baseChainOptions.exchangeFeeRate;
       const baseTotalFee = baseChainFeeBase * txnPair.base.length;
       const fullBaseAmount = txnPair.base.reduce((accumulator, txn) => accumulator + Number(txn.amount) / (1 - baseChainFeeRate), 0) + baseTotalFee;
 
-      const quoteChainOptions = marketOptions.chains[this.state.activeAssets[0]];
+      const quoteChainOptions = GC.getMarketChain(this.state.activeMarket, this.state.activeAssets[0]);
       const quoteChainFeeBase = quoteChainOptions.exchangeFeeBase;
       const quoteChainFeeRate = quoteChainOptions.exchangeFeeRate;
       const quoteTotalFee = quoteChainFeeBase * txnPair.quote.length;
@@ -336,10 +332,9 @@ class App extends React.Component {
       processedHeights = {};
     }
 
-    const heightSafetyMargin = this.state.configuration.assets[order.sourceChain].processingHeightExpiry;
+    const heightSafetyMargin = GC.getAssetProcessingHeightExpiry(order.sourceChain);
     order.submitHeight = processedHeights[order.sourceChain] || Infinity;
-    order.submitExpiryHeight = order.submitHeight + this.state.configuration
-      .markets[this.state.activeMarket].marketOptions.chains[order.sourceChain].requiredConfirmations + heightSafetyMargin;
+    order.submitExpiryHeight = order.submitHeight + GC.getMarketChainRequiredConfirmations(this.state.activeMarket, order.sourceChain) + heightSafetyMargin;
     order.status = 'pending';
 
     this.pendingOrders[this.state.activeMarket][order.id] = order;
@@ -360,7 +355,7 @@ class App extends React.Component {
       };
     });
 
-    const orderDexAddress = this.state.configuration.markets[this.state.activeMarket].marketOptions.chains[order.sourceChain].walletAddress;
+    const orderDexAddress = GC.getMarketChainWalletAddress(this.state.activeMarket, order.sourceChain);
     const chainSymbol = order.sourceChain.toUpperCase();
 
     let message;
@@ -404,7 +399,7 @@ class App extends React.Component {
       this.setState((prevState) => ({
         notifications: prevState.notifications,
       }));
-    }, this.state.configuration.notificationDuration);
+    }, GC.getNotificationDuration());
 
     this.setState({
       notifications: updatedNotifications,
@@ -447,10 +442,10 @@ class App extends React.Component {
     const baseAsset = this.state.activeAssets[1];
 
     const { activeMarket } = this.state;
-    const { orderBookDepth } = this.state.configuration.markets[activeMarket] || {};
+    const { orderBookDepth } = GC.getMarket(activeMarket) || {};
 
     const apiResults = [
-      getOrderBook(dexClient, orderBookDepth == null ? DEFAULT_ORDER_BOOK_DEPTH : orderBookDepth),
+      getOrderBook(dexClient, orderBookDepth ?? DEFAULT_ORDER_BOOK_DEPTH),
     ];
     let quoteWalletAddress;
     let baseWalletAddress;
@@ -566,20 +561,15 @@ class App extends React.Component {
     return newState;
   }
 
-  getActiveMarketOptions() {
-    return this.state.configuration.markets[this.state.activeMarket];
-  }
-
   getPriceDecimalPrecision() {
-    const { marketOptions } = this.getActiveMarketOptions();
-    return marketOptions.priceDecimalPrecision == null ? DEFAULT_PRICE_DECIMAL_PRECISION : marketOptions.priceDecimalPrecision;
+    return GC.getMarketPriceDecimalPrecision(this.state.activeMarket) ?? DEFAULT_PRICE_DECIMAL_PRECISION;
   }
 
   async updatePendingOrders() {
     const pendingMarketSymbols = Object.keys(this.pendingOrders);
     const marketCompletedOrders = await Promise.all(
       pendingMarketSymbols.map(async (market) => {
-        const dexClient = getClient(this.state.configuration.markets[market].apiUrl);
+        const dexClient = getClient(GC.getMarketApiUrl(market));
         const pendingOrders = Object.values(this.pendingOrders[market]);
 
         if (!pendingOrders.length) {
@@ -626,10 +616,9 @@ class App extends React.Component {
   async updateUIWithNewData() {
     await this.updatePendingOrders();
     let combinedStateUpdate = {};
-    const marketOptions = this.getActiveMarketOptions();
     try {
       let fetchHistoryPromise;
-      if (marketOptions.priceHistoryAPI === 'dex') {
+      if (GC.getMarketPriceHistoryAPI(this.state.activeMarket) === 'dex') {
         fetchHistoryPromise = this.fetchPriceHistoryStateFromDEX();
       } else {
         fetchHistoryPromise = this.fetchPriceHistoryStateFromBlockchains();
@@ -668,7 +657,7 @@ class App extends React.Component {
       this.activateMarket(locationProps.market);
       setInterval(async () => {
         this.updateUIWithNewData();
-      }, this.state.configuration.refreshInterval);
+      }, GC.getRefreshInterval());
       this.intervalRegistered = true;
     }
   }
@@ -789,7 +778,7 @@ class App extends React.Component {
     const balances = await Promise.all(
       this.state.activeAssets.map(async (asset) => {
         if (asset in assetInfos) {
-          const targetEndpoint = this.state.configuration.assets[asset].apiUrl;
+          const targetEndpoint = GC.getAssetApiUrl(asset);
           try {
             const response = await client.get(`${targetEndpoint}/accounts?address=${assetInfos[asset].address}`);
             const balanceList = Array.isArray(response.data) ? response.data : response.data.data;
@@ -811,7 +800,7 @@ class App extends React.Component {
 
   async activateMarket(activeMarket) {
     if (!activeMarket) {
-      activeMarket = this.defaultMarket;
+      activeMarket = this.state.activeMarket;
     }
     const activeAssets = activeMarket.split('/');
     await this.setState({
@@ -846,8 +835,6 @@ class App extends React.Component {
     const locationProps = this.getPropsFromURL();
     if (locationProps.market) {
       this.activateMarket(locationProps.market);
-    } else if (this.defaultMarket) {
-      this.activateMarket(this.defaultMarket);
     }
   }
 
@@ -866,10 +853,10 @@ class App extends React.Component {
           {this.state.displayLeaveWarning && <LeaveWarning setDisplayLeaveWarning={this.setDisplayLeaveWarning} />}
           <div className="top-bar">
             <div>
-              <b style={{ fontSize: '21px' }}>{this.state.configuration.appTitle}</b>
+              <b style={{ fontSize: '21px' }}>{GC.getAppTitle()}</b>
               {' '}
               &nbsp;
-              <a className="feedback-link" style={{ fontSize: '14px' }} href={this.state.configuration.feedbackLink.url} rel="noopener noreferrer" target="_blank">{this.state.configuration.feedbackLink.text}</a>
+              <a className="feedback-link" style={{ fontSize: '14px' }} href={GC.getFeedbackLink()} rel="noopener noreferrer" target="_blank">{GC.getFeedbackText()}</a>
             </div>
             <div>
               <SignInState className="sign-in-state" showSignIn={this.showSignIn} keys={this.getActiveKeys()} signedIn={this.isSignedIn()} signOut={this.signOut} />
@@ -887,10 +874,10 @@ class App extends React.Component {
               {this.state.notifications.map((data) => <Notification key={data.id} data={data} />)}
             </div>
             <div className="sell-panel">
-              <PlaceOrder side="ask" configuration={this.state.configuration} activeMarket={this.state.activeMarket} orderSubmit={this.orderSubmit} orderSubmitError={this.orderSubmitError} showEstimateInfo={this.showEstimateInfo} assetBalance={this.state.baseAssetBalance} />
+              <PlaceOrder side="ask" activeMarket={this.state.activeMarket} orderSubmit={this.orderSubmit} orderSubmitError={this.orderSubmitError} showEstimateInfo={this.showEstimateInfo} assetBalance={this.state.baseAssetBalance} />
             </div>
             <div className="buy-panel">
-              <PlaceOrder side="bid" configuration={this.state.configuration} activeMarket={this.state.activeMarket} orderSubmit={this.orderSubmit} orderSubmitError={this.orderSubmitError} showEstimateInfo={this.showEstimateInfo} assetBalance={this.state.quoteAssetBalance} />
+              <PlaceOrder side="bid" activeMarket={this.state.activeMarket} orderSubmit={this.orderSubmit} orderSubmitError={this.orderSubmitError} showEstimateInfo={this.showEstimateInfo} assetBalance={this.state.quoteAssetBalance} />
             </div>
             <div className="order-book-container">
               <div className="sell-orders-title">Asks</div>
@@ -926,7 +913,7 @@ class App extends React.Component {
               <YourOrders orders={this.state.yourOrders} orderCanceled={this.orderCancel} handleCancelFail={this.orderCancelFail} />
             </div>
             <div className="market-name-and-stats">
-              <MarketList configuration={this.state.configuration} activeMarket={this.state.activeMarket} signOut={this.signOut} />
+              <MarketList activeMarket={this.state.activeMarket} signOut={this.signOut} />
             </div>
           </div>
         </userContext.Provider>

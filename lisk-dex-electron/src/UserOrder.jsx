@@ -3,7 +3,8 @@ import './UserOrder.css';
 import * as transactions from '@liskhq/lisk-transactions';
 import axios from 'axios';
 import userContext from './context';
-import { getLiteralAssetBalance } from './Utils';
+import { getLiteralAssetBalance, GlobalConfiguration as GC } from './Utils';
+
 
 export default class UserOrder extends React.Component {
   static contextType = userContext;
@@ -16,11 +17,11 @@ export default class UserOrder extends React.Component {
   cancelOrder = async () => {
     const confirmed = window.confirm('Are you sure you want to cancel this limit order?');
     if (confirmed) {
-      const dexAddress = this.context.configuration.markets[this.context.activeMarket].marketOptions.chains[this.props.order.sourceChain].walletAddress;
+      const dexAddress = GC.getMarketChainWalletAddress(this.context.activeMarket, this.props.order.sourceChain);
       const { passphrase } = this.context.keys[this.props.order.sourceChain];
       const { targetChain } = this.props.order;
       const orderId = this.props.order.id;
-      const broadcastURL = this.context.configuration.assets[this.props.order.sourceChain].apiUrl;
+      const broadcastURL = GC.getAssetApiUrl(this.props.order.sourceChain);
 
       const tx = transactions.transfer({
         amount: transactions.utils.convertLSKToBeddows('0.11').toString(),

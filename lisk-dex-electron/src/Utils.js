@@ -1,16 +1,92 @@
 // Eventually store all config in singleton class and make it accessible everywhere
-const CryptoAsset = (() => {
-  let assetConfig = { };
+function required(varName) {
+  throw new Error(`${varName} is required. `);
+}
+
+const GlobalConfiguration = (() => {
+  let globalConfig = { };
 
   return {
-    getConfig(assetName) {
-      return assetConfig[assetName];
+    getConfig() {
+      return globalConfig;
     },
-    setConfig(assets) {
-      assetConfig = assets;
+    setConfig(config = required('config')) {
+      globalConfig = config;
     },
-    getAssetUnitValue(assetName) {
-      return assetConfig[assetName] && assetConfig[assetName].unitValue;
+    getAppTitle() {
+      return globalConfig.appTitle;
+    },
+    getNotificationDuration() {
+      return globalConfig.notificationDuration;
+    },
+    getRefreshInterval() {
+      return globalConfig.refreshInterval;
+    },
+    getFeedbackLink() {
+      return globalConfig.feedbackLink.url;
+    },
+    getFeedbackText() {
+      return globalConfig.feedbackLink.text;
+    },
+    getAssetNames() {
+      return globalConfig.assets && Object.keys(globalConfig.assets);
+    },
+    getAsset(assetName = required('assetName')) {
+      return globalConfig.assets && globalConfig.assets[assetName];
+    },
+    getAssetApiUrl(assetName = required('assetName')) {
+      return this.getAsset(assetName).apiUrl;
+    },
+    getAssetUnitValue(assetName = required('assetName')) {
+      return this.getAsset(assetName).unitValue;
+    },
+    getAssetProcessingHeightExpiry(assetName = required('assetName')) {
+      return this.getAsset(assetName).processingHeightExpiry;
+    },
+    getMarketNames() {
+      return globalConfig.markets && Object.keys(globalConfig.markets);
+    },
+    getMarket(market) {
+      return globalConfig.markets && globalConfig.markets[market];
+    },
+    getDefaultActiveMarketName() {
+      return this.getMarketNames()[0];
+    },
+    getMarketAssets(market = required('market')) {
+      return this.getMarket(market).assets;
+    },
+    getMarketApiUrl(market = required('market')) {
+      return this.getMarket(market).apiUrl;
+    },
+    getMarketPriceHistoryAPI(market = required('market')) {
+      return this.getMarket(market).priceHistoryAPI;
+    },
+    getMarketOptions(market = required('market')) {
+      return this.getMarket(market).marketOptions;
+    },
+    getMarketVersion(market = required('market')) {
+      return this.getMarketOptions(market).version;
+    },
+    getMarketBaseChain(market = required('market')) {
+      return this.getMarketOptions(market).baseChain;
+    },
+    getMarketPriceDecimalPrecision(market = required('market')) {
+      return this.getMarketOptions(market).priceDecimalPrecision;
+    },
+    getMarketChainNames(market = required('market')) {
+      return Object.keys(this.getMarketOptions(market).chains);
+    },
+    getMarketChain(market = required('market'), assetName = required('assetName')) {
+      return this.getMarketOptions(market).chains[assetName];
+    },
+    getMarketChainMinOrderAmount(market = required('market'), assetName = required('assetName')) {
+      return this.getMarketChain(market, assetName).minOrderAmount;
+    },
+    getMarketChainWalletAddress(market = required('market'), assetName = required('assetName')) {
+      return this.getMarketChain(market, assetName).walletAddress;
+    },
+    getMarketChainRequiredConfirmations(market = required('market'), assetName = required('assetName')) {
+      return this.getMarketChain(market, assetName).requiredConfirmations;
     },
   };
 })();
@@ -19,13 +95,13 @@ const CryptoAsset = (() => {
 const getNumericAssetBalance = (assetAmount, assetName, decimal = 2) => {
   // eslint-disable-next-line no-restricted-properties
   const uptoDecimalPlaces = Math.pow(10, decimal);
-  const unitValue = CryptoAsset.getAssetUnitValue(assetName);
+  const unitValue = GlobalConfiguration.getAssetUnitValue(assetName);
   return Math.round((assetAmount * uptoDecimalPlaces) / unitValue) / uptoDecimalPlaces;
 };
 
 // returns string
 const getLiteralAssetBalance = (assetAmount, assetName, decimals = 4) => {
-  const unitValue = CryptoAsset.getAssetUnitValue(assetName);
+  const unitValue = GlobalConfiguration.getAssetUnitValue(assetName);
   return parseFloat((assetAmount / unitValue).toFixed(decimals));
 };
 
@@ -154,5 +230,5 @@ const getCleanOrderBook = (contextOrderBook, sourceAsset, targetAsset) => {
 };
 
 export {
-  formatThousands, Keys, Values, estimateBestReturnsForSeller, estimatedBestReturnsForBuyer, EstimationStatus, getCleanOrderBook, CryptoAsset, getNumericAssetBalance, getLiteralAssetBalance,
+  formatThousands, Keys, Values, estimateBestReturnsForSeller, estimatedBestReturnsForBuyer, EstimationStatus, getCleanOrderBook, GlobalConfiguration, getNumericAssetBalance, getLiteralAssetBalance,
 };

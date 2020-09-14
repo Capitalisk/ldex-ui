@@ -9,7 +9,7 @@ import {
   getCleanOrderBook,
   estimateBestReturnsForSeller,
   estimatedBestReturnsForBuyer,
-  EstimationStatus, getNumericAssetBalance,
+  EstimationStatus, getNumericAssetBalance, GlobalConfiguration as GC,
 } from './Utils';
 import InfoIcon from './InfoIcon';
 import marketInfoDescriptor from './Market';
@@ -132,13 +132,11 @@ export default class PlaceOrder extends React.Component {
 
   validateOrder() {
     const baseFee = this.getBaseFees();
-    const { marketOptions } = this.context.configuration.markets[this.context.activeMarket];
-    const { priceDecimalPrecision } = marketOptions;
+    const priceDecimalPrecision = GC.getMarketPriceDecimalPrecision(this.context.activeMarket);
     const sourceAsset = this.getSourceAsset();
     const sourceAssetBaseFee = baseFee[sourceAsset];
     const actualAssetBalance = getNumericAssetBalance(this.props.assetBalance, sourceAsset) - sourceAssetBaseFee;
-    const { unitValue } = this.context.configuration.assets[sourceAsset];
-    const minOrderAmount = marketOptions.chains[sourceAsset].minOrderAmount / unitValue;
+    const minOrderAmount = GC.getMarketChainMinOrderAmount(this.context.activeMarket, sourceAsset) / GC.getAssetUnitValue(sourceAsset);
     const isLimitOrder = !this.state.marketMode;
 
     function validateAmount(amount) {
@@ -237,17 +235,17 @@ export default class PlaceOrder extends React.Component {
       let targetChain;
       let broadcastURL;
       if (this.props.side === 'bid') {
-        dexAddress = this.context.configuration.markets[this.context.activeMarket].marketOptions.chains[this.context.activeAssets[1]].walletAddress;
+        dexAddress = GC.getMarketChainWalletAddress(this.context.activeMarket, this.context.activeAssets[1]);
         destAddress = this.context.keys[this.context.activeAssets[0]].address;
         passphrase = this.context.keys[this.context.activeAssets[1]].passphrase;
         [targetChain, sourceChain] = this.context.activeAssets;
-        broadcastURL = this.context.configuration.assets[this.context.activeAssets[1]].apiUrl;
+        broadcastURL = GC.getAssetApiUrl(this.context.activeAssets[1]);
       } else if (this.props.side === 'ask') {
-        dexAddress = this.context.configuration.markets[this.context.activeMarket].marketOptions.chains[this.context.activeAssets[0]].walletAddress;
+        dexAddress = GC.getMarketChainWalletAddress(this.context.activeMarket, this.context.activeAssets[0]);
         destAddress = this.context.keys[this.context.activeAssets[1]].address;
         passphrase = this.context.keys[this.context.activeAssets[0]].passphrase;
         [sourceChain, targetChain] = this.context.activeAssets;
-        broadcastURL = this.context.configuration.assets[this.context.activeAssets[0]].apiUrl;
+        broadcastURL = GC.getAssetApiUrl(this.context.activeAssets[0]);
       }
 
       if (dexAddress && destAddress && passphrase && targetChain && broadcastURL) {
@@ -286,17 +284,17 @@ export default class PlaceOrder extends React.Component {
       let targetChain;
       let broadcastURL;
       if (this.props.side === 'bid') {
-        dexAddress = this.context.configuration.markets[this.context.activeMarket].marketOptions.chains[this.context.activeAssets[1]].walletAddress;
+        dexAddress = GC.getMarketChainWalletAddress(this.context.activeMarket, this.context.activeAssets[1]);
         destAddress = this.context.keys[this.context.activeAssets[0]].address;
         passphrase = this.context.keys[this.context.activeAssets[1]].passphrase;
         [targetChain, sourceChain] = this.context.activeAssets;
-        broadcastURL = this.context.configuration.assets[this.context.activeAssets[1]].apiUrl;
+        broadcastURL = GC.getAssetApiUrl(this.context.activeAssets[1]);
       } else if (this.props.side === 'ask') {
-        dexAddress = this.context.configuration.markets[this.context.activeMarket].marketOptions.chains[this.context.activeAssets[0]].walletAddress;
+        dexAddress = GC.getMarketChainWalletAddress(this.context.activeMarket, this.context.activeAssets[0]);
         destAddress = this.context.keys[this.context.activeAssets[1]].address;
         passphrase = this.context.keys[this.context.activeAssets[0]].passphrase;
         [sourceChain, targetChain] = this.context.activeAssets;
-        broadcastURL = this.context.configuration.assets[this.context.activeAssets[0]].apiUrl;
+        broadcastURL = GC.getAssetApiUrl(this.context.activeAssets[0]);
       }
 
       if (dexAddress && destAddress && passphrase && targetChain && broadcastURL) {
@@ -332,10 +330,9 @@ export default class PlaceOrder extends React.Component {
   }
 
   getBaseFees() {
-    const dexConfig = this.props.configuration.markets[this.props.activeMarket].marketOptions;
-    const chains = Object.keys(dexConfig.chains);
-    const firstChain = dexConfig.chains[chains[0]];
-    const secondChain = dexConfig.chains[chains[1]];
+    const chains = GC.getMarketChainNames(this.props.activeMarket);
+    const firstChain = GC.getMarketChain(this.props.activeMarket, chains[0]);
+    const secondChain = GC.getMarketChain(this.props.activeMarket, chains[1]);
     const baseFeeKey = 'exchangeFeeBase';
     const keyDescriptor = marketInfoDescriptor[baseFeeKey];
     const firstChainBaseFee = firstChain[baseFeeKey] / keyDescriptor.div;
