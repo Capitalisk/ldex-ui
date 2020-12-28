@@ -16,14 +16,14 @@
     },
     "lsh": {
       "name": "Leasehold testnet",
-      "apiUrls": ["http://18.206.164.187:7010/api"],
+      "apiUrls": ["http://54.174.172.179:7010/api"],
       "unitValue": 100000000,
       "apiMaxPageSize": 100,
       "processingHeightExpiry": 5
     },
     "clsk": {
       "name": "Capitalisk testnet",
-      "apiUrls": ["http://18.206.164.187:7020/api"],
+      "apiUrls": ["http://34.227.22.98:7020/api"],
       "unitValue": 100000000,
       "apiMaxPageSize": 100,
       "processingHeightExpiry": 5
@@ -31,13 +31,13 @@
   },
   "markets": {
     "lsh/lsk": {
-      "apiUrls": ["http://18.206.164.187:7011"],
+      "apiUrls": ["http://54.174.172.179:7011"],
       "assets": ["lsh", "lsk"],
       "orderBookDepth": 20,
       "priceHistoryAPI": "blockchain"
     },
     "clsk/lsk": {
-      "apiUrls": ["http://18.206.164.187:7021"],
+      "apiUrls": ["http://34.227.22.98:7021"],
       "assets": ["clsk", "lsk"],
       "orderBookDepth": 20,
       "priceHistoryAPI": "blockchain"

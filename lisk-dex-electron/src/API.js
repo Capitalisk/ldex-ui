@@ -21,8 +21,8 @@ export async function getAsksFromWallet(instance, sourceWalletAddress) {
   return (await instance.get(`/orders/asks?sourceWalletAddress=${sourceWalletAddress}`)).data;
 }
 
-export async function getPendingTransfers(instance, targetAssetSymbol, recipientId) {
-  return (await instance.get(`/transfers/pending?targetChain=${targetAssetSymbol}&recipientId=${recipientId}`)).data;
+export async function getPendingTransfers(instance, targetAssetSymbol, recipientAddress) {
+  return (await instance.get(`/transfers/pending?targetChain=${targetAssetSymbol}&recipientId=${recipientAddress}`)).data;
 }
 
 export async function getRecentTransfers(instance, originOrderId) {
