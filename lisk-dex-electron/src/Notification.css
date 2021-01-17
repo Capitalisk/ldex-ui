@@ -31,6 +31,7 @@
   padding: 10px;
   border-radius: 10px;
   background: #FFFFFF;
+  pointer-events: none;
 }
 
 .notification-container.active {
@@ -50,4 +51,11 @@
 .notification-container.error {
   color: #CC0000;
   border: 2px solid #CC0000;
+}
+
+@media only screen and (max-width: 950px), only screen and (max-height: 700px) {
+  .notification-container {
+    left: 15%;
+    width: 70%;
+  }
 }

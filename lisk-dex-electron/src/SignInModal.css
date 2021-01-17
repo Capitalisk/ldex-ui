@@ -2,17 +2,28 @@
   position: fixed;
   box-sizing: border-box;
   z-index: 200;
-  top: calc(50% - 321px);
+  top: calc(50% - 343px);
   left: 25%;
   width: 50%;
   padding: 40px;
   background-color: rgb(27, 27, 27);
-  height: 642px;
+  height: 686px;
   overflow-y: auto;
 }
 
 .sign-in-textarea {
   height: 46px;
+  width: 100%;
+  font-size: 20px;
+  background-color: rgb(36, 35, 35);
+  color: white;
+  font-family: 'Courier New', Courier, monospace;
+  margin-top: 10px;
+  margin-bottom: 8px;
+}
+
+.sign-in-input {
+  height: 30px;
   width: 100%;
   font-size: 20px;
   background-color: rgb(36, 35, 35);
@@ -30,6 +41,11 @@
   left: 5%;
 }
 
+.sign-in-heading {
+  margin-top: -26px;
+  margin-bottom: 50px;
+}
+
 @media only screen and (max-width: 950px), only screen and (max-height: 700px) {
   #sign-in-modal {
     padding: 20px;
@@ -38,6 +54,11 @@
     top: 0;
     width: 100%;
     height: 100%;
+  }
+
+  .sign-in-heading {
+    margin-top: 15px;
+    margin-bottom: 25px;
   }
 
   .sign-in-textarea {

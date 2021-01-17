@@ -1,7 +1,6 @@
 import React from 'react';
 import './App.css';
 
-import * as cryptography from '@liskhq/lisk-cryptography';
 import { Mnemonic } from '@liskhq/lisk-passphrase';
 import axios from 'axios';
 import OrderBook from './OrderBook';
@@ -663,22 +662,34 @@ class App extends React.Component {
   }
 
   showSignIn = () => {
+    this.notify(
+      <span>
+        <span style={{ color: 'red' }}>Be careful!</span>
+        <span>
+          {' '}
+          {'Never share your passphrase with anyone! Only enter your passphrase in '}
+          {'applications you trust and which are obtained from official sources. '}
+          {'It is strongly recommended that you provide a separate passphrase for every '}
+          {'chain you will trade across.'}
+        </span>
+      </span>
+    );
     this.setState({ displaySigninModal: true });
   }
 
-  passphraseSubmit = async (payload) => {
+  submitLoginDetails = async (assetLoginDetails) => {
     const newKeys = {};
     let atLeastOneKey = false;
-    for (const asset in payload) {
-      if (payload[asset] !== undefined) {
+    for (const asset in assetLoginDetails) {
+      if (assetLoginDetails[asset] && assetLoginDetails[asset].passphrase && assetLoginDetails[asset].address) {
         atLeastOneKey = true;
-        const passphrase = payload[asset].trim();
+        const passphrase = assetLoginDetails[asset].passphrase.trim();
+        const address = assetLoginDetails[asset].address.trim();
         if (!Mnemonic.validateMnemonic(passphrase, Mnemonic.wordlists.english)) {
           delete newKeys[asset];
 
           return false;
         }
-        const { address } = cryptography.getAddressAndPublicKeyFromPassphrase(passphrase);
         newKeys[asset] = { address, passphrase };
       }
     }
@@ -849,7 +860,7 @@ class App extends React.Component {
     return (
       <>
         <userContext.Provider value={{ ...this.state }}>
-          {this.state.displaySigninModal && <SignInModal passphraseSubmit={this.passphraseSubmit} enabledAssets={this.state.activeAssets} close={this.closeSignInModal} walletGenerated={this.walletGenerated} />}
+          {this.state.displaySigninModal && <SignInModal submitLoginDetails={this.submitLoginDetails} enabledAssets={this.state.activeAssets} close={this.closeSignInModal} walletGenerated={this.walletGenerated} />}
           {this.state.displayLeaveWarning && <LeaveWarning setDisplayLeaveWarning={this.setDisplayLeaveWarning} />}
           <div className="top-bar">
             <div>

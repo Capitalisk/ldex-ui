@@ -3,17 +3,22 @@ import './SignInModal.css';
 import './progress.css';
 import * as cryptography from '@liskhq/lisk-cryptography';
 import { Mnemonic } from '@liskhq/lisk-passphrase';
-
+import { GlobalConfiguration as GC } from './Utils';
 
 export default class SignInModal extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      passphrase: '',
+      passphrases: {},
       addresses: {},
       failure: false,
       signingIn: false,
     };
+    let assetNames = GC.getAssetNames();
+    for (let asset of assetNames) {
+      this.state.passphrases[asset] = '';
+      this.state.addresses[asset] = '';
+    }
   }
 
   updateAddress(asset, passphrase) {
@@ -30,26 +35,47 @@ export default class SignInModal extends React.Component {
     return address;
   }
 
-  handleChange = (event) => {
+  handleWalletAddressChange = (event) => {
     const { target } = event;
     const value = target.type === 'checkbox' ? target.checked : target.value;
     const { name } = target;
 
+    this.setState((prevState) => ({
+      addresses: {
+        ...prevState.addresses,
+        [name]: value,
+      },
+    }));
+  }
+
+  handlePassphraseChange = (event) => {
+    const { target } = event;
+    const value = target.type === 'checkbox' ? target.checked : target.value;
+    const { name } = target;
+
+    // TODO: When the new client wrapper has been implemented, only upate the address
+    // if the client wrapper exposes a 'getAddressFromPassphrase' method.
     this.updateAddress(name, value);
 
-    this.setState({
-      [name]: value,
-    });
+    this.setState((prevState) => ({
+      passphrases: {
+        ...prevState.passphrases,
+        [name]: value,
+      },
+    }));
   }
 
   handleSubmit = async (event) => {
     event.preventDefault();
-    const payload = {};
+    const assetLoginDetails = {};
     for (const asset of this.props.enabledAssets) {
-      payload[asset] = this.state[asset];
+      assetLoginDetails[asset] = {
+        address: this.state.addresses[asset],
+        passphrase: this.state.passphrases[asset],
+      };
     }
     await this.setState({ signingIn: true });
-    const success = await this.props.passphraseSubmit(payload);
+    const success = await this.props.submitLoginDetails(assetLoginDetails);
     if (!success) {
       await this.setState({ signingIn: false, failure: true });
     }
@@ -60,10 +86,15 @@ export default class SignInModal extends React.Component {
     const asset = event.target.name;
     const passphrase = Mnemonic.generateMnemonic();
 
-    this.setState({
-      [asset]: passphrase,
-    });
+    this.setState((prevState) => ({
+      passphrases: {
+        ...prevState.passphrases,
+        [asset]: passphrase,
+      },
+    }));
 
+    // TODO: When the new client wrapper has been implemented, only upate the address
+    // if the client wrapper exposes a 'getAddressFromPassphrase' method.
     const address = this.updateAddress(asset, passphrase);
 
     if (this.props.walletGenerated) {
@@ -78,10 +109,14 @@ export default class SignInModal extends React.Component {
     } else {
       styles.border = '1px solid grey';
     }
-    const passphraseTextareas = [];
+    const loginAssetPanels = [];
     for (const asset of this.props.enabledAssets) {
-      passphraseTextareas.push(
+      const assetConfig = GC.getAsset(asset);
+
+      loginAssetPanels.push(
         <div key={asset} style={{ marginBottom: '20px' }}>
+          {assetConfig.allowCustomWalletAddresses && <span>Wallet address for {asset.toUpperCase()}:</span>}
+          {assetConfig.allowCustomWalletAddresses && <input style={styles} name={asset} data-gramm={false} className="sign-in-input" value={this.state.addresses[asset]} onChange={this.handleWalletAddressChange} />}
           <span>
             Passphrase for
             {' '}
@@ -89,7 +124,7 @@ export default class SignInModal extends React.Component {
             :
             {' '}
           </span>
-          <textarea style={styles} rows={4} name={asset} data-gramm={false} className="sign-in-textarea" value={this.state[asset]} onChange={this.handleChange} />
+          <textarea style={styles} rows={4} name={asset} data-gramm={false} className="sign-in-textarea" value={this.state.passphrases[asset]} onChange={this.handlePassphraseChange} />
           <button type="button" className="button-secondary" name={asset} onClick={this.handleWalletCreate} style={{ marginRight: '10px' }}>Generate wallet</button>
           {' '}
           {this.state.addresses[asset] && (
@@ -101,7 +136,10 @@ export default class SignInModal extends React.Component {
           )}
         </div>,
       );
+
+      loginAssetPanels.push(<hr key={`${asset}-underline`} style={{ marginTop: '30px', marginBottom: '30px' }} />)
     }
+    loginAssetPanels.pop();
     return (
       <>
         <div className="modal-background" />
@@ -117,21 +155,8 @@ export default class SignInModal extends React.Component {
             <div style={{ textAlign: 'right', width: '100%' }}>
               <button type="button" className="button-secondary" onClick={this.props.close}>Close</button>
             </div>
-            <h2>Sign in using your blockchain passphrases.</h2>
-            <p>
-              <span style={{ color: 'red' }}>Be careful!</span>
-              {' '}
-              Never share your passphrase with anyone! Only enter your passphrase in applications which you trust and are obtained from official sources.
-            </p>
-            <p>
-              It is
-              {' '}
-              <b>strongly recommended for security</b>
-              {' '}
-              that you provide a separate passphrase for every chain you will trade across. Using the same passphrase for multiple assets will make
-              you vulnerable to cross-chain replay attacks.
-            </p>
-            {passphraseTextareas}
+            <h2 className="sign-in-heading">Sign in using your blockchain passphrases.</h2>
+            {loginAssetPanels}
             <input className="button-primary" style={{ fontSize: '20px', marginTop: '15px' }} type="submit" value="Submit" />
           </form>
         </div>

@@ -26,7 +26,8 @@
       "apiUrls": ["http://34.227.22.98:7020/api"],
       "unitValue": 100000000,
       "apiMaxPageSize": 100,
-      "processingHeightExpiry": 5
+      "processingHeightExpiry": 5,
+      "allowCustomWalletAddresses": true
     }
   },
   "markets": {
