@@ -85,6 +85,9 @@ const GlobalConfiguration = (() => {
     getMarketChainWalletAddress(market = required('market'), assetName = required('assetName')) {
       return this.getMarketChain(market, assetName).walletAddress;
     },
+    getMarketChainExchangeFeeBase(market = required('market'), assetName = required('assetName')) {
+      return this.getMarketChain(market, assetName).exchangeFeeBase;
+    },
     getMarketChainRequiredConfirmations(market = required('market'), assetName = required('assetName')) {
       return this.getMarketChain(market, assetName).requiredConfirmations;
     },

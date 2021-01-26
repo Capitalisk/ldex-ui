@@ -90,15 +90,14 @@ class App extends React.Component {
     const enabledAssets = GC.getAssetNames();
     for (const asset of enabledAssets) {
       const assetConfig = GC.getAsset(asset);
-      const adapterConfig = assetConfig.adapter;
+      const adapterConfig = { ...assetConfig.adapter };
       const AssetAdapterClass = adapterClasses[adapterConfig.type];
       if (!AssetAdapterClass) {
         throw new Error(
           `The ${adapterConfig.type} adapter type is not supported`
         );
       }
-      const assetAdapter = new AssetAdapterClass();
-      await assetAdapter.load(adapterConfig);
+      const assetAdapter = new AssetAdapterClass(adapterConfig);
       this.assetAdapters[asset] = assetAdapter;
     }
 
@@ -427,16 +426,13 @@ class App extends React.Component {
   }
 
   getTransferType(pendingTransfer) {
-    console.log('getTransferType', pendingTransfer.type);
     return (pendingTransfer.type || '').charAt(0);
   }
 
   getCounterpartyOrderId(pendingTransfer) {
     if (pendingTransfer.type === 'r3') {
-      console.log('getCounterpartyOrderId r3', pendingTransfer.closerOrderId);
       return pendingTransfer.closerOrderId || null;
     }
-    console.log('getCounterpartyOrderId other', pendingTransfer.originOrderId);
     return pendingTransfer.originOrderId || null;
   }
 
@@ -715,9 +711,11 @@ class App extends React.Component {
           delete newKeys[asset];
           return false;
         }
+        assetAdapter.connect({ passphrase });
         newKeys[asset] = { address, passphrase };
       }
     }
+
 
     // The keys need to be updated on the state before we fetch the order book.
     await this.setState((state) => ({

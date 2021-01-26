@@ -9,7 +9,7 @@
   "dependencies": {
     "axios": "^0.19.0",
     "cors-anywhere": "^0.4.1",
-    "ldex-ui-lisk-adapter": "^1.0.4",
+    "ldex-ui-lisk-adapter": "^1.1.0",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
     "react-scripts": "^3.4.1",

@@ -16,6 +16,7 @@ export default class UserOrder extends React.Component {
     if (confirmed) {
       const { targetChain, sourceChain } = this.props.order;
       const dexAddress = GC.getMarketChainWalletAddress(this.context.activeMarket, sourceChain);
+      const feeBase = GC.getMarketChainExchangeFeeBase(this.context.activeMarket, sourceChain);
       const orderId = this.props.order.id;
       const { passphrase } = this.context.keys[sourceChain];
       const assetAdapter = this.context.assetAdapters[sourceChain];
@@ -25,6 +26,7 @@ export default class UserOrder extends React.Component {
         recipientAddress: dexAddress,
         message: `${targetChain},close,${orderId}`,
         passphrase,
+        fee: String(feeBase),
       });
       const { order } = this.props;
       try {

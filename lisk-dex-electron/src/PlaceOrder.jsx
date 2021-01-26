@@ -243,14 +243,18 @@ export default class PlaceOrder extends React.Component {
       let passphrase;
       let sourceChain;
       let targetChain;
+      let feeBase;
+
       if (this.props.side === 'bid') {
         dexAddress = GC.getMarketChainWalletAddress(this.context.activeMarket, this.context.activeAssets[1]);
+        feeBase = GC.getMarketChainExchangeFeeBase(this.context.activeMarket, this.context.activeAssets[1]);
         destAddress = this.context.keys[this.context.activeAssets[0]].address;
         sourceAddress = this.context.keys[this.context.activeAssets[1]].address;
         passphrase = this.context.keys[this.context.activeAssets[1]].passphrase;
         [targetChain, sourceChain] = this.context.activeAssets;
       } else if (this.props.side === 'ask') {
         dexAddress = GC.getMarketChainWalletAddress(this.context.activeMarket, this.context.activeAssets[0]);
+        feeBase = GC.getMarketChainExchangeFeeBase(this.context.activeMarket, this.context.activeAssets[0]);
         destAddress = this.context.keys[this.context.activeAssets[1]].address;
         sourceAddress = this.context.keys[this.context.activeAssets[0]].address;
         passphrase = this.context.keys[this.context.activeAssets[0]].passphrase;
@@ -267,6 +271,7 @@ export default class PlaceOrder extends React.Component {
             recipientAddress: dexAddress,
             message: `${targetChain},market,${destAddress}`,
             passphrase,
+            fee: String(feeBase),
           });
           (async () => {
             await this.setState({ isSubmitting: true });
@@ -314,14 +319,18 @@ export default class PlaceOrder extends React.Component {
       let passphrase;
       let sourceChain;
       let targetChain;
+      let feeBase;
+
       if (this.props.side === 'bid') {
         dexAddress = GC.getMarketChainWalletAddress(this.context.activeMarket, this.context.activeAssets[1]);
+        feeBase = GC.getMarketChainExchangeFeeBase(this.context.activeMarket, this.context.activeAssets[1]);
         destAddress = this.context.keys[this.context.activeAssets[0]].address;
         sourceAddress = this.context.keys[this.context.activeAssets[1]].address;
         passphrase = this.context.keys[this.context.activeAssets[1]].passphrase;
         [targetChain, sourceChain] = this.context.activeAssets;
       } else if (this.props.side === 'ask') {
         dexAddress = GC.getMarketChainWalletAddress(this.context.activeMarket, this.context.activeAssets[0]);
+        feeBase = GC.getMarketChainExchangeFeeBase(this.context.activeMarket, this.context.activeAssets[0]);
         destAddress = this.context.keys[this.context.activeAssets[1]].address;
         sourceAddress = this.context.keys[this.context.activeAssets[0]].address;
         passphrase = this.context.keys[this.context.activeAssets[0]].passphrase;
@@ -339,6 +348,7 @@ export default class PlaceOrder extends React.Component {
             recipientAddress: dexAddress,
             message: `${targetChain},limit,${price},${destAddress}`,
             passphrase,
+            fee: String(feeBase),
           });
           (async () => {
             await this.setState({ isSubmitting: true });
