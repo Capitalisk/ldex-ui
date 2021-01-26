@@ -7,15 +7,18 @@ import { getClient } from '../API';
 
 const assets = Dictionary(Record({
   name: String,
-  apiUrls: Array(String),
-  apiMaxPageSize: Number,
   unitValue: Number,
   processingHeightExpiry: Number,
+  adapter: Record({
+    type: String,
+    apiURL: String,
+    apiMaxPageSize: Number,
+  }),
 }));
 
 const markets = Dictionary(Record({
   assets: Array(String),
-  apiUrls: Array(String),
+  apiURL: String,
 }));
 
 const UnprocessedDEXConfiguration = Record({
@@ -30,7 +33,7 @@ const UnprocessedDEXConfiguration = Record({
   assets,
 });
 
-// A ready-to-use DEX configuration with the marketOptions (which is fetched from the apiUrl) populated.
+// A ready-to-use DEX configuration with the marketOptions (which is fetched from the apiURL) populated.
 // eslint-disable-next-line no-unused-vars
 const DEXConfiguration = Record({
   appTitle: String,
@@ -42,14 +45,14 @@ const DEXConfiguration = Record({
   refreshInterval: Number,
   assets: Dictionary(Record({
     name: String,
-    apiUrls: Array(String),
+    apiURL: String,
     apiMaxPageSize: Number,
     unitValue: Number,
     processingHeightExpiry: Number,
   })),
   markets: Dictionary(Record({
     assets: Array(String),
-    apiUrls: Array(String),
+    apiURL: String,
     marketOptions: Record({
       version: String,
       baseChain: String,
@@ -71,31 +74,20 @@ const DEXConfiguration = Record({
 
 export default async function createRefinedGlobalConfig(config) {
   // Throws an exception if check fails for given config object
-  const _config = UnprocessedDEXConfiguration.check(config);
-  const assetSymbols = Object.keys(_config.assets);
-
-  // Select a random URL for each asset.
-  for (const assetSymbol of assetSymbols) {
-    const asset = _config.assets[assetSymbol];
-    const randomIndex = Math.floor(Math.random() * asset.apiUrls.length);
-    asset.apiUrl = asset.apiUrls[randomIndex];
-  }
-
+  const verifiedConfig = UnprocessedDEXConfiguration.check(config);
   const marketSymbols = Object.keys(config.markets);
 
   for (const marketSymbol of marketSymbols) {
     const market = config.markets[marketSymbol];
-    const randomIndex = Math.floor(Math.random() * market.apiUrls.length);
-    market.apiUrl = market.apiUrls[randomIndex];
-    const client = getClient(market.apiUrl);
+    const client = getClient(market.apiURL);
     const { data } = await client.get('/status');
     if (!(data && data.chains)) {
-      throw new Error(`DEX API ${market.apiUrl} returned an invalid response.`);
+      throw new Error(`DEX API ${market.apiURL} returned an invalid response.`);
     }
     market.marketOptions = data;
   }
 
   console.log('Loaded configuration: ');
-  console.log(_config);
-  return _config;
+  console.log(verifiedConfig);
+  return verifiedConfig;
 }

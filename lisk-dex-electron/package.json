@@ -7,17 +7,14 @@
   "author": "Jong, sacOO7",
   "description": "Lisk DEX-UI app for exchanging tokens with sidechains",
   "dependencies": {
-    "@liskhq/lisk-cryptography": "^2.2.0",
-    "@liskhq/lisk-passphrase": "^2.0.3",
-    "@liskhq/lisk-transactions": "^2.3.1",
     "axios": "^0.19.0",
     "cors-anywhere": "^0.4.1",
+    "ldex-ui-lisk-adapter": "^1.0.4",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
     "react-scripts": "^3.4.1",
     "recharts": "^1.8.5",
-    "runtypes": "^4.1.0",
-    "sodium-native": "^3.1.1"
+    "runtypes": "^4.1.0"
   },
   "scripts": {
     "electron": "electron .",

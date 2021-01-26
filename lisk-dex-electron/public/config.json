@@ -9,22 +9,28 @@
   "assets": {
     "lsk": {
       "name": "Lisk",
-      "apiUrls": ["https://ldex.exchange/chain/lsk/api"],
       "unitValue": 100000000,
-      "apiMaxPageSize": 100,
-      "processingHeightExpiry": 5
+      "processingHeightExpiry": 5,
+      "adapter": {
+        "type": "lisk",
+        "apiURL": "https://ldex.exchange/chain/lsk/api",
+        "apiMaxPageSize": 100
+      }
     },
     "lsh": {
       "name": "Leasehold",
-      "apiUrls": ["https://ldex.exchange/chain/lsh/api"],
       "unitValue": 100000000,
-      "apiMaxPageSize": 100,
-      "processingHeightExpiry": 5
+      "processingHeightExpiry": 5,
+      "adapter": {
+        "type": "lisk",
+        "apiURL": "https://ldex.exchange/chain/lsh/api",
+        "apiMaxPageSize": 100
+      }
     }
   },
   "markets": {
     "lsh/lsk": {
-      "apiUrls": ["https://ldex.exchange/dex/lsh-lsk/api"],
+      "apiURL": "https://ldex.exchange/dex/lsh-lsk/api",
       "assets": ["lsh", "lsk"],
       "orderBookDepth": 20,
       "priceHistoryAPI": "blockchain"

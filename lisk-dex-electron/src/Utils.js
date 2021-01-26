@@ -34,8 +34,8 @@ const GlobalConfiguration = (() => {
     getAsset(assetName = required('assetName')) {
       return globalConfig.assets && globalConfig.assets[assetName];
     },
-    getAssetApiUrl(assetName = required('assetName')) {
-      return this.getAsset(assetName).apiUrl;
+    getAssetApiURL(assetName = required('assetName')) {
+      return this.getAsset(assetName).apiURL;
     },
     getAssetUnitValue(assetName = required('assetName')) {
       return this.getAsset(assetName).unitValue;
@@ -55,8 +55,8 @@ const GlobalConfiguration = (() => {
     getMarketAssets(market = required('market')) {
       return this.getMarket(market).assets;
     },
-    getMarketApiUrl(market = required('market')) {
-      return this.getMarket(market).apiUrl;
+    getMarketApiURL(market = required('market')) {
+      return this.getMarket(market).apiURL;
     },
     getMarketPriceHistoryAPI(market = required('market')) {
       return this.getMarket(market).priceHistoryAPI;

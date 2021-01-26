@@ -1,10 +1,7 @@
 import React from 'react';
 import './UserOrder.css';
-import * as transactions from '@liskhq/lisk-transactions';
-import axios from 'axios';
 import userContext from './context';
 import { getLiteralAssetBalance, GlobalConfiguration as GC } from './Utils';
-
 
 export default class UserOrder extends React.Component {
   static contextType = userContext;
@@ -17,21 +14,23 @@ export default class UserOrder extends React.Component {
   cancelOrder = async () => {
     const confirmed = window.confirm('Are you sure you want to cancel this limit order?');
     if (confirmed) {
-      const dexAddress = GC.getMarketChainWalletAddress(this.context.activeMarket, this.props.order.sourceChain);
-      const { passphrase } = this.context.keys[this.props.order.sourceChain];
-      const { targetChain } = this.props.order;
+      const { targetChain, sourceChain } = this.props.order;
+      const dexAddress = GC.getMarketChainWalletAddress(this.context.activeMarket, sourceChain);
       const orderId = this.props.order.id;
-      const broadcastURL = GC.getAssetApiUrl(this.props.order.sourceChain);
+      const { passphrase } = this.context.keys[sourceChain];
+      const assetAdapter = this.context.assetAdapters[sourceChain];
 
-      const tx = transactions.transfer({
-        amount: transactions.utils.convertLSKToBeddows('0.11').toString(),
-        recipientId: dexAddress,
-        data: `${targetChain},close,${orderId}`,
+      const tx = assetAdapter.createTransfer({
+        amount: 0.11,
+        recipientAddress: dexAddress,
+        message: `${targetChain},close,${orderId}`,
         passphrase,
       });
       const { order } = this.props;
       try {
-        await axios.post(`${broadcastURL}/transactions`, tx);
+        await assetAdapter.postTransaction({
+          transaction: tx
+        });
       } catch (error) {
         error.orderToCancel = order;
         this.props.failedToCancelOrder(error);

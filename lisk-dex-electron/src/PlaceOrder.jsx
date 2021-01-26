@@ -1,7 +1,5 @@
 import React from 'react';
 import './PlaceOrder.css';
-import * as transactions from '@liskhq/lisk-transactions';
-import axios from 'axios';
 import BalanceDisplay from './BalanceDisplay';
 import userContext from './context';
 import Modal from './Modal';
@@ -27,6 +25,7 @@ export default class PlaceOrder extends React.Component {
       errors: {},
       isActionInfoModalOpen: false,
     };
+    this.assetAdapters = props.assetAdapters;
   }
 
   handleChange = (event) => {
@@ -197,7 +196,6 @@ export default class PlaceOrder extends React.Component {
     });
   }
 
-
   generateOrder(tx, type, sourceChain, targetChain, side, price) {
     const order = {
       id: tx.id,
@@ -233,34 +231,34 @@ export default class PlaceOrder extends React.Component {
       let passphrase;
       let sourceChain;
       let targetChain;
-      let broadcastURL;
       if (this.props.side === 'bid') {
         dexAddress = GC.getMarketChainWalletAddress(this.context.activeMarket, this.context.activeAssets[1]);
         destAddress = this.context.keys[this.context.activeAssets[0]].address;
         passphrase = this.context.keys[this.context.activeAssets[1]].passphrase;
         [targetChain, sourceChain] = this.context.activeAssets;
-        broadcastURL = GC.getAssetApiUrl(this.context.activeAssets[1]);
       } else if (this.props.side === 'ask') {
         dexAddress = GC.getMarketChainWalletAddress(this.context.activeMarket, this.context.activeAssets[0]);
         destAddress = this.context.keys[this.context.activeAssets[1]].address;
         passphrase = this.context.keys[this.context.activeAssets[0]].passphrase;
         [sourceChain, targetChain] = this.context.activeAssets;
-        broadcastURL = GC.getAssetApiUrl(this.context.activeAssets[0]);
       }
 
-      if (dexAddress && destAddress && passphrase && targetChain && broadcastURL) {
+      if (dexAddress && destAddress && passphrase && targetChain) {
         if (this.state.amount > 0) {
           const { side } = this.props;
-          const tx = transactions.transfer({
-            amount: transactions.utils.convertLSKToBeddows(this.state.amount.toString()).toString(),
-            recipientId: dexAddress,
-            data: `${targetChain},market,${destAddress}`,
+          const sourceAssetAdapter = this.assetAdapters[sourceChain];
+          const tx = sourceAssetAdapter.createTransfer({
+            amount: this.state.amount,
+            recipientAddress: dexAddress,
+            message: `${targetChain},market,${destAddress}`,
             passphrase,
           });
           (async () => {
             await this.setState({ isSubmitting: true });
             try {
-              await axios.post(`${broadcastURL}/transactions`, tx);
+              await sourceAssetAdapter.postTransaction({
+                transaction: tx,
+              });
             } catch (err) {
               const error = new Error(`Failed to post market order because of error: ${err.message}`);
               error.response = err.response;
@@ -282,35 +280,35 @@ export default class PlaceOrder extends React.Component {
       let passphrase;
       let sourceChain;
       let targetChain;
-      let broadcastURL;
       if (this.props.side === 'bid') {
         dexAddress = GC.getMarketChainWalletAddress(this.context.activeMarket, this.context.activeAssets[1]);
         destAddress = this.context.keys[this.context.activeAssets[0]].address;
         passphrase = this.context.keys[this.context.activeAssets[1]].passphrase;
         [targetChain, sourceChain] = this.context.activeAssets;
-        broadcastURL = GC.getAssetApiUrl(this.context.activeAssets[1]);
       } else if (this.props.side === 'ask') {
         dexAddress = GC.getMarketChainWalletAddress(this.context.activeMarket, this.context.activeAssets[0]);
         destAddress = this.context.keys[this.context.activeAssets[1]].address;
         passphrase = this.context.keys[this.context.activeAssets[0]].passphrase;
         [sourceChain, targetChain] = this.context.activeAssets;
-        broadcastURL = GC.getAssetApiUrl(this.context.activeAssets[0]);
       }
 
-      if (dexAddress && destAddress && passphrase && targetChain && broadcastURL) {
+      if (dexAddress && destAddress && passphrase && targetChain) {
         if (this.state.amount > 0) {
           const { price } = this.state;
           const { side } = this.props;
-          const tx = transactions.transfer({
-            amount: transactions.utils.convertLSKToBeddows(this.state.amount.toString()).toString(),
-            recipientId: dexAddress,
-            data: `${targetChain},limit,${price},${destAddress}`,
+          const sourceAssetAdapter = this.assetAdapters[sourceChain];
+          const tx = sourceAssetAdapter.createTransfer({
+            amount: this.state.amount,
+            recipientAddress: dexAddress,
+            message: `${targetChain},limit,${price},${destAddress}`,
             passphrase,
           });
           (async () => {
             await this.setState({ isSubmitting: true });
             try {
-              await axios.post(`${broadcastURL}/transactions`, tx);
+              await sourceAssetAdapter.postTransaction({
+                transaction: tx
+              });
             } catch (err) {
               const error = new Error(`Failed to post limit order because of error: ${err.message}`);
               error.response = err.response;

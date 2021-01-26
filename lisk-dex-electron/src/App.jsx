@@ -1,8 +1,6 @@
 import React from 'react';
 import './App.css';
 
-import { Mnemonic } from '@liskhq/lisk-passphrase';
-import axios from 'axios';
 import OrderBook from './OrderBook';
 import PriceHistoryChart from './PriceHistoryChart';
 import PlaceOrder from './PlaceOrder';
@@ -26,6 +24,14 @@ import userContext from './context';
 import LeaveWarning from './LeaveWarning';
 import createRefinedGlobalConfig from './config/Configuration';
 import { getNumericAssetBalance, GlobalConfiguration as GC } from './Utils';
+
+// Import supported adapters.
+import LiskAdapter from 'ldex-ui-lisk-adapter';
+
+// The property names in this object can be used as the adapter 'type' in the config file.
+const adapterClasses = {
+  lisk: LiskAdapter,
+};
 
 const NOTIFICATIONS_MAX_QUEUE_LENGTH = 3;
 const DEFAULT_API_MAX_PAGE_SIZE = 100;
@@ -66,25 +72,42 @@ class App extends React.Component {
 
     this.notificationId = 0;
     this.intervalRegistered = false;
-    this.loadConfiguration();
+    this.assetAdapters = {};
+    this.load();
   }
 
   getDexClient() {
-    return getClient(GC.getMarketApiUrl(this.state.activeMarket));
+    return getClient(GC.getMarketApiURL(this.state.activeMarket));
   }
 
-  async loadConfiguration() {
+  async load() {
     const localClient = getClient('');
     const defaultConfiguration = await getConfig(localClient);
     const config = await createRefinedGlobalConfig(defaultConfiguration);
     // set global config
     GC.setConfig(config);
     this.initPendingOrders(GC.getMarketNames());
+    const enabledAssets = GC.getAssetNames();
+    for (const asset of enabledAssets) {
+      const assetConfig = GC.getAsset(asset);
+      const adapterConfig = assetConfig.adapter;
+      const AssetAdapterClass = adapterClasses[adapterConfig.type];
+      if (!AssetAdapterClass) {
+        throw new Error(
+          `The ${adapterConfig.type} adapter type is not supported`
+        );
+      }
+      const assetAdapter = new AssetAdapterClass();
+      await assetAdapter.load(adapterConfig);
+      this.assetAdapters[asset] = assetAdapter;
+    }
+
     await this.setState({
       configuration: GC.getConfig(),
       activeMarket: GC.getDefaultActiveMarketName(),
       activeAssets: GC.getMarketAssets(GC.getDefaultActiveMarketName()),
-      enabledAssets: GC.getAssetNames(),
+      enabledAssets,
+      assetAdapters: this.assetAdapters,
       configurationLoaded: true,
     });
   }
@@ -144,17 +167,11 @@ class App extends React.Component {
     const [quoteChainTxns, baseChainTxns] = await Promise.all(
       this.state.activeAssets.map(async (assetSymbol) => {
         const asset = GC.getAsset(assetSymbol);
-        const client = axios.create();
-        const targetEndpoint = asset.apiUrl;
         const dexWalletAddress = GC.getMarketChainWalletAddress(this.state.activeMarket, assetSymbol);
-        const result = await client.get(
-          `${targetEndpoint}/transactions?senderId=${
-            dexWalletAddress
-          }&limit=${
-            asset.apiMaxPageSize || DEFAULT_API_MAX_PAGE_SIZE
-          }&sort=timestamp:desc`,
-        );
-        return result.data.data;
+        return this.assetAdapters[assetSymbol].getLatestOutboundTransactions({
+          address: dexWalletAddress,
+          limit: asset.apiMaxPageSize || DEFAULT_API_MAX_PAGE_SIZE,
+        });
       }),
     );
 
@@ -568,7 +585,7 @@ class App extends React.Component {
     const pendingMarketSymbols = Object.keys(this.pendingOrders);
     const marketCompletedOrders = await Promise.all(
       pendingMarketSymbols.map(async (market) => {
-        const dexClient = getClient(GC.getMarketApiUrl(market));
+        const dexClient = getClient(GC.getMarketApiURL(market));
         const pendingOrders = Object.values(this.pendingOrders[market]);
 
         if (!pendingOrders.length) {
@@ -685,9 +702,10 @@ class App extends React.Component {
         atLeastOneKey = true;
         const passphrase = assetLoginDetails[asset].passphrase.trim();
         const address = assetLoginDetails[asset].address.trim();
-        if (!Mnemonic.validateMnemonic(passphrase, Mnemonic.wordlists.english)) {
+        const assetAdapter = this.assetAdapters[asset];
+        let isPassphraseValid = assetAdapter.validatePassphrase({ passphrase });
+        if (!isPassphraseValid) {
           delete newKeys[asset];
-
           return false;
         }
         newKeys[asset] = { address, passphrase };
@@ -784,18 +802,13 @@ class App extends React.Component {
   }
 
   async fetchAssetBalances(assetInfos) {
-    const client = axios.create();
-    client.defaults.timeout = 10000;
     const balances = await Promise.all(
       this.state.activeAssets.map(async (asset) => {
         if (asset in assetInfos) {
-          const targetEndpoint = GC.getAssetApiUrl(asset);
           try {
-            const response = await client.get(`${targetEndpoint}/accounts?address=${assetInfos[asset].address}`);
-            const balanceList = Array.isArray(response.data) ? response.data : response.data.data;
-            if (balanceList.length > 0) {
-              return balanceList[0].balance;
-            }
+            return await this.assetAdapters[asset].getAccountBalance({
+              address: assetInfos[asset].address,
+            });
           } catch (error) {
             console.error(error);
           }
@@ -860,7 +873,7 @@ class App extends React.Component {
     return (
       <>
         <userContext.Provider value={{ ...this.state }}>
-          {this.state.displaySigninModal && <SignInModal submitLoginDetails={this.submitLoginDetails} enabledAssets={this.state.activeAssets} close={this.closeSignInModal} walletGenerated={this.walletGenerated} />}
+          {this.state.displaySigninModal && <SignInModal submitLoginDetails={this.submitLoginDetails} enabledAssets={this.state.activeAssets} close={this.closeSignInModal} walletGenerated={this.walletGenerated} assetAdapters={this.assetAdapters} />}
           {this.state.displayLeaveWarning && <LeaveWarning setDisplayLeaveWarning={this.setDisplayLeaveWarning} />}
           <div className="top-bar">
             <div>
@@ -885,10 +898,10 @@ class App extends React.Component {
               {this.state.notifications.map((data) => <Notification key={data.id} data={data} />)}
             </div>
             <div className="sell-panel">
-              <PlaceOrder side="ask" activeMarket={this.state.activeMarket} orderSubmit={this.orderSubmit} orderSubmitError={this.orderSubmitError} showEstimateInfo={this.showEstimateInfo} assetBalance={this.state.baseAssetBalance} />
+              <PlaceOrder side="ask" activeMarket={this.state.activeMarket} orderSubmit={this.orderSubmit} orderSubmitError={this.orderSubmitError} showEstimateInfo={this.showEstimateInfo} assetBalance={this.state.baseAssetBalance} assetAdapters={this.assetAdapters} />
             </div>
             <div className="buy-panel">
-              <PlaceOrder side="bid" activeMarket={this.state.activeMarket} orderSubmit={this.orderSubmit} orderSubmitError={this.orderSubmitError} showEstimateInfo={this.showEstimateInfo} assetBalance={this.state.quoteAssetBalance} />
+              <PlaceOrder side="bid" activeMarket={this.state.activeMarket} orderSubmit={this.orderSubmit} orderSubmitError={this.orderSubmitError} showEstimateInfo={this.showEstimateInfo} assetBalance={this.state.quoteAssetBalance} assetAdapters={this.assetAdapters} />
             </div>
             <div className="order-book-container">
               <div className="sell-orders-title">Asks</div>

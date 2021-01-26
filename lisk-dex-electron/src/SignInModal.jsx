@@ -1,8 +1,6 @@
 import React from 'react';
 import './SignInModal.css';
 import './progress.css';
-import * as cryptography from '@liskhq/lisk-cryptography';
-import { Mnemonic } from '@liskhq/lisk-passphrase';
 import { GlobalConfiguration as GC } from './Utils';
 
 export default class SignInModal extends React.Component {
@@ -14,6 +12,7 @@ export default class SignInModal extends React.Component {
       failure: false,
       signingIn: false,
     };
+    this.assetAdapters = props.assetAdapters;
     let assetNames = GC.getAssetNames();
     for (let asset of assetNames) {
       this.state.passphrases[asset] = '';
@@ -22,8 +21,9 @@ export default class SignInModal extends React.Component {
   }
 
   updateAddress(asset, passphrase) {
-    const isValidPassphrase = Mnemonic.validateMnemonic(passphrase, Mnemonic.wordlists.english);
-    const address = isValidPassphrase ? cryptography.getAddressAndPublicKeyFromPassphrase(passphrase).address : null;
+    let assetAdapter = this.assetAdapters[asset];
+    const isValidPassphrase = assetAdapter.validatePassphrase({ passphrase });
+    const address = isValidPassphrase ? assetAdapter.getAddressFromPassphrase({ passphrase }) : null;
 
     this.setState((prevState) => ({
       addresses: {
@@ -53,9 +53,10 @@ export default class SignInModal extends React.Component {
     const value = target.type === 'checkbox' ? target.checked : target.value;
     const { name } = target;
 
-    // TODO: When the new client wrapper has been implemented, only upate the address
-    // if the client wrapper exposes a 'getAddressFromPassphrase' method.
-    this.updateAddress(name, value);
+    // Only upate the address if the client wrapper exposes a getAddressFromPassphrase method.
+    if (this.assetAdapters[name].getAddressFromPassphrase) {
+      this.updateAddress(name, value);
+    }
 
     this.setState((prevState) => ({
       passphrases: {
@@ -84,18 +85,19 @@ export default class SignInModal extends React.Component {
   handleWalletCreate = (event) => {
     event.preventDefault();
     const asset = event.target.name;
-    const passphrase = Mnemonic.generateMnemonic();
+    let assetAdapter = this.assetAdapters[asset];
+    const { address, passphrase } = assetAdapter.createWallet();
 
     this.setState((prevState) => ({
       passphrases: {
         ...prevState.passphrases,
         [asset]: passphrase,
       },
+      addresses: {
+        ...prevState.addresses,
+        [asset]: address,
+      },
     }));
-
-    // TODO: When the new client wrapper has been implemented, only upate the address
-    // if the client wrapper exposes a 'getAddressFromPassphrase' method.
-    const address = this.updateAddress(asset, passphrase);
 
     if (this.props.walletGenerated) {
       this.props.walletGenerated(address, passphrase);

@@ -1,8 +1,8 @@
 import axios from 'axios';
 
-export function getClient(apiBaseUrl) {
+export function getClient(apiBaseURL) {
   return axios.create({
-    baseURL: apiBaseUrl,
+    baseURL: apiBaseURL,
     timeout: 10000,
     headers: { 'X-LiskDexUI-Version': '0.2' },
   });

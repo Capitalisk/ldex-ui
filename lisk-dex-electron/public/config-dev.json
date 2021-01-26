@@ -9,36 +9,45 @@
   "assets": {
     "lsk": {
       "name": "Lisk testnet",
-      "apiUrls": ["https://test-02.liskapi.io/api"],
       "unitValue": 100000000,
-      "apiMaxPageSize": 100,
-      "processingHeightExpiry": 5
+      "processingHeightExpiry": 5,
+      "adapter": {
+        "type": "lisk",
+        "apiURL": "https://test-02.liskapi.io/api",
+        "apiMaxPageSize": 100
+      }
     },
     "lsh": {
       "name": "Leasehold testnet",
-      "apiUrls": ["http://54.174.172.179:7010/api"],
       "unitValue": 100000000,
-      "apiMaxPageSize": 100,
-      "processingHeightExpiry": 5
+      "processingHeightExpiry": 5,
+      "adapter": {
+        "type": "lisk",
+        "apiURL": "http://54.174.172.179:7010/api",
+        "apiMaxPageSize": 100
+      }
     },
     "clsk": {
       "name": "Capitalisk testnet",
-      "apiUrls": ["http://34.227.22.98:7020/api"],
       "unitValue": 100000000,
-      "apiMaxPageSize": 100,
       "processingHeightExpiry": 5,
-      "allowCustomWalletAddresses": true
+      "allowCustomWalletAddresses": true,
+      "adapter": {
+        "type": "lisk",
+        "apiURL": "http://34.227.22.98:7020/api",
+        "apiMaxPageSize": 100
+      }
     }
   },
   "markets": {
     "lsh/lsk": {
-      "apiUrls": ["http://54.174.172.179:7011"],
+      "apiURL": "http://54.174.172.179:7011",
       "assets": ["lsh", "lsk"],
       "orderBookDepth": 20,
       "priceHistoryAPI": "blockchain"
     },
     "clsk/lsk": {
-      "apiUrls": ["http://34.227.22.98:7021"],
+      "apiURL": "http://18.206.164.187:7021",
       "assets": ["clsk", "lsk"],
       "orderBookDepth": 20,
       "priceHistoryAPI": "blockchain"
