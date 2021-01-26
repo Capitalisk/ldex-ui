@@ -196,21 +196,32 @@ export default class PlaceOrder extends React.Component {
     });
   }
 
-  generateOrder(tx, type, sourceChain, targetChain, side, price) {
+  generateOrder({
+    transactionId,
+    senderAddress,
+    recipientAddress,
+    amount,
+    type,
+    sourceChain,
+    targetChain,
+    side,
+    price
+  }) {
     const order = {
-      id: tx.id,
+      id: transactionId,
       type,
       side,
-      senderId: tx.senderId,
-      recipientId: tx.recipientId,
+      senderAddress,
+      recipientAddress,
       sourceChain,
       targetChain,
     };
+    const unitValue = GC.getAssetUnitValue(sourceChain);
     if (side === 'bid') {
-      order.value = tx.amount;
+      order.value = String(amount * unitValue);
       order.valueRemaining = order.value;
     } else {
-      order.size = tx.amount;
+      order.size = String(amount * unitValue);
       order.sizeRemaining = order.size;
     }
     if (price != null) {
@@ -219,8 +230,8 @@ export default class PlaceOrder extends React.Component {
     return order;
   }
 
-  handleTransactionSubmit(tx, type, sourceChain, targetChain, side, price) {
-    const order = this.generateOrder(tx, type, sourceChain, targetChain, side, price);
+  handleTransactionSubmit(orderData) {
+    const order = this.generateOrder(orderData);
     this.props.orderSubmit(order);
   }
 
@@ -228,27 +239,31 @@ export default class PlaceOrder extends React.Component {
     if (this.state.marketMode) {
       let dexAddress;
       let destAddress;
+      let sourceAddress;
       let passphrase;
       let sourceChain;
       let targetChain;
       if (this.props.side === 'bid') {
         dexAddress = GC.getMarketChainWalletAddress(this.context.activeMarket, this.context.activeAssets[1]);
         destAddress = this.context.keys[this.context.activeAssets[0]].address;
+        sourceAddress = this.context.keys[this.context.activeAssets[1]].address;
         passphrase = this.context.keys[this.context.activeAssets[1]].passphrase;
         [targetChain, sourceChain] = this.context.activeAssets;
       } else if (this.props.side === 'ask') {
         dexAddress = GC.getMarketChainWalletAddress(this.context.activeMarket, this.context.activeAssets[0]);
         destAddress = this.context.keys[this.context.activeAssets[1]].address;
+        sourceAddress = this.context.keys[this.context.activeAssets[0]].address;
         passphrase = this.context.keys[this.context.activeAssets[0]].passphrase;
         [sourceChain, targetChain] = this.context.activeAssets;
       }
 
       if (dexAddress && destAddress && passphrase && targetChain) {
-        if (this.state.amount > 0) {
+        let amount = this.state.amount;
+        if (amount > 0) {
           const { side } = this.props;
           const sourceAssetAdapter = this.assetAdapters[sourceChain];
           const tx = sourceAssetAdapter.createTransfer({
-            amount: this.state.amount,
+            amount,
             recipientAddress: dexAddress,
             message: `${targetChain},market,${destAddress}`,
             passphrase,
@@ -262,7 +277,16 @@ export default class PlaceOrder extends React.Component {
             } catch (err) {
               const error = new Error(`Failed to post market order because of error: ${err.message}`);
               error.response = err.response;
-              error.order = this.generateOrder(tx, 'market', sourceChain, targetChain, side);
+              error.order = this.generateOrder({
+                transactionId: tx.id,
+                senderAddress: sourceAddress,
+                recipientAddress: dexAddress,
+                amount,
+                type: 'market',
+                sourceChain,
+                targetChain,
+                side,
+              });
               if (this.props.orderSubmitError) {
                 this.props.orderSubmitError(error);
               }
@@ -270,35 +294,48 @@ export default class PlaceOrder extends React.Component {
               return;
             }
             await this.setState({ isSubmitting: false });
-            this.handleTransactionSubmit(tx, 'market', sourceChain, targetChain, side);
+            this.handleTransactionSubmit({
+              transactionId: tx.id,
+              senderAddress: sourceAddress,
+              recipientAddress: dexAddress,
+              amount,
+              type: 'market',
+              sourceChain,
+              targetChain,
+              side,
+            });
           })();
         }
       }
     } else {
       let dexAddress;
       let destAddress;
+      let sourceAddress;
       let passphrase;
       let sourceChain;
       let targetChain;
       if (this.props.side === 'bid') {
         dexAddress = GC.getMarketChainWalletAddress(this.context.activeMarket, this.context.activeAssets[1]);
         destAddress = this.context.keys[this.context.activeAssets[0]].address;
+        sourceAddress = this.context.keys[this.context.activeAssets[1]].address;
         passphrase = this.context.keys[this.context.activeAssets[1]].passphrase;
         [targetChain, sourceChain] = this.context.activeAssets;
       } else if (this.props.side === 'ask') {
         dexAddress = GC.getMarketChainWalletAddress(this.context.activeMarket, this.context.activeAssets[0]);
         destAddress = this.context.keys[this.context.activeAssets[1]].address;
+        sourceAddress = this.context.keys[this.context.activeAssets[0]].address;
         passphrase = this.context.keys[this.context.activeAssets[0]].passphrase;
         [sourceChain, targetChain] = this.context.activeAssets;
       }
 
       if (dexAddress && destAddress && passphrase && targetChain) {
-        if (this.state.amount > 0) {
+        let amount = this.state.amount;
+        if (amount > 0) {
           const { price } = this.state;
           const { side } = this.props;
           const sourceAssetAdapter = this.assetAdapters[sourceChain];
           const tx = sourceAssetAdapter.createTransfer({
-            amount: this.state.amount,
+            amount,
             recipientAddress: dexAddress,
             message: `${targetChain},limit,${price},${destAddress}`,
             passphrase,
@@ -312,7 +349,17 @@ export default class PlaceOrder extends React.Component {
             } catch (err) {
               const error = new Error(`Failed to post limit order because of error: ${err.message}`);
               error.response = err.response;
-              error.order = this.generateOrder(tx, 'limit', sourceChain, targetChain, side, parseFloat(price));
+              error.order = this.generateOrder({
+                transactionId: tx.id,
+                senderAddress: sourceAddress,
+                recipientAddress: dexAddress,
+                amount,
+                type: 'limit',
+                sourceChain,
+                targetChain,
+                side,
+                price: parseFloat(price),
+              });
               if (this.props.orderSubmitError) {
                 this.props.orderSubmitError(error);
               }
@@ -320,7 +367,17 @@ export default class PlaceOrder extends React.Component {
               return;
             }
             await this.setState({ isSubmitting: false });
-            this.handleTransactionSubmit(tx, 'limit', sourceChain, targetChain, side, parseFloat(price));
+            this.handleTransactionSubmit({
+              transactionId: tx.id,
+              senderAddress: sourceAddress,
+              recipientAddress: dexAddress,
+              amount,
+              type: 'limit',
+              sourceChain,
+              targetChain,
+              side,
+              price: parseFloat(price)
+            });
           })();
         }
       }

@@ -112,8 +112,12 @@ class App extends React.Component {
     });
   }
 
+  getTransactionMessage(transaction) {
+    return transaction.message || '';
+  }
+
   getTakerOrderIdFromTransaction(transaction) {
-    const transactionData = transaction.asset.data || '';
+    const transactionData = this.getTransactionMessage(transaction);
     const header = transactionData.split(':')[0];
     const parts = header.split(',');
     const txnType = parts[0];
@@ -127,19 +131,19 @@ class App extends React.Component {
   }
 
   isTakerTransaction(transaction) {
-    const transactionData = transaction.asset.data || '';
+    const transactionData = this.getTransactionMessage(transaction);
     const header = transactionData.split(':')[0];
     return header.split(',')[0] === 't1';
   }
 
   isMakerTransaction(transaction) {
-    const transactionData = transaction.asset.data || '';
+    const transactionData = this.getTransactionMessage(transaction);
     const header = transactionData.split(':')[0];
     return header.split(',')[0] === 't2';
   }
 
   _getExpectedCounterpartyTransactionCount(transaction) {
-    const transactionData = transaction.asset.data || '';
+    const transactionData = this.getTransactionMessage(transaction);
     const header = transactionData.split(':')[0];
     const parts = header.split(',');
     const txnType = parts[0];
@@ -423,14 +427,17 @@ class App extends React.Component {
   }
 
   getTransferType(pendingTransfer) {
-    const transactionData = pendingTransfer.transaction.asset.data || '';
-    return transactionData.charAt(0);
+    console.log('getTransferType', pendingTransfer.type);
+    return (pendingTransfer.type || '').charAt(0);
   }
 
-  getOriginOrderId(pendingTransfer) {
-    const transactionData = pendingTransfer.transaction.asset.data || '';
-    const header = transactionData.split(':')[0];
-    return header.split(',')[2] || null;
+  getCounterpartyOrderId(pendingTransfer) {
+    if (pendingTransfer.type === 'r3') {
+      console.log('getCounterpartyOrderId r3', pendingTransfer.closerOrderId);
+      return pendingTransfer.closerOrderId || null;
+    }
+    console.log('getCounterpartyOrderId other', pendingTransfer.originOrderId);
+    return pendingTransfer.originOrderId || null;
   }
 
   savePendingOrders() {
@@ -500,18 +507,18 @@ class App extends React.Component {
 
     const pendingTransfers = [...pendingBaseAssetTransfers, ...pendingQuoteAssetTransfers];
     const tradeTransfers = pendingTransfers.filter((transfer) => this.getTransferType(transfer) === 't');
-    const tradeTransfersOriginOrderIds = new Set(tradeTransfers.map((transfer) => this.getOriginOrderId(transfer)));
-    const uniqueRefundTransfers = pendingTransfers.filter((transfer) => this.getTransferType(transfer) === 'r' && !tradeTransfersOriginOrderIds.has(this.getOriginOrderId(transfer)));
+    const tradeTransfersOriginOrderIds = new Set(tradeTransfers.map((transfer) => this.getCounterpartyOrderId(transfer)));
+    const uniqueRefundTransfers = pendingTransfers.filter((transfer) => this.getTransferType(transfer) === 'r' && !tradeTransfersOriginOrderIds.has(this.getCounterpartyOrderId(transfer)));
     const uniquePendingTransfers = [...tradeTransfers, ...uniqueRefundTransfers];
 
     const pendingTransferOrderIds = new Set();
     for (const pendingTransfer of uniquePendingTransfers) {
-      const originOrderId = this.getOriginOrderId(pendingTransfer);
+      const originOrderId = this.getCounterpartyOrderId(pendingTransfer);
       pendingTransferOrderIds.add(originOrderId);
     }
 
     const pendingOrdersForActiveMarket = Object.values(this.pendingOrders[activeMarket]).filter(
-      (pendingOrder) => pendingOrder.senderId === quoteWalletAddress || pendingOrder.senderId === baseWalletAddress,
+      (pendingOrder) => pendingOrder.senderAddress === quoteWalletAddress || pendingOrder.senderAddress === baseWalletAddress,
     );
     for (const pendingOrder of pendingOrdersForActiveMarket) {
       if (pendingTransferOrderIds.has(pendingOrder.id)) {
