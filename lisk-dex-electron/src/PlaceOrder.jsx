@@ -265,9 +265,10 @@ export default class PlaceOrder extends React.Component {
         let amount = this.state.amount;
         if (amount > 0) {
           const { side } = this.props;
+          const unitValue = GC.getAssetUnitValue(sourceChain);
           const sourceAssetAdapter = this.assetAdapters[sourceChain];
           const tx = sourceAssetAdapter.createTransfer({
-            amount,
+            amount: String(amount * unitValue),
             recipientAddress: dexAddress,
             message: `${targetChain},market,${destAddress}`,
             passphrase,
@@ -342,9 +343,10 @@ export default class PlaceOrder extends React.Component {
         if (amount > 0) {
           const { price } = this.state;
           const { side } = this.props;
+          const unitValue = GC.getAssetUnitValue(sourceChain);
           const sourceAssetAdapter = this.assetAdapters[sourceChain];
           const tx = sourceAssetAdapter.createTransfer({
-            amount,
+            amount: String(amount * unitValue),
             recipientAddress: dexAddress,
             message: `${targetChain},limit,${price},${destAddress}`,
             passphrase,

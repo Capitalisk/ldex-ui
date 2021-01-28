@@ -20,9 +20,10 @@ export default class UserOrder extends React.Component {
       const orderId = this.props.order.id;
       const { passphrase } = this.context.keys[sourceChain];
       const assetAdapter = this.context.assetAdapters[sourceChain];
+      const unitValue = GC.getAssetUnitValue(sourceChain);
 
       const tx = assetAdapter.createTransfer({
-        amount: 0.11,
+        amount: String(feeBase + unitValue * 0.1),
         recipientAddress: dexAddress,
         message: `${targetChain},close,${orderId}`,
         passphrase,

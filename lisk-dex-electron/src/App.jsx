@@ -27,10 +27,12 @@ import { getNumericAssetBalance, GlobalConfiguration as GC } from './Utils';
 
 // Import supported adapters.
 import LiskAdapter from 'ldex-ui-lisk-adapter';
+import LDPoSAdapter from 'ldex-ui-ldpos-adapter';
 
 // The property names in this object can be used as the adapter 'type' in the config file.
 const adapterClasses = {
   lisk: LiskAdapter,
+  ldpos: LDPoSAdapter,
 };
 
 const NOTIFICATIONS_MAX_QUEUE_LENGTH = 3;
@@ -637,10 +639,10 @@ class App extends React.Component {
     let combinedStateUpdate = {};
     try {
       let fetchHistoryPromise;
-      if (GC.getMarketPriceHistoryAPI(this.state.activeMarket) === 'dex') {
-        fetchHistoryPromise = this.fetchPriceHistoryStateFromDEX();
-      } else {
+      if (GC.getMarketPriceHistoryAPI(this.state.activeMarket) === 'blockchain') {
         fetchHistoryPromise = this.fetchPriceHistoryStateFromBlockchains();
+      } else {
+        fetchHistoryPromise = this.fetchPriceHistoryStateFromDEX();
       }
       const [newOrderBookState, newPriceHistoryState] = await Promise.all([
         this.fetchOrderBookState(),
