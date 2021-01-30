@@ -86,7 +86,9 @@ export default class SignInModal extends React.Component {
     event.preventDefault();
     const asset = event.target.name;
     let assetAdapter = this.assetAdapters[asset];
-    const { address, passphrase } = assetAdapter.createWallet();
+    const { address, passphrase } = assetAdapter.createWallet({
+      networkSymbol: asset
+    });
 
     this.setState((prevState) => ({
       passphrases: {
@@ -114,11 +116,15 @@ export default class SignInModal extends React.Component {
     const loginAssetPanels = [];
     for (const asset of this.props.enabledAssets) {
       const assetConfig = GC.getAsset(asset);
+      const addressInputStyles = { ...styles };
+      if (!assetConfig.allowCustomWalletAddresses) {
+        addressInputStyles.borderStyle = 'none';
+      }
 
       loginAssetPanels.push(
         <div key={asset} style={{ marginBottom: '20px' }}>
-          {assetConfig.allowCustomWalletAddresses && <span>Wallet address for {asset.toUpperCase()}:</span>}
-          {assetConfig.allowCustomWalletAddresses && <input style={styles} name={asset} data-gramm={false} className="sign-in-input" value={this.state.addresses[asset]} onChange={this.handleWalletAddressChange} />}
+          {<span>Wallet address for {asset.toUpperCase()}:</span>}
+          {<input style={addressInputStyles} name={asset} data-gramm={false} className="sign-in-input" value={this.state.addresses[asset]} onChange={this.handleWalletAddressChange} disabled={!assetConfig.allowCustomWalletAddresses} />}
           <span>
             Passphrase for
             {' '}
@@ -128,14 +134,6 @@ export default class SignInModal extends React.Component {
           </span>
           <textarea style={styles} rows={4} name={asset} data-gramm={false} className="sign-in-textarea" value={this.state.passphrases[asset]} onChange={this.handlePassphraseChange} />
           <button type="button" className="button-secondary" name={asset} onClick={this.handleWalletCreate} style={{ marginRight: '10px' }}>Generate wallet</button>
-          {' '}
-          {this.state.addresses[asset] && (
-          <span className="generated-wallet-address">
-            Wallet address:
-            {' '}
-            {this.state.addresses[asset]}
-          </span>
-          )}
         </div>,
       );
 

@@ -34,7 +34,7 @@ export async function getProcessedHeights(instance) {
   return status.processedHeights;
 }
 
-export async function getPriceHistory(instance) {
+export async function getPriceHistory(instance, offset, limit) {
   return (await instance.get('/prices/recent')).data;
 }
 

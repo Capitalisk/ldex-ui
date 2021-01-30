@@ -37,20 +37,30 @@
         "apiURL": "http://34.227.22.98:7020/api",
         "apiMaxPageSize": 100
       }
+    },
+    "ldpos": {
+      "name": "LDPOS testnet",
+      "unitValue": 100000000,
+      "processingHeightExpiry": 3,
+      "allowCustomWalletAddresses": true,
+      "adapter": {
+        "type": "ldpos",
+        "apiURL": "ws://34.227.22.98:7001",
+        "apiMaxPageSize": 100
+      }
     }
   },
   "markets": {
-    "lsh/lsk": {
-      "apiURL": "http://54.174.172.179:7011",
-      "assets": ["lsh", "lsk"],
-      "orderBookDepth": 20,
-      "priceHistoryAPI": "blockchain"
+    "ldpos/lsk": {
+      "apiURL": "http://34.227.22.98:7021",
+      "assets": ["ldpos", "lsk"],
+      "useRawTargetAddresses": ["ldpos"],
+      "orderBookDepth": 20
     },
-    "clsk/lsk": {
-      "apiURL": "http://18.206.164.187:7021",
-      "assets": ["clsk", "lsk"],
-      "orderBookDepth": 20,
-      "priceHistoryAPI": "blockchain"
+    "lsh/lsk": {
+      "apiURL": "http://2.56.214.88:7011",
+      "assets": ["lsh", "lsk"],
+      "orderBookDepth": 20
     }
   }
 }

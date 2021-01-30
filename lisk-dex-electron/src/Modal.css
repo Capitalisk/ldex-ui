@@ -35,8 +35,8 @@
   border: 1px solid lightgray;
   border-radius: 6px;
   background: white;
-  width: 740px;
-  left: calc(50% - 370px);
+  width: 1000px;
+  left: calc(50% - 500px);
   top: 50%;
   display: none;
   transform: translateY(-50%);
@@ -51,6 +51,13 @@
   position: absolute;
   top: 10px;
   right: 10px;
+}
+
+@media only screen and (max-width: 1600px) {
+  .modal-container {
+    width: 800px;
+    left: calc(50% - 400px);
+  }
 }
 
 @media only screen and (max-width: 950px), only screen and (max-height: 700px) {

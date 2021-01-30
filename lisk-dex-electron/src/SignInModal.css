@@ -71,9 +71,4 @@
   .sign-in-textarea {
     height: 70px;
   }
-
-  .generated-wallet-address {
-    display: inline-block;
-    padding-top: 10px;
-  }
 }

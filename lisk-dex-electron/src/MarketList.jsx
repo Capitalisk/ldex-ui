@@ -44,11 +44,13 @@ export default class MarketList extends React.PureComponent {
 
       const getBasicTableRow = (firstCellValue, secondCellValue) => (
         <tr>
-          <td style={{ fontWeight: 'bold', border: 'none', width: '50%' }}>{firstCellValue}</td>
+          <td style={{ fontWeight: 'bold', border: 'none', width: '50%', wordBreak: 'break-word', padding: '5px' }}>{firstCellValue}</td>
           <td
             colSpan={2}
             style={{
               textTransform: 'uppercase', border: 'none', width: '50%',
+              wordBreak: 'break-word',
+              padding: '5px',
             }}
           >
             {secondCellValue}
@@ -58,14 +60,14 @@ export default class MarketList extends React.PureComponent {
 
       return (
         <div className="market-info-container">
-          <table style={{ border: 'none', width: '60%' }}>
+          <table style={{ border: 'none', width: '60%', tableLayout: 'fixed' }}>
             <tbody>
               {getBasicTableRow('Version', GC.getMarketVersion(this.props.activeMarket))}
               {getBasicTableRow('Base chain', GC.getMarketBaseChain(this.props.activeMarket))}
               {getBasicTableRow('Price decimal precision', GC.getMarketPriceDecimalPrecision(this.props.activeMarket))}
             </tbody>
           </table>
-          <table style={{ width: '-webkit-fill-available', marginTop: '20px' }}>
+          <table style={{ width: '-webkit-fill-available', marginTop: '20px', tableLayout: 'fixed' }}>
             <tbody>
               <tr style={{ textTransform: 'uppercase' }}>
                 <th> </th>
@@ -73,14 +75,19 @@ export default class MarketList extends React.PureComponent {
               </tr>
               {
               Object.keys(firstChain).map((chainInfoKey) => {
+                let renderList = (list) => {
+                  return <ul style={{ paddingLeft: '20px' }}>{list.map(item => <li>{item}</li>)}</ul>;
+                };
                 if (Array.isArray(firstChain[chainInfoKey])) {
-                  const firstChainValues = firstChain[chainInfoKey].join('\r\n');
-                  const secondChainValues = secondChain[chainInfoKey].join('\r\n');
+                  // const firstChainValues = firstChain[chainInfoKey].join('\r\n');
+                  // const secondChainValues = secondChain[chainInfoKey].join('\r\n');
+                  const firstChainValues = renderList(firstChain[chainInfoKey]);
+                  const secondChainValues = renderList(secondChain[chainInfoKey]);
                   return (
                     <tr key={chainInfoKey}>
-                      <td style={{ fontWeight: 'bold' }}>{marketInfoDescriptor[chainInfoKey].name}</td>
-                      <td style={{ whiteSpace: 'pre' }}>{firstChainValues}</td>
-                      <td style={{ whiteSpace: 'pre' }}>{secondChainValues}</td>
+                      <td style={{ fontWeight: 'bold', wordBreak: 'break-word', padding: '5px' }}>{marketInfoDescriptor[chainInfoKey].name}</td>
+                      <td style={{ wordBreak: 'break-word', padding: '5px' }}>{firstChainValues}</td>
+                      <td style={{ wordBreak: 'break-word', padding: '5px' }}>{secondChainValues}</td>
                     </tr>
                   );
                 }
@@ -99,9 +106,9 @@ export default class MarketList extends React.PureComponent {
                 }
                 return (
                   <tr key={chainInfoKey}>
-                    <td style={{ fontWeight: 'bold' }}>{keyDescriptor.name}</td>
-                    <td>{firstChainValue}</td>
-                    <td>{secondChainValue}</td>
+                    <td style={{ fontWeight: 'bold', wordBreak: 'break-word', padding: '5px' }}>{keyDescriptor.name}</td>
+                    <td style={{ wordBreak: 'break-word', padding: '5px' }}>{firstChainValue}</td>
+                    <td style={{ wordBreak: 'break-word', padding: '5px' }}>{secondChainValue}</td>
                   </tr>
                 );
               })

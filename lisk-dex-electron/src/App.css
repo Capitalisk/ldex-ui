@@ -232,6 +232,16 @@ li {
   }
 }
 
+.place-order-wallet-address, .place-order-balance {
+  word-break: break-word;
+}
+
+@media only screen and (max-width: 1600px) {
+  .sign-in-state-address {
+    display: none;
+  }
+}
+
 @media only screen and (max-width: 950px) {
   .container {
     height: 1650px;
@@ -241,10 +251,6 @@ li {
 
   .your-order-entry {
     height: 50px;
-  }
-
-  .sign-in-state-address {
-    display: none;
   }
 
   .modal-background {
@@ -313,5 +319,5 @@ div::-webkit-scrollbar-track {
 div::-webkit-scrollbar-thumb {
   border-radius: 10px;
   background-color: #212424;
-  outline: 2px solid slategrey;
+  outline: 0px;
 }

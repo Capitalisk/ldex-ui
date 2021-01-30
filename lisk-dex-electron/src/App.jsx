@@ -36,7 +36,6 @@ const adapterClasses = {
 };
 
 const NOTIFICATIONS_MAX_QUEUE_LENGTH = 3;
-const DEFAULT_API_MAX_PAGE_SIZE = 100;
 const DEFAULT_PRICE_DECIMAL_PRECISION = 4;
 const DEFAULT_ORDER_BOOK_DEPTH = 20;
 
@@ -159,112 +158,15 @@ class App extends React.Component {
 
   async fetchPriceHistoryStateFromDEX() {
     const dexClient = this.getDexClient();
-    const priceHistory = await getPriceHistory(dexClient);
-    priceHistory.reverse();
-    const priceDecimalPrecision = this.getPriceDecimalPrecision();
-    return {
-      priceHistory,
-      priceDecimalPrecision,
-    };
-  }
-
-  async fetchPriceHistoryStateFromBlockchains() {
-    const [quoteChainTxns, baseChainTxns] = await Promise.all(
-      this.state.activeAssets.map(async (assetSymbol) => {
-        const asset = GC.getAsset(assetSymbol);
-        const dexWalletAddress = GC.getMarketChainWalletAddress(this.state.activeMarket, assetSymbol);
-        return this.assetAdapters[assetSymbol].getLatestOutboundTransactions({
-          address: dexWalletAddress,
-          limit: asset.apiMaxPageSize || DEFAULT_API_MAX_PAGE_SIZE,
-        });
-      }),
-    );
-
-    const quoteChainMakers = {};
-    const quoteChainTakers = {};
-
-    for (const txn of quoteChainTxns) {
-      const isMaker = this.isMakerTransaction(txn);
-      const isTaker = this.isTakerTransaction(txn);
-      const takerOrderId = this.getTakerOrderIdFromTransaction(txn);
-      if (isMaker) {
-        if (!quoteChainMakers[takerOrderId]) {
-          quoteChainMakers[takerOrderId] = [];
-        }
-        quoteChainMakers[takerOrderId].push(txn);
-      } else if (isTaker) {
-        quoteChainTakers[takerOrderId] = [txn];
-      }
-    }
-
-    const txnPairsMap = {};
-
-    for (const txn of baseChainTxns) {
-      const isMaker = this.isMakerTransaction(txn);
-      const isTaker = this.isTakerTransaction(txn);
-
-      if (!isMaker && !isTaker) {
-        continue;
-      }
-
-      const counterpartyTakerId = this.getTakerOrderIdFromTransaction(txn);
-      const counterpartyTxns = quoteChainMakers[counterpartyTakerId] || quoteChainTakers[counterpartyTakerId] || [];
-
-      if (!counterpartyTxns.length) {
-        continue;
-      }
-
-      // Group base chain orders which were matched with the same counterparty order together.
-      if (!txnPairsMap[counterpartyTakerId]) {
-        txnPairsMap[counterpartyTakerId] = {
-          base: [],
-          quote: counterpartyTxns,
-        };
-      }
-      const txnPair = txnPairsMap[counterpartyTakerId];
-      txnPair.base.push(txn);
-    }
-
-    const priceHistory = [];
-
-    // Filter out all entries which are incompete.
-    const txnPairsList = Object.values(txnPairsMap).filter((txnPair) => {
-      const firstBaseTxn = txnPair.base[0];
-      const firstQuoteTxn = txnPair.quote[0];
-      if (!firstBaseTxn || !firstQuoteTxn) {
-        return false;
-      }
-      const expectedBaseCount = this._getExpectedCounterpartyTransactionCount(firstQuoteTxn);
-      const expectedQuoteCount = this._getExpectedCounterpartyTransactionCount(firstBaseTxn);
-
-      return txnPair.base.length >= expectedBaseCount && txnPair.quote.length >= expectedQuoteCount;
+    const priceHistory = (await getPriceHistory(dexClient)).map((historyItem) => {
+      return {
+        ...historyItem,
+        baseTimestamp: Math.round(historyItem.baseTimestamp / 1000),
+        quoteTimestamp: Math.round(historyItem.quoteTimestamp / 1000)
+      };
     });
-
-    const priceDecimalPrecision = this.getPriceDecimalPrecision();
-
-    for (const txnPair of txnPairsList) {
-      const baseChainOptions = GC.getMarketChain(this.state.activeMarket, this.state.activeAssets[1]);
-      const baseChainFeeBase = baseChainOptions.exchangeFeeBase;
-      const baseChainFeeRate = baseChainOptions.exchangeFeeRate;
-      const baseTotalFee = baseChainFeeBase * txnPair.base.length;
-      const fullBaseAmount = txnPair.base.reduce((accumulator, txn) => accumulator + Number(txn.amount) / (1 - baseChainFeeRate), 0) + baseTotalFee;
-
-      const quoteChainOptions = GC.getMarketChain(this.state.activeMarket, this.state.activeAssets[0]);
-      const quoteChainFeeBase = quoteChainOptions.exchangeFeeBase;
-      const quoteChainFeeRate = quoteChainOptions.exchangeFeeRate;
-      const quoteTotalFee = quoteChainFeeBase * txnPair.quote.length;
-      const fullQuoteAmount = txnPair.quote.reduce((accumulator, txn) => accumulator + Number(txn.amount) / (1 - quoteChainFeeRate), 0) + quoteTotalFee;
-
-      const price = Number((fullBaseAmount / fullQuoteAmount).toFixed(priceDecimalPrecision));
-      priceHistory.push({
-        baseTimestamp: txnPair.base[txnPair.base.length - 1].timestamp,
-        price,
-        volume: Math.round(fullBaseAmount / 1000000) / 100,
-      });
-    }
-
     priceHistory.reverse();
-
+    const priceDecimalPrecision = this.getPriceDecimalPrecision();
     return {
       priceHistory,
       priceDecimalPrecision,
@@ -638,12 +540,7 @@ class App extends React.Component {
     await this.updatePendingOrders();
     let combinedStateUpdate = {};
     try {
-      let fetchHistoryPromise;
-      if (GC.getMarketPriceHistoryAPI(this.state.activeMarket) === 'blockchain') {
-        fetchHistoryPromise = this.fetchPriceHistoryStateFromBlockchains();
-      } else {
-        fetchHistoryPromise = this.fetchPriceHistoryStateFromDEX();
-      }
+      let fetchHistoryPromise = this.fetchPriceHistoryStateFromDEX();
       const [newOrderBookState, newPriceHistoryState] = await Promise.all([
         this.fetchOrderBookState(),
         fetchHistoryPromise,
@@ -713,11 +610,10 @@ class App extends React.Component {
           delete newKeys[asset];
           return false;
         }
-        assetAdapter.connect({ passphrase });
+        await assetAdapter.connect({ passphrase });
         newKeys[asset] = { address, passphrase };
       }
     }
-
 
     // The keys need to be updated on the state before we fetch the order book.
     await this.setState((state) => ({
