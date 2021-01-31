@@ -110,13 +110,13 @@ export default class PlaceOrder extends React.Component {
     );
   }
 
-  handleSubmit = (event) => {
+  handleSubmit = async (event) => {
     event.preventDefault();
     this.clearErrors();
     if (this.validateOrder()) {
       const confirmed = window.confirm(`Are you sure you want to place this ${this.getOrderType()} order?`);
       if (confirmed) {
-        this.placeOrder();
+        await this.placeOrder();
         this.clearValues();
       }
     }
@@ -235,7 +235,7 @@ export default class PlaceOrder extends React.Component {
     this.props.orderSubmit(order);
   }
 
-  placeOrder() {
+  async placeOrder() {
     if (this.state.marketMode) {
       let dexAddress;
       let destAddress;
@@ -273,7 +273,7 @@ export default class PlaceOrder extends React.Component {
           const { side } = this.props;
           const unitValue = GC.getAssetUnitValue(sourceChain);
           const sourceAssetAdapter = this.assetAdapters[sourceChain];
-          const tx = sourceAssetAdapter.createTransfer({
+          const tx = await sourceAssetAdapter.createTransfer({
             amount: String(amount * unitValue),
             recipientAddress: dexAddress,
             message: `${targetChain},market,${destAddress}`,
@@ -357,7 +357,7 @@ export default class PlaceOrder extends React.Component {
           const { side } = this.props;
           const unitValue = GC.getAssetUnitValue(sourceChain);
           const sourceAssetAdapter = this.assetAdapters[sourceChain];
-          const tx = sourceAssetAdapter.createTransfer({
+          const tx = await sourceAssetAdapter.createTransfer({
             amount: String(amount * unitValue),
             recipientAddress: dexAddress,
             message: `${targetChain},limit,${price},${destAddress}`,

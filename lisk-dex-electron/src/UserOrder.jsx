@@ -22,7 +22,7 @@ export default class UserOrder extends React.Component {
       const assetAdapter = this.context.assetAdapters[sourceChain];
       const unitValue = GC.getAssetUnitValue(sourceChain);
 
-      const tx = assetAdapter.createTransfer({
+      const tx = await assetAdapter.createTransfer({
         amount: String(feeBase + unitValue * 0.1),
         recipientAddress: dexAddress,
         message: `${targetChain},close,${orderId}`,
