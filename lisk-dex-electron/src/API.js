@@ -14,19 +14,19 @@ export async function getOrderBook(instance, orderBookDepth) {
 }
 
 export async function getBidsFromWallet(instance, sourceWalletAddress) {
-  return (await instance.get(`/orders/bids?sourceWalletAddress=${sourceWalletAddress}`)).data;
+  return (await instance.get(`/orders/bids?sourceWalletAddress=${encodeURIComponent(sourceWalletAddress)}`)).data;
 }
 
 export async function getAsksFromWallet(instance, sourceWalletAddress) {
-  return (await instance.get(`/orders/asks?sourceWalletAddress=${sourceWalletAddress}`)).data;
+  return (await instance.get(`/orders/asks?sourceWalletAddress=${encodeURIComponent(sourceWalletAddress)}`)).data;
 }
 
 export async function getPendingTransfers(instance, targetAssetSymbol, recipientAddress) {
-  return (await instance.get(`/transfers/pending?targetChain=${targetAssetSymbol}&recipientId=${recipientAddress}`)).data;
+  return (await instance.get(`/transfers/pending?targetChain=${targetAssetSymbol}&recipientId=${encodeURIComponent(recipientAddress)}`)).data;
 }
 
 export async function getRecentTransfers(instance, originOrderId) {
-  return (await instance.get(`/transfers/recent?originOrderId=${originOrderId}`)).data;
+  return (await instance.get(`/transfers/recent?originOrderId=${encodeURIComponent(originOrderId)}`)).data;
 }
 
 export async function getProcessedHeights(instance) {

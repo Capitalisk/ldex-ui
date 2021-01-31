@@ -263,13 +263,13 @@ class App extends React.Component {
     this.pendingOrders[this.state.activeMarket][order.id] = order;
     this.savePendingOrders();
 
-    const pendingMarketOrders = Object.values(this.pendingOrders[this.state.activeMarket] || {});
-
-    await this.setState(({ yourOrders }) => {
+    await this.setState(({ yourOrders, activeMarket }) => {
       const yourOrderMap = {};
       for (const yourOrder of yourOrders) {
         yourOrderMap[yourOrder.id] = yourOrder;
       }
+      const pendingMarketOrders = Object.values(this.pendingOrders[activeMarket] || {});
+
       for (const pendingOrder of pendingMarketOrders) {
         yourOrderMap[pendingOrder.id] = pendingOrder;
       }
@@ -333,7 +333,7 @@ class App extends React.Component {
     return (pendingTransfer.type || '').charAt(0);
   }
 
-  getCounterpartyOrderId(pendingTransfer) {
+  getInitiatingOrderId(pendingTransfer) {
     if (pendingTransfer.type === 'r3') {
       return pendingTransfer.closerOrderId || null;
     }
@@ -367,7 +367,7 @@ class App extends React.Component {
     const { activeMarket } = this.state;
     const { orderBookDepth } = GC.getMarket(activeMarket) || {};
 
-    const apiResults = [
+    const orderBookDataAPIResults = [
       getOrderBook(dexClient, orderBookDepth ?? DEFAULT_ORDER_BOOK_DEPTH),
     ];
     let quoteWalletAddress;
@@ -375,28 +375,43 @@ class App extends React.Component {
 
     if (this.state.keys[quoteAsset]) {
       quoteWalletAddress = this.state.keys[quoteAsset].address;
-      apiResults.push(getAsksFromWallet(dexClient, quoteWalletAddress));
-      apiResults.push(getPendingTransfers(dexClient, quoteAsset, quoteWalletAddress));
+      orderBookDataAPIResults.push(getAsksFromWallet(dexClient, quoteWalletAddress));
     } else {
-      apiResults.push(Promise.resolve([]));
-      apiResults.push(Promise.resolve([]));
+      orderBookDataAPIResults.push(Promise.resolve([]));
     }
     if (this.state.keys[baseAsset]) {
       baseWalletAddress = this.state.keys[baseAsset].address;
-      apiResults.push(getBidsFromWallet(dexClient, baseWalletAddress));
-      apiResults.push(getPendingTransfers(dexClient, baseAsset, baseWalletAddress));
+      orderBookDataAPIResults.push(getBidsFromWallet(dexClient, baseWalletAddress));
     } else {
-      apiResults.push(Promise.resolve([]));
-      apiResults.push(Promise.resolve([]));
+      orderBookDataAPIResults.push(Promise.resolve([]));
     }
 
     const [
       orderLevels,
       yourAsks,
-      pendingQuoteAssetTransfers,
       yourBids,
+    ] = await Promise.all(orderBookDataAPIResults);
+
+    await this.updatePendingOrders();
+    const pendingTransfersAPIResults = [];
+
+    if (this.state.keys[quoteAsset]) {
+      quoteWalletAddress = this.state.keys[quoteAsset].address;
+      pendingTransfersAPIResults.push(getPendingTransfers(dexClient, quoteAsset, quoteWalletAddress));
+    } else {
+      pendingTransfersAPIResults.push(Promise.resolve([]));
+    }
+    if (this.state.keys[baseAsset]) {
+      baseWalletAddress = this.state.keys[baseAsset].address;
+      pendingTransfersAPIResults.push(getPendingTransfers(dexClient, baseAsset, baseWalletAddress));
+    } else {
+      pendingTransfersAPIResults.push(Promise.resolve([]));
+    }
+
+    const [
+      pendingQuoteAssetTransfers,
       pendingBaseAssetTransfers,
-    ] = await Promise.all(apiResults);
+    ] = await Promise.all(pendingTransfersAPIResults);
 
     const yourOpenOrders = [...yourAsks, ...yourBids];
 
@@ -406,47 +421,103 @@ class App extends React.Component {
     const yourOrderMap = {};
 
     const pendingTransfers = [...pendingBaseAssetTransfers, ...pendingQuoteAssetTransfers];
-    const tradeTransfers = pendingTransfers.filter((transfer) => this.getTransferType(transfer) === 't');
-    const tradeTransfersOriginOrderIds = new Set(tradeTransfers.map((transfer) => this.getCounterpartyOrderId(transfer)));
-    const uniqueRefundTransfers = pendingTransfers.filter((transfer) => this.getTransferType(transfer) === 'r' && !tradeTransfersOriginOrderIds.has(this.getCounterpartyOrderId(transfer)));
-    const uniquePendingTransfers = [...tradeTransfers, ...uniqueRefundTransfers];
+    const takerTradeTransfers = pendingTransfers.filter(transfer => transfer.type === 't1');
+    const takerTradeOrderIds = new Set(takerTradeTransfers.map(transfer => transfer.takerOrderId));
 
-    const pendingTransferOrderIds = new Set();
-    for (const pendingTransfer of uniquePendingTransfers) {
-      const originOrderId = this.getCounterpartyOrderId(pendingTransfer);
-      pendingTransferOrderIds.add(originOrderId);
+    const makerTradeTransfers = pendingTransfers.filter(transfer => transfer.type === 't2');
+    const makerTradeOrderIds = new Set(makerTradeTransfers.map(transfer => transfer.makerOrderId));
+
+    // const closeTransfers = pendingTransfers.filter(transfer => transfer.type === 'r3');
+    // const closeOrderIds = new Set(closeTransfers.map(transfer => transfer.originOrderId));
+
+    const unmatchedMarketPartTransfers = pendingTransfers.filter(transfer => transfer.type === 'r4');
+    const unmatchedMarketPartOrderIds = new Set(unmatchedMarketPartTransfers.map(transfer => transfer.originOrderId));
+
+    const rejectedTransfers = pendingTransfers.filter(transfer => transfer.type === 'r1' || transfer.type === 'r5' || transfer.type === 'r6');
+    const rejectedOrderIds = new Set(rejectedTransfers.map(transfer => transfer.originOrderId));
+
+    for (const yourOrder of yourOpenOrders) {
+      yourOrder.status = 'ready';
+      yourOrderMap[yourOrder.id] = yourOrder;
     }
 
-    const pendingOrdersForActiveMarket = Object.values(this.pendingOrders[activeMarket]).filter(
-      (pendingOrder) => pendingOrder.senderAddress === quoteWalletAddress || pendingOrder.senderAddress === baseWalletAddress,
-    );
-    for (const pendingOrder of pendingOrdersForActiveMarket) {
-      if (pendingTransferOrderIds.has(pendingOrder.id)) {
-        pendingOrder.status = 'processing';
-      }
-      if (this.state.keys[pendingOrder.sourceChain]) {
-        yourOrderMap[pendingOrder.id] = pendingOrder;
+    const pendingOrdersForActiveMarket = Object.values(this.pendingOrders[activeMarket]);
+    const cancelingOrders = pendingOrdersForActiveMarket.filter(pendingOrder => pendingOrder.status === 'canceling');
+    const pendingTradeOrders = pendingOrdersForActiveMarket.filter(pendingOrder => pendingOrder.status === 'pending');
+    const processingTradeOrders = pendingOrdersForActiveMarket.filter(pendingOrder => pendingOrder.status === 'processing');
+    const matchingTradeOrders = pendingOrdersForActiveMarket.filter(pendingOrder => pendingOrder.status === 'matching');
+    const tradeOrders = [...pendingTradeOrders, ...processingTradeOrders, ...matchingTradeOrders];
+
+    for (const order of cancelingOrders) {
+      const yourOrder = yourOrderMap[order.id];
+      if (yourOrder) {
+        yourOrder.status = 'canceling';
+      } else if (this.state.keys[order.sourceChain]) {
+        yourOrderMap[order.id] = order;
       }
     }
+
+    for (const order of tradeOrders) {
+      if (takerTradeOrderIds.has(order.id)) {
+        order.status = 'processing';
+      } else if (makerTradeOrderIds.has(order.id)) {
+        order.status = 'matching';
+      } else if (unmatchedMarketPartOrderIds.has(order.id)) {
+        order.status = 'canceling';
+      } else if (rejectedOrderIds.has(order.id)) {
+        order.status = 'canceling';
+      }
+      const yourOrder = yourOrderMap[order.id];
+      if (yourOrder) {
+        if (order.status === 'pending') {
+          delete this.pendingOrders[activeMarket][order.id];
+          yourOrder.status = 'ready';
+        } else {
+          yourOrder.status = order.status;
+        }
+      } else if (this.state.keys[order.sourceChain]) {
+        yourOrderMap[order.id] = order;
+      }
+    }
+
+    const yourOrderIds = new Set(yourOpenOrders.map(yourOrder => yourOrder.id));
+    const previousYourOrders = this.state.yourOrders;
+    const yourRecentlyRemovedOrders = previousYourOrders.filter(yourOrder => !yourOrderIds.has(yourOrder.id));
 
     for (const order of yourOpenOrders) {
-      const pendingOrder = this.pendingOrders[activeMarket][order.id];
-      if (pendingOrder) {
-        if (pendingOrder.status === 'pending') {
-          delete this.pendingOrders[activeMarket][order.id];
-        } else if (pendingOrder.status === 'canceling') {
-          order.status = 'canceling';
+      let isPendingOutbound = false;
+      if (takerTradeOrderIds.has(order.id)) {
+        order.status = 'processing';
+        isPendingOutbound = true;
+      } else if (makerTradeOrderIds.has(order.id)) {
+        order.status = 'matching';
+        isPendingOutbound = true;
+      }
+      if (isPendingOutbound && order.type === 'limit') {
+        this.pendingOrders[activeMarket][order.id] = order;
+        if (this.state.keys[order.sourceChain]) {
           yourOrderMap[order.id] = order;
-          continue;
         }
       }
-      if (pendingTransferOrderIds.has(order.id)) {
-        order.status = 'matching';
-      } else {
-        order.status = 'ready';
-      }
-      yourOrderMap[order.id] = order;
     }
+
+    for (const order of yourRecentlyRemovedOrders) {
+      let isPendingOutbound = false;
+      if (takerTradeOrderIds.has(order.id)) {
+        order.status = 'processing';
+        isPendingOutbound = true;
+      } else if (makerTradeOrderIds.has(order.id)) {
+        order.status = 'matching';
+        isPendingOutbound = true;
+      }
+      if (isPendingOutbound && order.type === 'limit') {
+        this.pendingOrders[activeMarket][order.id] = order;
+        if (this.state.keys[order.sourceChain]) {
+          yourOrderMap[order.id] = order;
+        }
+      }
+    }
+
     this.savePendingOrders();
 
     for (const orderLvl of orderLevels) {
@@ -528,16 +599,17 @@ class App extends React.Component {
         };
       }),
     );
+    const completedOrderIds = [];
     for (const { market, completedOrders } of marketCompletedOrders) {
       for (const orderId of completedOrders) {
+        completedOrderIds.push(orderId);
         delete this.pendingOrders[market][orderId];
       }
     }
-    this.savePendingOrders();
+    return completedOrderIds;
   }
 
   async updateUIWithNewData() {
-    await this.updatePendingOrders();
     let combinedStateUpdate = {};
     try {
       let fetchHistoryPromise = this.fetchPriceHistoryStateFromDEX();
