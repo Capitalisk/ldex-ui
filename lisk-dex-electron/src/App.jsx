@@ -358,6 +358,14 @@ class App extends React.Component {
     }
   }
 
+  orderBelongsToCurrentUser(order) {
+    let loggedInUser = this.state.keys[order.sourceChain];
+    if (!loggedInUser) {
+      return false;
+    }
+    return order.senderAddress === loggedInUser.address;
+  }
+
   async fetchOrderBookState() {
     const dexClient = this.getDexClient();
 
@@ -427,9 +435,6 @@ class App extends React.Component {
     const makerTradeTransfers = pendingTransfers.filter(transfer => transfer.type === 't2');
     const makerTradeOrderIds = new Set(makerTradeTransfers.map(transfer => transfer.makerOrderId));
 
-    // const closeTransfers = pendingTransfers.filter(transfer => transfer.type === 'r3');
-    // const closeOrderIds = new Set(closeTransfers.map(transfer => transfer.originOrderId));
-
     const unmatchedMarketPartTransfers = pendingTransfers.filter(transfer => transfer.type === 'r4');
     const unmatchedMarketPartOrderIds = new Set(unmatchedMarketPartTransfers.map(transfer => transfer.originOrderId));
 
@@ -452,7 +457,7 @@ class App extends React.Component {
       const yourOrder = yourOrderMap[order.id];
       if (yourOrder) {
         yourOrder.status = 'canceling';
-      } else if (this.state.keys[order.sourceChain]) {
+      } else if (this.orderBelongsToCurrentUser(order)) {
         yourOrderMap[order.id] = order;
       }
     }
@@ -475,7 +480,7 @@ class App extends React.Component {
         } else {
           yourOrder.status = order.status;
         }
-      } else if (this.state.keys[order.sourceChain]) {
+      } else if (this.orderBelongsToCurrentUser(order)) {
         yourOrderMap[order.id] = order;
       }
     }
@@ -495,7 +500,7 @@ class App extends React.Component {
       }
       if (isPendingOutbound && order.type === 'limit') {
         this.pendingOrders[activeMarket][order.id] = order;
-        if (this.state.keys[order.sourceChain]) {
+        if (this.orderBelongsToCurrentUser(order)) {
           yourOrderMap[order.id] = order;
         }
       }
@@ -512,7 +517,7 @@ class App extends React.Component {
       }
       if (isPendingOutbound && order.type === 'limit') {
         this.pendingOrders[activeMarket][order.id] = order;
-        if (this.state.keys[order.sourceChain]) {
+        if (this.orderBelongsToCurrentUser(order)) {
           yourOrderMap[order.id] = order;
         }
       }
