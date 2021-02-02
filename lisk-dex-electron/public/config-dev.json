@@ -54,7 +54,6 @@
     "ldpos/lsk": {
       "apiURL": "http://34.227.22.98:7021",
       "assets": ["ldpos", "lsk"],
-      "useRawTargetAddresses": ["ldpos"],
       "orderBookDepth": 20
     },
     "lsh/lsk": {

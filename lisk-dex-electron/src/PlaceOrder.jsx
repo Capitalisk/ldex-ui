@@ -244,7 +244,6 @@ export default class PlaceOrder extends React.Component {
       let sourceChain;
       let targetChain;
       let feeBase;
-      const rawTargetAddressAssets = GC.getMarketUseRawTargetAddressesFor(this.context.activeMarket);
 
       if (this.props.side === 'bid') {
         dexAddress = GC.getMarketChainWalletAddress(this.context.activeMarket, this.context.activeAssets[1]);
@@ -260,11 +259,6 @@ export default class PlaceOrder extends React.Component {
         sourceAddress = this.context.keys[this.context.activeAssets[0]].address;
         passphrase = this.context.keys[this.context.activeAssets[0]].passphrase;
         [sourceChain, targetChain] = this.context.activeAssets;
-      }
-
-      let useRawAddress = rawTargetAddressAssets.includes(targetChain);
-      if (useRawAddress) {
-        destAddress = destAddress.replace(new RegExp(`${targetChain}$`), '');
       }
 
       if (dexAddress && destAddress && passphrase && targetChain) {
@@ -327,7 +321,6 @@ export default class PlaceOrder extends React.Component {
       let sourceChain;
       let targetChain;
       let feeBase;
-      const rawTargetAddressAssets = GC.getMarketUseRawTargetAddressesFor(this.context.activeMarket);
 
       if (this.props.side === 'bid') {
         dexAddress = GC.getMarketChainWalletAddress(this.context.activeMarket, this.context.activeAssets[1]);
@@ -343,11 +336,6 @@ export default class PlaceOrder extends React.Component {
         sourceAddress = this.context.keys[this.context.activeAssets[0]].address;
         passphrase = this.context.keys[this.context.activeAssets[0]].passphrase;
         [sourceChain, targetChain] = this.context.activeAssets;
-      }
-
-      let useRawAddress = rawTargetAddressAssets.includes(targetChain);
-      if (useRawAddress) {
-        destAddress = destAddress.replace(new RegExp(`${targetChain}$`), '');
       }
 
       if (dexAddress && destAddress && passphrase && targetChain) {

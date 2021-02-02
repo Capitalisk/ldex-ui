@@ -58,9 +58,6 @@ const GlobalConfiguration = (() => {
     getMarketApiURL(market = required('market')) {
       return this.getMarket(market).apiURL;
     },
-    getMarketUseRawTargetAddressesFor(market = required('market')) {
-      return this.getMarket(market).useRawTargetAddresses;
-    },
     getMarketOptions(market = required('market')) {
       return this.getMarket(market).marketOptions;
     },
