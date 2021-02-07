@@ -79,8 +79,6 @@ export default class MarketList extends React.PureComponent {
                   return <ul style={{ paddingLeft: '20px' }}>{list.map(item => <li key={item}>{item}</li>)}</ul>;
                 };
                 if (Array.isArray(firstChain[chainInfoKey])) {
-                  // const firstChainValues = firstChain[chainInfoKey].join('\r\n');
-                  // const secondChainValues = secondChain[chainInfoKey].join('\r\n');
                   const firstChainValues = renderList(firstChain[chainInfoKey]);
                   const secondChainValues = renderList(secondChain[chainInfoKey]);
                   return (
