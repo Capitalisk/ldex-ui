@@ -91,7 +91,7 @@ class App extends React.Component {
     const enabledAssets = GC.getAssetNames();
     for (const asset of enabledAssets) {
       const assetConfig = GC.getAsset(asset);
-      const adapterConfig = { ...assetConfig.adapter };
+      const adapterConfig = { chainSymbol: asset, ...assetConfig.adapter };
       const AssetAdapterClass = adapterClasses[adapterConfig.type];
       if (!AssetAdapterClass) {
         throw new Error(
@@ -678,7 +678,6 @@ class App extends React.Component {
     let atLeastOneKey = false;
     for (const asset in assetLoginDetails) {
       if (assetLoginDetails[asset] && assetLoginDetails[asset].passphrase && assetLoginDetails[asset].address) {
-        atLeastOneKey = true;
         const passphrase = assetLoginDetails[asset].passphrase.trim();
         const address = assetLoginDetails[asset].address.trim();
         const assetAdapter = this.assetAdapters[asset];
@@ -687,8 +686,14 @@ class App extends React.Component {
           delete newKeys[asset];
           return false;
         }
-        await assetAdapter.connect({ passphrase });
-        newKeys[asset] = { address, passphrase };
+        try {
+          await assetAdapter.connect({ passphrase });
+          newKeys[asset] = { address, passphrase };
+          atLeastOneKey = true;
+        } catch (error) {
+          this.notify(`Failed to login to asset ${asset} - Check that your wallet details are correct`, true);
+          return false;
+        }
       }
     }
 
@@ -785,9 +790,10 @@ class App extends React.Component {
     const balances = await Promise.all(
       this.state.activeAssets.map(async (asset) => {
         if (asset in assetInfos) {
+          let address = assetInfos[asset].address;
           try {
             return await this.assetAdapters[asset].getAccountBalance({
-              address: assetInfos[asset].address,
+              address,
             });
           } catch (error) {
             console.error(error);

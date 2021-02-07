@@ -9,6 +9,7 @@ export default class SignInModal extends React.Component {
     this.state = {
       passphrases: {},
       addresses: {},
+      keyIndexes: {},
       failure: false,
       signingIn: false,
     };
@@ -20,41 +21,65 @@ export default class SignInModal extends React.Component {
     }
   }
 
-  updateAddress(asset, passphrase) {
-    let assetAdapter = this.assetAdapters[asset];
+  async getKeyIndex(asset, address) {
+    const assetAdapter = this.assetAdapters[asset];
+    if (!address.length || !assetAdapter.getAccountNextKeyIndex) {
+      return null;
+    }
+    let keyIndex;
+    try {
+      keyIndex = await assetAdapter.getAccountNextKeyIndex({ address });
+    } catch (error) {}
+    return keyIndex || 0;
+  }
+
+  async updateAddress(asset, passphrase) {
+    const assetAdapter = this.assetAdapters[asset];
     const isValidPassphrase = assetAdapter.validatePassphrase({ passphrase });
     const address = isValidPassphrase ? assetAdapter.getAddressFromPassphrase({ passphrase }) : null;
 
-    this.setState((prevState) => ({
+    const keyIndex = await this.getKeyIndex(asset, address);
+
+    await this.setState((prevState) => ({
       addresses: {
         ...prevState.addresses,
         [asset]: address,
+      },
+      keyIndexes: {
+        ...prevState.keyIndexes,
+        [asset]: keyIndex
       },
     }));
 
     return address;
   }
 
-  handleWalletAddressChange = (event) => {
+  handleWalletAddressChange = async (event) => {
     const { target } = event;
-    const value = target.type === 'checkbox' ? target.checked : target.value;
+    const value = target.value || '';
     const { name } = target;
 
-    this.setState((prevState) => ({
+    const keyIndex = await this.getKeyIndex(name, value);
+
+    await this.setState((prevState) => ({
       addresses: {
         ...prevState.addresses,
         [name]: value,
+      },
+      keyIndexes: {
+        ...prevState.keyIndexes,
+        [name]: keyIndex
       },
     }));
   }
 
   handlePassphraseChange = (event) => {
     const { target } = event;
-    const value = target.type === 'checkbox' ? target.checked : target.value;
+    const value = target.value || '';
     const { name } = target;
 
     // Only upate the address if the client wrapper exposes a getAddressFromPassphrase method.
-    if (this.assetAdapters[name].getAddressFromPassphrase) {
+    if (value.length && this.assetAdapters[name].getAddressFromPassphrase) {
       this.updateAddress(name, value);
     }
 
@@ -82,15 +107,14 @@ export default class SignInModal extends React.Component {
     }
   }
 
-  handleWalletCreate = (event) => {
+  handleWalletCreate = async (event) => {
     event.preventDefault();
     const asset = event.target.name;
     let assetAdapter = this.assetAdapters[asset];
-    const { address, passphrase } = assetAdapter.createWallet({
-      networkSymbol: asset
-    });
+    const { address, passphrase } = assetAdapter.createWallet();
+    const keyIndex = await this.getKeyIndex(asset, address);
 
-    this.setState((prevState) => ({
+    await this.setState((prevState) => ({
       passphrases: {
         ...prevState.passphrases,
         [asset]: passphrase,
@@ -98,6 +122,10 @@ export default class SignInModal extends React.Component {
       addresses: {
         ...prevState.addresses,
         [asset]: address,
+      },
+      keyIndexes: {
+        ...prevState.keyIndexes,
+        [asset]: keyIndex
       },
     }));
 
@@ -118,6 +146,7 @@ export default class SignInModal extends React.Component {
       const assetConfig = GC.getAsset(asset);
       const addressInputStyles = { ...styles };
       if (!assetConfig.allowCustomWalletAddresses) {
+        delete addressInputStyles.border;
         addressInputStyles.borderStyle = 'none';
       }
 
@@ -134,6 +163,7 @@ export default class SignInModal extends React.Component {
           </span>
           <textarea style={styles} rows={4} name={asset} data-gramm={false} className="sign-in-textarea" value={this.state.passphrases[asset]} onChange={this.handlePassphraseChange} />
           <button type="button" className="button-secondary" name={asset} onClick={this.handleWalletCreate} style={{ marginRight: '10px' }}>Generate wallet</button>
+          {this.state.keyIndexes[asset] != null && <span><span>Next key index: </span><span>{this.state.keyIndexes[asset]}</span></span>}
         </div>,
       );
 
