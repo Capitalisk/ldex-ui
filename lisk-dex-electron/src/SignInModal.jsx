@@ -196,13 +196,13 @@ export default class SignInModal extends React.Component {
             <span role="img" aria-label="close" className="clickable" onClick={this.props.close}>&#x2715;</span>
           </div>
           <form onSubmit={this.handleSubmit}>
-            <div className="sign-in-progress-area">
-              {this.state.signingIn && (
-                <div className="progress">
-                  <div className="indeterminate" />
-                </div>
-              )}
-            </div>
+            {this.state.signingIn && (
+              <div className="sign-in-progress-area">
+                  <div className="progress">
+                    <div className="indeterminate" />
+                  </div>
+              </div>
+            )}
             <h2 className="sign-in-heading">Sign in using your blockchain passphrases.</h2>
             {loginAssetPanels}
             <input className="button-primary" style={{ fontSize: '20px', marginTop: '15px' }} type="submit" value="Submit" />
