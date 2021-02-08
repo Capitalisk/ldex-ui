@@ -1,5 +1,5 @@
 import React from 'react';
-import './App.css';
+import './App.scss';
 
 export default class SignInState extends React.Component {
   constructor(props) {

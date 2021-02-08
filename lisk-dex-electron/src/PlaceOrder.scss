@@ -1,3 +1,5 @@
+@import './styles/variables';
+
 .action-name {
   display: inline-block;
   font-size: 20px;
@@ -28,7 +30,7 @@
   outline: none;
   width: 105px;
   vertical-align: top;
-  background: #008800;
+  background: $primary;
 }
 
 .place-buy-order-button[disabled] {
@@ -59,7 +61,7 @@
   position: absolute;
   right: 10%;
   top: calc(50% - 11px);
-  color: #999999;
+  color: $primary-bg;
   user-select: none;
 }
 

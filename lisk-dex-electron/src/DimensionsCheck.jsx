@@ -1,6 +1,6 @@
 import React from 'react';
 import logo from './logo.svg';
-import './DimensionsCheck.css';
+import './DimensionsCheck.scss';
 
 class App extends React.Component {
   constructor(props) {

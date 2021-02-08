@@ -1,9 +1,9 @@
 import React from 'react';
-import './PlaceOrder.css';
+import './PlaceOrder.scss';
 import InfoIcon from './InfoIcon';
 import Modal from './Modal';
 import marketInfoDescriptor from './Market';
-import './Table.css';
+import './Table.scss';
 import { GlobalConfiguration as GC } from './Utils';
 
 export default class MarketList extends React.PureComponent {
@@ -145,7 +145,7 @@ export default class MarketList extends React.PureComponent {
               </div>
             ))}
           </div>
-          <p style={{ color: '#999999' }}>More markets coming soon!</p>
+          <p style={{ color: '$primary-bg' }}>More markets coming soon!</p>
           <small>
             <br />
             Data refreshed every

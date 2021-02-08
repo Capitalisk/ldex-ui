@@ -1,5 +1,5 @@
 import React from 'react';
-import './UserOrder.css';
+import './UserOrder.scss';
 import userContext from './context';
 import { getLiteralAssetBalance, GlobalConfiguration as GC } from './Utils';
 
