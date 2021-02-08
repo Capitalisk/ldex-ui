@@ -194,7 +194,7 @@ export default class SignInModal extends React.Component {
         <div className="modal-foreground">
           <div id="sign-in-modal">
             <div className="button-wrapper">
-              <div class="close-btn">
+              <div className="close-btn">
                 <span role="img" aria-label="close" className="clickable" onClick={this.props.close}>&#x2715;</span>
               </div>
             </div>
