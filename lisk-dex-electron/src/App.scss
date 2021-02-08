@@ -159,9 +159,14 @@ li {
 
 .modal-foreground {
   position: absolute;
-  z-index: 3;
+  display: flex;
+  // position: fixed;
+  justify-content: center;
+  align-content: center;
+  width: 100vw;
+  height: 100vh;
+  z-index: 111; // This is because of the chart in the background
   opacity: 1;
-  border: 1px solid $primary-bg;
 }
 
 .button-primary {

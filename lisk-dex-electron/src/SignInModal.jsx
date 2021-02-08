@@ -191,22 +191,26 @@ export default class SignInModal extends React.Component {
     return (
       <>
         <div className="modal-background" />
-        <div id="sign-in-modal" className="modal-foreground">
-          <div class="close-btn">
-            <span role="img" aria-label="close" className="clickable" onClick={this.props.close}>&#x2715;</span>
-          </div>
-          <form onSubmit={this.handleSubmit}>
-            {this.state.signingIn && (
-              <div className="sign-in-progress-area">
-                  <div className="progress">
-                    <div className="indeterminate" />
-                  </div>
+        <div className="modal-foreground">
+          <div id="sign-in-modal">
+            <div className="button-wrapper">
+              <div class="close-btn">
+                <span role="img" aria-label="close" className="clickable" onClick={this.props.close}>&#x2715;</span>
               </div>
-            )}
-            <h2 className="sign-in-heading">Sign in using your blockchain passphrases.</h2>
-            {loginAssetPanels}
-            <input className="button-primary" style={{ fontSize: '20px', marginTop: '15px' }} type="submit" value="Submit" />
-          </form>
+            </div>
+            <form onSubmit={this.handleSubmit}>
+              {this.state.signingIn && (
+                <div className="sign-in-progress-area">
+                    <div className="progress">
+                      <div className="indeterminate" />
+                    </div>
+                </div>
+              )}
+              <h2 className="sign-in-heading">Sign in using your blockchain passphrases.</h2>
+              {loginAssetPanels}
+              <input className="button-primary" style={{ fontSize: '20px', marginTop: '15px' }} type="submit" value="Submit" />
+            </form>
+          </div>
         </div>
       </>
     );
