@@ -175,12 +175,7 @@ export default class SignInModal extends React.Component {
         <div className="modal-background" />
         <div className="modal-foreground">
           <div id="sign-in-modal">
-            <div className="button-wrapper">
-              <div className="close-btn">
-                <span role="img" aria-label="close" className="clickable" onClick={this.props.close}>&#x2715;</span>
-              </div>
-            </div>
-            <form onSubmit={this.handleSubmit}>
+            <div className="wrapper">
               {this.state.signingIn && (
                 <div className="sign-in-progress-area">
                     <div className="progress">
@@ -188,10 +183,17 @@ export default class SignInModal extends React.Component {
                     </div>
                 </div>
               )}
-              <h2 className="sign-in-heading">Sign in using your blockchain passphrases.</h2>
-              {loginAssetPanels}
-              <input className="button-primary" style={{ fontSize: '20px', marginTop: '15px' }} type="submit" value="Submit" />
-            </form>
+              <div className="close-btn">
+                <span role="img" aria-label="close" className="clickable" onClick={this.props.close}>&#x2715;</span>
+              </div>
+              <div className="form">
+                <form onSubmit={this.handleSubmit}>
+                  <h2 className="sign-in-heading">Sign in using your blockchain passphrases.</h2>
+                  {loginAssetPanels}
+                  <input className="button-primary" style={{ fontSize: '20px', marginTop: '15px' }} type="submit" value="Submit" />
+                </form>
+              </div>
+            </div>
           </div>
         </div>
       </>

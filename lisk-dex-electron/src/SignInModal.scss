@@ -5,19 +5,30 @@
   box-sizing: border-box;
   z-index: 200;
   width: 50%;
-  padding: 30px;
   background-color: rgb(27, 27, 27);
   height: 75%;
   overflow-y: auto;
   border: 1px solid $primary-bg;
 
-  .button-wrapper {
+  .wrapper {
     position: relative;
     .close-btn {
       position: absolute;
-      top: -20px;
-      right: -20px;
+      top: 10px;
+      right: 10px;
       font-size: 32px;
+    }
+
+    .form {
+      padding: 30px;
+    }
+
+    .sign-in-progress-area {
+      position: absolute;
+      top: -8px;
+      height: 20px;
+      width: 100%;
+      // left: 5%;
     }
   }
 
@@ -46,14 +57,6 @@
   font-family: 'Courier New', Courier, monospace;
   margin-top: 10px;
   margin-bottom: 8px;
-}
-
-.sign-in-progress-area {
-  position: absolute;
-  top: 10px;
-  height: 20px;
-  width: 90%;
-  left: 5%;
 }
 
 @media only screen and (max-width: 950px), only screen and (max-height: 700px) {
