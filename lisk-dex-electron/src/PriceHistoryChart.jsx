@@ -103,13 +103,13 @@ class PriceHistoryChart extends React.PureComponent {
           style={{ position: 'relative', zIndex: 110 }}
         >
           <CartesianGrid strokeDasharray="3 3" stroke="#222222" />
-          <XAxis dataKey="baseTimestamp" tick={<TimeAxisTick />} label={{ value: 'Chain time (seconds)', dy: 30, fill: '$primary-bg' }} />
+          <XAxis dataKey="baseTimestamp" tick={<TimeAxisTick />} label={{ value: 'Chain time (seconds)', dy: 30, fill: '#999999' }} />
           <YAxis label={{
-            value: `Price (${assetSymbol})`, angle: -90, fill: '$primary-bg', dx: -25,
+            value: `Price (${assetSymbol})`, angle: -90, fill: '#999999', dx: -25,
           }}
           />
           <Tooltip content={<PriceTooltip />} />
-          <Bar dataKey="Volume" fill="$primary-bg" />
+          <Bar dataKey="Volume" fill="#999999" />
           <Line type="monotone" dataKey="Price" stroke="#009900" strokeWidth={2} activeDot={{ r: 4 }} dot={null} />
         </ComposedChart>
       </div>
