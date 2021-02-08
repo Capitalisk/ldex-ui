@@ -1,6 +1,6 @@
 import React from 'react';
 import OrderBookEntry from './OrderBookEntry';
-import './OrderBook.css';
+import './OrderBook.scss';
 import { Values } from './Utils';
 
 export default class OrderBook extends React.Component {

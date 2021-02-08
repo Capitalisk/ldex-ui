@@ -1,6 +1,6 @@
 import React from 'react';
 import userContext from './context';
-import './App.css';
+import './App.scss';
 import { formatThousands, getNumericAssetBalance } from './Utils';
 
 export default class BalanceDisplay extends React.Component {

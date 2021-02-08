@@ -1,5 +1,5 @@
 import React from 'react';
-import './PlaceOrder.css';
+import './PlaceOrder.scss';
 import UserOrder from './UserOrder';
 
 const statusValues = {
@@ -92,7 +92,7 @@ export default class YourOrders extends React.Component {
               {!!bids.length && bids.slice().reverse().map((order) => <UserOrder key={order.id} side="bid" order={order} orderCanceled={this.handleCancel} failedToCancelOrder={this.handleCancelFail} />)}
               {!bids.length && (
               <div style={{
-                display: 'flex', height: '100%', color: '#999999', alignItems: 'center', justifyContent: 'center',
+                display: 'flex', height: '100%', color: '$primary-bg', alignItems: 'center', justifyContent: 'center',
               }}
               >
                 No buy orders
@@ -120,7 +120,7 @@ export default class YourOrders extends React.Component {
               {!!asks.length && asks.map((order) => <UserOrder key={order.id} side="ask" order={order} orderCanceled={this.handleCancel} failedToCancelOrder={this.handleCancelFail} />)}
               {!asks.length && (
               <div style={{
-                display: 'flex', height: '100%', color: '#999999', alignItems: 'center', justifyContent: 'center',
+                display: 'flex', height: '100%', color: '$primary-bg', alignItems: 'center', justifyContent: 'center',
               }}
               >
                 No sell orders

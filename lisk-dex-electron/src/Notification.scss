@@ -1,3 +1,5 @@
+@import './styles/variables';
+
 @keyframes appear {
   from {
     opacity: 0;
@@ -24,7 +26,7 @@
   position: fixed;
   z-index: 1000;
   top: 4px;
-  color: #000000;
+  color: $secondary-bg;
   text-align: center;
   left: 25%;
   width: 50%;
@@ -49,8 +51,8 @@
 }
 
 .notification-container.error {
-  color: #CC0000;
-  border: 2px solid #CC0000;
+  color: $error;
+  border: 2px solid $error;
 }
 
 @media only screen and (max-width: 950px), only screen and (max-height: 700px) {

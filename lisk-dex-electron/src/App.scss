@@ -1,3 +1,5 @@
+@import './styles/variables';
+
 #root {
   height: 100%;
   width: 100%;
@@ -152,14 +154,14 @@ li {
   width: 100%;
   height: 100%;
   opacity: 0.6;
-  background: #000000;
+  background: $secondary-bg;
 }
 
 .modal-foreground {
   position: absolute;
   z-index: 3;
   opacity: 1;
-  border: 1px solid #999999;
+  border: 1px solid $primary-bg;
 }
 
 .button-primary {
@@ -169,7 +171,7 @@ li {
   border: 0;
   padding: 5px 15px 5px 15px;
   outline: none;
-  background: #008800;
+  background: $primary;
 }
 
 .button-secondary {
@@ -179,34 +181,34 @@ li {
   border: 0;
   padding: 5px 15px 5px 15px;
   outline: none;
-  background: #555555;
+  background: $secondary;
 }
 
 .tab-button {
   cursor: pointer;
   font-size: 20px;
-  color: #000000;
+  color: $secondary-bg;
   border: 0;
   padding: 5px 15px 5px 15px;
   outline: none;
-  background: #999999;
+  background: $primary-bg;
 }
 
 .tab-button:disabled {
   cursor: default;
   font-size: 20px;
-  color: #000000;
+  color: $secondary-bg;
   border: 0;
   padding: 5px 15px 5px 15px;
   outline: none;
-  background: #dddddd;
+  background: $disabled-bg;
 }
 
 .error-message {
   font-size: 14px;
   margin-top: 4px;
   margin-bottom: 2px;
-  color: #cc0000;
+  color: $error;
 }
 
 .lds-dual-ring {

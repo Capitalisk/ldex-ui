@@ -1,6 +1,6 @@
 import React from 'react';
 import userContext from './context';
-import './Notification.css';
+import './Notification.scss';
 
 export default class Notification extends React.Component {
   static contextType = userContext;
