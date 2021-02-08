@@ -64,6 +64,15 @@
     top: 0;
     width: 100%;
     height: 100%;
+
+    .button-wrapper {
+      .close-btn {
+        position: absolute;
+        top: 0px;
+        right: 0px;
+        font-size: 32px;
+      }
+    }
   }
 
   .sign-in-textarea {
