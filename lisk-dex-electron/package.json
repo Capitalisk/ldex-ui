@@ -15,7 +15,8 @@
     "react-dom": "^16.13.1",
     "react-scripts": "^3.4.1",
     "recharts": "^1.8.5",
-    "runtypes": "^4.1.0"
+    "runtypes": "^4.1.0",
+    "sodium-native": "^3.2.1"
   },
   "scripts": {
     "electron": "electron .",
