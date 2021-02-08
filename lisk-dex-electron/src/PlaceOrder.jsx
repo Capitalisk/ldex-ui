@@ -275,7 +275,7 @@ export default class PlaceOrder extends React.Component {
             fee: String(feeBase),
           });
           (async () => {
-            await this.setState({ isSubmitting: true });
+            this.setState({ isSubmitting: true });
             try {
               await sourceAssetAdapter.postTransaction({
                 transaction: tx,
@@ -296,10 +296,10 @@ export default class PlaceOrder extends React.Component {
               if (this.props.orderSubmitError) {
                 this.props.orderSubmitError(error);
               }
-              await this.setState({ isSubmitting: false });
+              this.setState({ isSubmitting: false });
               return;
             }
-            await this.setState({ isSubmitting: false });
+            this.setState({ isSubmitting: false });
             this.handleTransactionSubmit({
               transactionId: tx.id,
               senderAddress: sourceAddress,
@@ -353,7 +353,7 @@ export default class PlaceOrder extends React.Component {
             fee: String(feeBase),
           });
           (async () => {
-            await this.setState({ isSubmitting: true });
+            this.setState({ isSubmitting: true });
             try {
               await sourceAssetAdapter.postTransaction({
                 transaction: tx
@@ -375,10 +375,10 @@ export default class PlaceOrder extends React.Component {
               if (this.props.orderSubmitError) {
                 this.props.orderSubmitError(error);
               }
-              await this.setState({ isSubmitting: false });
+              this.setState({ isSubmitting: false });
               return;
             }
-            await this.setState({ isSubmitting: false });
+            this.setState({ isSubmitting: false });
             this.handleTransactionSubmit({
               transactionId: tx.id,
               senderAddress: sourceAddress,

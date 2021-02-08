@@ -1,5 +1,5 @@
 import React from 'react';
-import './SignInModal.css';
+import './SignInModal.scss';
 import './progress.css';
 import { GlobalConfiguration as GC } from './Utils';
 
@@ -40,7 +40,7 @@ export default class SignInModal extends React.Component {
 
     const keyIndex = await this.getKeyIndex(asset, address);
 
-    await this.setState((prevState) => ({
+    this.setState((prevState) => ({
       addresses: {
         ...prevState.addresses,
         [asset]: address,
@@ -61,7 +61,7 @@ export default class SignInModal extends React.Component {
 
     const keyIndex = await this.getKeyIndex(name, value);
 
-    await this.setState((prevState) => ({
+    this.setState((prevState) => ({
       addresses: {
         ...prevState.addresses,
         [name]: value,
@@ -100,10 +100,10 @@ export default class SignInModal extends React.Component {
         passphrase: this.state.passphrases[asset],
       };
     }
-    await this.setState({ signingIn: true });
+    this.setState({ signingIn: true });
     const success = await this.props.submitLoginDetails(assetLoginDetails);
     if (!success) {
-      await this.setState({ signingIn: false, failure: true });
+      this.setState({ signingIn: false, failure: true });
     }
   }
 
@@ -114,7 +114,7 @@ export default class SignInModal extends React.Component {
     const { address, passphrase } = assetAdapter.createWallet();
     const keyIndex = await this.getKeyIndex(asset, address);
 
-    await this.setState((prevState) => ({
+    this.setState((prevState) => ({
       passphrases: {
         ...prevState.passphrases,
         [asset]: passphrase,

@@ -102,7 +102,7 @@ class App extends React.Component {
       this.assetAdapters[asset] = assetAdapter;
     }
 
-    await this.setState({
+    this.setState({
       configuration: GC.getConfig(),
       activeMarket: GC.getDefaultActiveMarketName(),
       activeAssets: GC.getMarketAssets(GC.getDefaultActiveMarketName()),
@@ -179,7 +179,7 @@ class App extends React.Component {
     this.notify(message, true);
   }
 
-  orderCancel = async (order) => {
+  orderCancel = (order) => {
     const chainSymbol = order.sourceChain.toUpperCase();
 
     order.status = 'canceling';
@@ -200,7 +200,7 @@ class App extends React.Component {
     }
     this.notify(message);
 
-    await this.setState(({ yourOrders }) => ({
+    this.setState(({ yourOrders }) => ({
       yourOrders,
     }));
   }
@@ -263,7 +263,7 @@ class App extends React.Component {
     this.pendingOrders[this.state.activeMarket][order.id] = order;
     this.savePendingOrders();
 
-    await this.setState(({ yourOrders, activeMarket }) => {
+    this.setState(({ yourOrders, activeMarket }) => {
       const yourOrderMap = {};
       for (const yourOrder of yourOrders) {
         yourOrderMap[yourOrder.id] = yourOrder;
@@ -643,7 +643,7 @@ class App extends React.Component {
     } else {
       combinedStateUpdate.lastTradePrice = null;
     }
-    await this.setState(combinedStateUpdate);
+    this.setState(combinedStateUpdate);
   }
 
   componentDidUpdate() {
@@ -698,7 +698,7 @@ class App extends React.Component {
     }
 
     // The keys need to be updated on the state before we fetch the order book.
-    await this.setState((state) => ({
+    this.setState((state) => ({
       quoteAssetBalance: null,
       baseAssetBalance: null,
       keys: {
@@ -727,7 +727,7 @@ class App extends React.Component {
         console.error(error);
         this.notify('Failed to fetch asset balances - Check your connection.', true);
       }
-      await this.setState({
+      this.setState({
         ...combinedStateUpdate,
         displaySigninModal: false,
       });
@@ -747,7 +747,7 @@ class App extends React.Component {
   }
 
   signOut = async () => {
-    await this.setState({ keys: {}, yourOrders: [] });
+    this.setState({ keys: {}, yourOrders: [] });
     await this.updateUIWithNewData();
   }
 
@@ -813,7 +813,7 @@ class App extends React.Component {
       activeMarket = this.state.activeMarket;
     }
     const activeAssets = activeMarket.split('/');
-    await this.setState({
+    this.setState({
       yourOrders: [],
       orderBookData: {
         orders: [], bids: [], asks: [], maxSize: { bid: 0, ask: 0 },
