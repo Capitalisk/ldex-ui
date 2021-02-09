@@ -1,6 +1,6 @@
 import React from 'react';
-import './SignInModal.scss';
-import './progress.scss';
+import './SignInModal.css';
+import './progress.css';
 import { GlobalConfiguration as GC } from './Utils';
 
 export default class SignInModal extends React.Component {

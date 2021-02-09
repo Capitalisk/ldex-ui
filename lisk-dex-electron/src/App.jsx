@@ -1,5 +1,5 @@
 import React from 'react';
-import './App.scss';
+import './App.css';
 
 import OrderBook from './OrderBook';
 import PriceHistoryChart from './PriceHistoryChart';
