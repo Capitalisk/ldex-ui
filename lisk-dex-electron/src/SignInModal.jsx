@@ -23,7 +23,7 @@ export default class SignInModal extends React.Component {
 
   async getKeyIndex(asset, address) {
     const assetAdapter = this.assetAdapters[asset];
-    if (!address.length || !assetAdapter.getAccountNextKeyIndex) {
+    if ((address && !address.length) || !assetAdapter.getAccountNextKeyIndex) {
       return null;
     }
     let keyIndex;
