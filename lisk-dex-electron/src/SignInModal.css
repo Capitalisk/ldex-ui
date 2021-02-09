@@ -35,6 +35,7 @@
   width: 100%;
   /* left: 5%; */
 }
+
 .sign-in-textarea {
   height: 46px;
   width: 100%;
@@ -65,7 +66,16 @@
     top: 0;
     width: 100%;
     height: 100%;
+  }
 
+  .sign-in-progress-area {
+    position: fixed;
+    top: -8px;
+    left: 0;
+    right: 0;
+    height: 20px;
+    /* width: 100%; */
+    /* left: 5%; */
   }
 
   .close-btn {
