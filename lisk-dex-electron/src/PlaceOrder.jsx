@@ -1,5 +1,5 @@
 import React from 'react';
-import './PlaceOrder.scss';
+import './PlaceOrder.css';
 import BalanceDisplay from './BalanceDisplay';
 import userContext from './context';
 import Modal from './Modal';

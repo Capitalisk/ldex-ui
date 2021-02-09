@@ -1,5 +1,5 @@
 import React from 'react';
-import './OrderBookEntry.scss';
+import './OrderBookEntry.css';
 import { formatThousands, getLiteralAssetBalance } from './Utils';
 
 export default class OrderBookEntry extends React.Component {

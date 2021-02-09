@@ -1,5 +1,5 @@
 import React from 'react';
-import './Modal.scss';
+import './Modal.css';
 
 export default function Modal(props) {
   const coverClass = props.modalOpened ? 'modal-cover modal-cover-active' : 'modal-cover';

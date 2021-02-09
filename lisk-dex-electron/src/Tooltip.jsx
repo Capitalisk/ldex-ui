@@ -1,5 +1,5 @@
 import React from 'react';
-import './Tooltip.scss';
+import './Tooltip.css';
 
 export default class Tooltip extends React.Component {
   constructor(props) {
