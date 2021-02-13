@@ -754,7 +754,6 @@ class App extends React.Component {
   }
 
   componentDidMount() {
-    this.updateWindowDimensions();
     window.addEventListener('hashchange', this.locationHashChange, false);
   }
 
