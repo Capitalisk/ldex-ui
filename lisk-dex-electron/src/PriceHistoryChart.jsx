@@ -68,6 +68,9 @@ class PriceHistoryChart extends React.PureComponent {
       this.chartReSize(chartElement);
     });
   }
+  componentWillUnmount() {
+    window.removeEventListener('resize', this.chartSizes);
+  }
 
   render() {
     let volumeDisplayHeightRatio;
