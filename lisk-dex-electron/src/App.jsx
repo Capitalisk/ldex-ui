@@ -862,7 +862,7 @@ class App extends React.Component {
           {this.state.displaySigninModal && <SignInModal submitLoginDetails={this.submitLoginDetails} enabledAssets={this.state.activeAssets} close={this.closeSignInModal} walletGenerated={this.walletGenerated} assetAdapters={this.assetAdapters} />}
           {this.state.displayLeaveWarning && <LeaveWarning setDisplayLeaveWarning={this.setDisplayLeaveWarning} />}
           <div className="top-bar">
-            <div>
+            <div className="top-bar-title">
               <b style={{ fontSize: '21px' }}>{GC.getAppTitle()}</b>
               {' '}
               &nbsp;
