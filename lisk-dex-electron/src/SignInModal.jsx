@@ -193,7 +193,7 @@ export default class SignInModal extends React.Component {
         <div className="modal-background" />
         <div className="modal-foreground">
           <div id="sign-in-modal">
-            <div className="wrapper">
+            <div className="sign-in-wrapper">
               {this.state.signingIn && (
                 <div className="sign-in-progress-area">
                     <div className="progress">
