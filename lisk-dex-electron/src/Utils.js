@@ -40,9 +40,6 @@ const GlobalConfiguration = (() => {
     getAssetUnitValue(assetName = required('assetName')) {
       return this.getAsset(assetName).unitValue;
     },
-    getAssetProcessingHeightExpiry(assetName = required('assetName')) {
-      return this.getAsset(assetName).processingHeightExpiry;
-    },
     getMarketNames() {
       return globalConfig.markets && Object.keys(globalConfig.markets);
     },
@@ -57,6 +54,9 @@ const GlobalConfiguration = (() => {
     },
     getMarketApiURL(market = required('market')) {
       return this.getMarket(market).apiURL;
+    },
+    getMarketPendingOrderExpiry(market = required('market')) {
+      return this.getMarket(market).pendingOrderExpiry;
     },
     getMarketOptions(market = required('market')) {
       return this.getMarket(market).marketOptions;

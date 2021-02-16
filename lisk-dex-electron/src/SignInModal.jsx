@@ -22,9 +22,12 @@ export default class SignInModal extends React.Component {
   }
 
   async getKeyIndex(asset, address) {
+    if (!address) {
+      return '';
+    }
     const assetAdapter = this.assetAdapters[asset];
     if ((address && !address.length) || !assetAdapter.getAccountNextKeyIndex) {
-      return null;
+      return '';
     }
     let keyIndex;
     try {
@@ -34,9 +37,24 @@ export default class SignInModal extends React.Component {
   }
 
   async updateAddress(asset, passphrase) {
+    if (!passphrase) {
+      await this.setState((prevState) => ({
+        addresses: {
+          ...prevState.addresses,
+          [asset]: '',
+        },
+        keyIndexes: {
+          ...prevState.keyIndexes,
+          [asset]: ''
+        },
+      }));
+
+      return '';
+    }
+    passphrase = passphrase.trim();
     const assetAdapter = this.assetAdapters[asset];
     const isValidPassphrase = assetAdapter.validatePassphrase({ passphrase });
-    const address = isValidPassphrase ? assetAdapter.getAddressFromPassphrase({ passphrase }) : null;
+    const address = isValidPassphrase ? assetAdapter.getAddressFromPassphrase({ passphrase }) : '';
 
     const keyIndex = await this.getKeyIndex(asset, address);
 
@@ -79,7 +97,7 @@ export default class SignInModal extends React.Component {
     const { name } = target;
 
     // Only upate the address if the client wrapper exposes a getAddressFromPassphrase method.
-    if (value.length && this.assetAdapters[name].getAddressFromPassphrase) {
+    if (this.assetAdapters[name].getAddressFromPassphrase) {
       this.updateAddress(name, value);
     }
 
@@ -163,7 +181,7 @@ export default class SignInModal extends React.Component {
           </span>
           <textarea style={styles} rows={4} name={asset} data-gramm={false} className="sign-in-textarea" value={this.state.passphrases[asset]} onChange={this.handlePassphraseChange} />
           <button type="button" className="button-secondary" name={asset} onClick={this.handleWalletCreate} style={{ marginRight: '10px' }}>Generate wallet</button>
-          {this.state.keyIndexes[asset] != null && <span><span>Next key index: </span><span>{this.state.keyIndexes[asset]}</span></span>}
+          {Number.isInteger(this.state.keyIndexes[asset]) && <span><span>Next key index: </span><span>{this.state.keyIndexes[asset]}</span></span>}
         </div>,
       );
 

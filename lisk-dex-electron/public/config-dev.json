@@ -10,7 +10,6 @@
     "lsk": {
       "name": "Lisk testnet",
       "unitValue": 100000000,
-      "processingHeightExpiry": 5,
       "adapter": {
         "type": "lisk",
         "apiURL": "https://test-02.liskapi.io/api",
@@ -20,7 +19,6 @@
     "lsh": {
       "name": "Leasehold testnet",
       "unitValue": 100000000,
-      "processingHeightExpiry": 5,
       "adapter": {
         "type": "lisk",
         "apiURL": "http://54.174.172.179:7010/api",
@@ -30,7 +28,6 @@
     "clsk": {
       "name": "Capitalisk testnet",
       "unitValue": 100000000,
-      "processingHeightExpiry": 5,
       "allowCustomWalletAddresses": true,
       "adapter": {
         "type": "lisk",
@@ -41,7 +38,6 @@
     "ldpos": {
       "name": "LDPOS testnet",
       "unitValue": 100000000,
-      "processingHeightExpiry": 3,
       "allowCustomWalletAddresses": true,
       "adapter": {
         "type": "ldpos",
@@ -54,12 +50,14 @@
     "ldpos/lsk": {
       "apiURL": "http://34.227.22.98:7021",
       "assets": ["ldpos", "lsk"],
-      "orderBookDepth": 20
+      "orderBookDepth": 20,
+      "pendingOrderExpiry": 120000
     },
     "lsh/lsk": {
       "apiURL": "http://2.56.214.88:7011",
       "assets": ["lsh", "lsk"],
-      "orderBookDepth": 20
+      "orderBookDepth": 20,
+      "pendingOrderExpiry": 120000
     }
   }
 }

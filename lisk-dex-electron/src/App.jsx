@@ -255,9 +255,9 @@ class App extends React.Component {
       processedHeights = {};
     }
 
-    const heightSafetyMargin = GC.getAssetProcessingHeightExpiry(order.sourceChain);
+    const pendingOrderExpiry = GC.getMarketPendingOrderExpiry(this.state.activeMarket);
     order.submitHeight = processedHeights[order.sourceChain] || Infinity;
-    order.submitExpiryHeight = order.submitHeight + GC.getMarketChainRequiredConfirmations(this.state.activeMarket, order.sourceChain) + heightSafetyMargin;
+    order.submitExpiryTime = Date.now() + pendingOrderExpiry;
     order.status = 'pending';
 
     this.pendingOrders[this.state.activeMarket][order.id] = order;
@@ -474,7 +474,7 @@ class App extends React.Component {
       }
       const yourOrder = yourOrderMap[order.id];
       if (yourOrder) {
-        if (order.status === 'pending') {
+        if (order.status === 'pending' || order.status === 'matching') {
           delete this.pendingOrders[activeMarket][order.id];
           yourOrder.status = 'ready';
         } else {
@@ -578,11 +578,9 @@ class App extends React.Component {
           };
         }
         try {
-          const processedHeights = await getProcessedHeights(dexClient);
           const processedOrExpiredTransfers = await Promise.all(
             pendingOrders.map(async (order) => {
-              const currentHeight = processedHeights[order.sourceChain];
-              if (currentHeight >= order.submitExpiryHeight) {
+              if (Date.now() >= order.submitExpiryTime) {
                 return order.id;
               }
               const result = await getRecentTransfers(dexClient, order.id);
