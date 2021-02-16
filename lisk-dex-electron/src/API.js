@@ -25,8 +25,13 @@ export async function getPendingTransfers(instance, targetAssetSymbol, recipient
   return (await instance.get(`/transfers/pending?targetChain=${targetAssetSymbol}&recipientId=${encodeURIComponent(recipientAddress)}`)).data;
 }
 
-export async function getRecentTransfers(instance, originOrderId) {
-  return (await instance.get(`/transfers/recent?originOrderId=${encodeURIComponent(originOrderId)}`)).data;
+export async function getRecentTransfers(instance, orderId) {
+  let [ takerResult, makerResult, originResult ] = await Promise.all([
+    instance.get(`/transfers/recent?takerOrderId=${encodeURIComponent(orderId)}`),
+    instance.get(`/transfers/recent?makerOrderId=${encodeURIComponent(orderId)}`),
+    instance.get(`/transfers/recent?originOrderId=${encodeURIComponent(orderId)}`)
+  ]);
+  return [ ...takerResult.data, ...makerResult.data, ...originResult.data ];
 }
 
 export async function getProcessedHeights(instance) {

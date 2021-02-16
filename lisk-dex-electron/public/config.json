@@ -10,7 +10,6 @@
     "lsk": {
       "name": "Lisk",
       "unitValue": 100000000,
-      "processingHeightExpiry": 5,
       "adapter": {
         "type": "lisk",
         "apiURL": "https://ldex.exchange/chain/lsk/api",
@@ -20,7 +19,6 @@
     "lsh": {
       "name": "Leasehold",
       "unitValue": 100000000,
-      "processingHeightExpiry": 5,
       "adapter": {
         "type": "lisk",
         "apiURL": "https://ldex.exchange/chain/lsh/api",
@@ -32,7 +30,8 @@
     "lsh/lsk": {
       "apiURL": "https://ldex.exchange/dex/lsh-lsk/api",
       "assets": ["lsh", "lsk"],
-      "orderBookDepth": 20
+      "orderBookDepth": 20,
+      "pendingOrderExpiry": 120000
     }
   }
 }

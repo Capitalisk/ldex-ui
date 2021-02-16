@@ -8,7 +8,6 @@ import { getClient } from '../API';
 const assets = Dictionary(Record({
   name: String,
   unitValue: Number,
-  processingHeightExpiry: Number,
   adapter: Record({
     type: String,
     apiURL: String,
@@ -19,6 +18,8 @@ const assets = Dictionary(Record({
 const markets = Dictionary(Record({
   assets: Array(String),
   apiURL: String,
+  orderBookDepth: Number,
+  pendingOrderExpiry: Number,
 }));
 
 const UnprocessedDEXConfiguration = Record({
@@ -48,11 +49,12 @@ const DEXConfiguration = Record({
     apiURL: String,
     apiMaxPageSize: Number,
     unitValue: Number,
-    processingHeightExpiry: Number,
   })),
   markets: Dictionary(Record({
     assets: Array(String),
     apiURL: String,
+    orderBookDepth: Number,
+    pendingOrderExpiry: Number,
     marketOptions: Record({
       version: String,
       baseChain: String,
