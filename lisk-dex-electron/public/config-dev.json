@@ -30,26 +30,17 @@
       "unitValue": 100000000,
       "allowCustomWalletAddresses": true,
       "adapter": {
-        "type": "lisk",
-        "apiURL": "http://34.227.22.98:7020/api",
-        "apiMaxPageSize": 100
-      }
-    },
-    "ldpos": {
-      "name": "LDPOS testnet",
-      "unitValue": 100000000,
-      "allowCustomWalletAddresses": true,
-      "adapter": {
         "type": "ldpos",
         "apiURL": "ws://34.227.22.98:7001",
-        "apiMaxPageSize": 100
+        "apiMaxPageSize": 100,
+        "chainModuleName": "capitalisk_chain"
       }
     }
   },
   "markets": {
-    "ldpos/lsk": {
+    "clsk/lsk": {
       "apiURL": "http://34.227.22.98:7021",
-      "assets": ["ldpos", "lsk"],
+      "assets": ["clsk", "lsk"],
       "orderBookDepth": 20,
       "pendingOrderExpiry": 120000
     },
