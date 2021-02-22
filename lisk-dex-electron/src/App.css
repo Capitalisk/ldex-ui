@@ -38,11 +38,15 @@ li {
 
 .top-bar {
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-end;
   align-items: center;
   height: 50px;
-  width: 95%;
-  margin-left: auto;
+  width: auto;
+  padding: 0 10px;
+  background-color: #000;
+}
+
+.top-bar-title {
   margin-right: auto;
 }
 
