@@ -6,7 +6,6 @@ import { formatThousands } from './Utils';
 
 const DEFAULT_VOLUME_DISPLAY_HEIGHT_RATIO = 0.2;
 
-
 const PriceTooltip = ({ active, payload, label }) => {
   if (!active || !payload) {
     return null;
@@ -44,7 +43,33 @@ const TimeAxisTick = ({
 class PriceHistoryChart extends React.PureComponent {
   constructor(props, context) {
     super(props, context);
-    this.state = {};
+    this.state = {
+      chartSizes: {
+        height: 0,
+        width: 0,
+      },
+    };
+  }
+
+  chartReSize(chartElement) {
+    this.setState((s) => ({
+      ...s,
+      chartSizes: {
+        height: chartElement.offsetHeight - 50,
+        width: chartElement.offsetWidth - 50,
+      },
+    }));
+  }
+
+  componentDidMount() {
+    const chartElement = document.querySelector('.price-chart');
+    this.chartReSize(chartElement);
+    window.addEventListener('resize', () => {
+      this.chartReSize(chartElement);
+    });
+  }
+  componentWillUnmount() {
+    window.removeEventListener('resize', this.chartSizes);
   }
 
   render() {
@@ -54,37 +79,7 @@ class PriceHistoryChart extends React.PureComponent {
     } else {
       volumeDisplayHeightRatio = this.props.volumeDisplayHeightRatio;
     }
-    // TODO: Make graph always fit within its container without using break points.
-    let width;
-    let height;
-    if (this.props.windowWidth > 1599) {
-      width = 700;
-      height = 380;
-    } else if (this.props.windowWidth > 1499) {
-      width = 600;
-      height = 380;
-    } else if (this.props.windowWidth > 1049) {
-      width = 380;
-      height = 340;
-    } else if (this.props.windowWidth > 949) {
-      width = 340;
-      height = 280;
-    } else if (this.props.windowWidth > 729) {
-      width = 700;
-      height = 250;
-    } else if (this.props.windowWidth > 469) {
-      width = 400;
-      height = 250;
-    } else if (this.props.windowWidth > 399) {
-      width = 350;
-      height = 250;
-    } else {
-      width = 300;
-      height = 200;
-    }
-    if (this.props.windowWidth > 1000 && this.props.windowHeight < 800) {
-      height = 200;
-    }
+
     const maxVolume = this.props.data.reduce((accumulator, entry) => (entry.volume > accumulator ? entry.volume : accumulator), -Infinity);
     const maxPrice = this.props.data.reduce((accumulator, entry) => (entry.price > accumulator ? entry.price : accumulator), -Infinity);
 
@@ -95,11 +90,12 @@ class PriceHistoryChart extends React.PureComponent {
       Price: entry.price,
       Volume: (entry.volume / maxVolume) * maxPrice * volumeDisplayHeightRatio,
     }));
+
     return (
       <div style={{ position: 'relative' }}>
         <ComposedChart
-          width={width}
-          height={height}
+          width={this.state.chartSizes.width}
+          height={this.state.chartSizes.height}
           data={data}
           margin={{
             top: 0, right: 0, bottom: 50, left: 10,
@@ -116,7 +112,6 @@ class PriceHistoryChart extends React.PureComponent {
           <Bar dataKey="Volume" fill="#999999" />
           <Line type="monotone" dataKey="Price" stroke="#009900" strokeWidth={2} activeDot={{ r: 4 }} dot={null} />
         </ComposedChart>
-
       </div>
     );
   }

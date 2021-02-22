@@ -67,8 +67,6 @@ class App extends React.Component {
       // the address will be used when the asset is being used as the destination chain.
       notifications: [],
       keys: {},
-      windowWidth: 0,
-      windowHeight: 0,
     };
 
     this.notificationId = 0;
@@ -754,13 +752,10 @@ class App extends React.Component {
   }
 
   componentDidMount() {
-    this.updateWindowDimensions();
-    window.addEventListener('resize', this.updateWindowDimensions);
     window.addEventListener('hashchange', this.locationHashChange, false);
   }
 
   componentWillUnmount() {
-    window.removeEventListener('resize', this.updateWindowDimensions);
     window.removeEventListener('hashchange', this.locationHashChange, false);
   }
 
@@ -846,10 +841,6 @@ class App extends React.Component {
     }
   }
 
-  updateWindowDimensions = () => {
-    this.setState({ windowWidth: window.innerWidth, windowHeight: window.innerHeight });
-  }
-
   render() {
     if (!this.state.configurationLoaded) {
       return <div style={{ padding: '10px' }}>Loading...</div>;
@@ -913,8 +904,6 @@ class App extends React.Component {
                 market={this.state.activeMarket}
                 assets={this.state.activeAssets}
                 data={this.state.priceHistory}
-                windowWidth={this.state.windowWidth}
-                windowHeight={this.state.windowHeight}
               />
             </div>
             <div className="your-orders">
