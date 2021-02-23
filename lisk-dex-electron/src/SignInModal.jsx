@@ -26,7 +26,7 @@ export default class SignInModal extends React.Component {
       return '';
     }
     const assetAdapter = this.assetAdapters[asset];
-    if ((address && !address.length) || !assetAdapter.getAccountNextKeyIndex) {
+    if (!address.length || !assetAdapter.getAccountNextKeyIndex) {
       return '';
     }
     let keyIndex;
