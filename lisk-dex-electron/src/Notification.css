@@ -49,8 +49,8 @@
 }
 
 .notification-container.error {
-  color: #cc0000;
-  border: 2px solid #cc0000;
+  color: #CC0000;
+  border: 2px solid #CC0000;
 }
 
 @media only screen and (max-width: 950px), only screen and (max-height: 700px) {
