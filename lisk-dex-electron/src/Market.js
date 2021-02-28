@@ -20,6 +20,11 @@ const marketInfoDescriptor = {
     desc: 'It is the minimum order size allowed on each blockchain',
     isUnitValue: true,
   },
+  maxOrderAmount: {
+    name: 'Max order amount',
+    desc: 'It is the maximum order size allowed on each blockchain',
+    isUnitValue: true,
+  },
   minPartialTake: {
     name: 'Min partial take',
     desc: 'It is the minimum amount that can be taken from a counter offer',
