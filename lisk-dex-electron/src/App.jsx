@@ -155,12 +155,15 @@ class App extends React.Component {
   }
 
   async fetchPriceHistoryStateFromDEX() {
+    const baseChain = this.state.activeAssets[1];
+    const unitValue = Number(GC.getAssetUnitValue(baseChain));
     const dexClient = this.getDexClient();
     const priceHistory = (await getPriceHistory(dexClient)).map((historyItem) => {
       return {
         ...historyItem,
         baseTimestamp: Math.round(historyItem.baseTimestamp / 1000),
-        quoteTimestamp: Math.round(historyItem.quoteTimestamp / 1000)
+        quoteTimestamp: Math.round(historyItem.quoteTimestamp / 1000),
+        volume: Math.round(Number(historyItem.volume) * 100 / unitValue) / 100
       };
     });
     priceHistory.reverse();

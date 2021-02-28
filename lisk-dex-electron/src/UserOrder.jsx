@@ -23,12 +23,13 @@ export default class UserOrder extends React.Component {
       const unitValue = GC.getAssetUnitValue(sourceChain);
 
       const tx = await assetAdapter.createTransfer({
-        amount: String(feeBase + Math.round(unitValue * 0.1)),
+        amount: String(Number(feeBase) + (Number(unitValue) / 100)),
         recipientAddress: dexAddress,
         message: `${targetChain},close,${orderId}`,
         passphrase,
         fee: String(feeBase),
       });
+
       const { order } = this.props;
       try {
         await assetAdapter.postTransaction({
