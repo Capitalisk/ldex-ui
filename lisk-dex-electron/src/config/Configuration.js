@@ -61,7 +61,7 @@ const DEXConfiguration = Record({
       priceDecimalPrecision: Number,
       chainsWhitelist: Array(String),
       chains: Dictionary(Record({
-        walletAddress: String,
+        multisigAddress: String,
         multisigMembers: Array(String),
         multisigRequiredSignatureCount: Number,
         minOrderAmount: String,
