@@ -54,7 +54,7 @@ export default class SignInModal extends React.Component {
     passphrase = passphrase.trim();
     const assetAdapter = this.assetAdapters[asset];
     const isValidPassphrase = assetAdapter.validatePassphrase({ passphrase });
-    const address = isValidPassphrase ? assetAdapter.getAddressFromPassphrase({ passphrase }) : '';
+    const address = isValidPassphrase ? (await assetAdapter.getAddressFromPassphrase({ passphrase })) : '';
 
     const keyIndex = await this.getKeyIndex(asset, address);
 
@@ -129,7 +129,7 @@ export default class SignInModal extends React.Component {
     event.preventDefault();
     const asset = event.target.name;
     let assetAdapter = this.assetAdapters[asset];
-    const { address, passphrase } = assetAdapter.createWallet();
+    const { address, passphrase } = await assetAdapter.createWallet();
     const keyIndex = await this.getKeyIndex(asset, address);
 
     await this.setState((prevState) => ({
