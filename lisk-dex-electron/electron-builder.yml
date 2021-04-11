@@ -7,7 +7,7 @@ asar: true
 protocols:
   name: Lisk Dex
   schemes:
-    - ldex.exchange
+    - ldex.trading
 
 mac:
   artifactName: ${name}-${version}-${os}.${ext}

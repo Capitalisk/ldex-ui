@@ -45,7 +45,7 @@
       "pendingOrderExpiry": 120000
     },
     "lsh/lsk": {
-      "apiURL": "http://2.56.214.88:7011",
+      "apiURL": "https://ldex.trading/dex/lsh-lsk/api",
       "assets": ["lsh", "lsk"],
       "orderBookDepth": 20,
       "pendingOrderExpiry": 120000

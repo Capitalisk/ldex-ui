@@ -12,7 +12,7 @@
       "unitValue": 100000000,
       "adapter": {
         "type": "lisk",
-        "apiURL": "https://ldex.exchange/chain/lsk/api",
+        "apiURL": "https://ldex.trading/chain/lsk/api",
         "apiMaxPageSize": 100
       }
     },
@@ -21,14 +21,14 @@
       "unitValue": 100000000,
       "adapter": {
         "type": "lisk",
-        "apiURL": "https://ldex.exchange/chain/lsh/api",
+        "apiURL": "https://ldex.trading/chain/lsh/api",
         "apiMaxPageSize": 100
       }
     }
   },
   "markets": {
     "lsh/lsk": {
-      "apiURL": "https://ldex.exchange/dex/lsh-lsk/api",
+      "apiURL": "https://ldex.trading/dex/lsh-lsk/api",
       "assets": ["lsh", "lsk"],
       "orderBookDepth": 20,
       "pendingOrderExpiry": 120000
