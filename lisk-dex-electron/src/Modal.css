@@ -90,4 +90,7 @@
 .modal-body {
   color: black;
   margin: 20px;
+  height: calc(100% - 90px);
+  overflow-y: auto;
+  padding-right: 10px;
 }
