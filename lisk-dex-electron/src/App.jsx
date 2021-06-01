@@ -213,14 +213,22 @@ class App extends React.Component {
   _prepareErrorMessage = (error) => {
     let errorDetails;
     if (
-      error.response
-      && error.response.data
-      && error.response.data.errors
-      && error.response.data.errors.length
-      && error.response.data.errors[0].message
+      error.response &&
+      error.response.data
     ) {
-      errorDetails = error.response.data.errors[0].message;
-    } else {
+      if (
+        error.response.data.errors &&
+        error.response.data.errors.length &&
+        error.response.data.errors[0].message != null
+      ) {
+        errorDetails = error.response.data.errors[0].message;
+      } else if (
+        error.response.data.message != null
+      ) {
+        errorDetails = error.response.data.message;
+      }
+    }
+    if (errorDetails == null) {
       errorDetails = 'Check your connection';
     }
     return errorDetails;
@@ -243,6 +251,7 @@ class App extends React.Component {
         getNumericAssetBalance(order.value || order.size, order.sourceChain)
       } ${chainSymbol} - ${errorDetails}.`;
     }
+    console.error(error);
     this.notify(message, true);
   }
 
