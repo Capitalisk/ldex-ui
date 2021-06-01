@@ -229,7 +229,7 @@ class App extends React.Component {
       }
     }
     if (errorDetails == null) {
-      errorDetails = 'Check your connection';
+      errorDetails = error.message;
     }
     return errorDetails;
   }

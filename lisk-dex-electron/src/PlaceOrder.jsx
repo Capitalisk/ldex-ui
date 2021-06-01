@@ -281,7 +281,8 @@ export default class PlaceOrder extends React.Component {
                 transaction: tx,
               });
             } catch (err) {
-              const error = new Error(`Failed to post market order because of error: ${err.message}`);
+              let sourceErrorMessage = err.sourceError == null ? err.message : err.sourceError.message;
+              const error = new Error(`Failed to post market order because of error: ${sourceErrorMessage}`);
               error.response = err.response;
               error.order = this.generateOrder({
                 transactionId: tx.id,
@@ -359,7 +360,8 @@ export default class PlaceOrder extends React.Component {
                 transaction: tx
               });
             } catch (err) {
-              const error = new Error(`Failed to post limit order because of error: ${err.message}`);
+              let sourceErrorMessage = err.sourceError == null ? err.message : err.sourceError.message;
+              const error = new Error(`Failed to post limit order because of error: ${sourceErrorMessage}`);
               error.response = err.response;
               error.order = this.generateOrder({
                 transactionId: tx.id,
