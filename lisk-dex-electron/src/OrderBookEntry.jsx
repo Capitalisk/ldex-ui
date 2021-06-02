@@ -2,6 +2,8 @@ import React from 'react';
 import './OrderBookEntry.css';
 import { formatThousands, getLiteralAssetBalance } from './Utils';
 
+const MIN_QTY_LABEL = '< 0.0001';
+
 export default class OrderBookEntry extends React.Component {
   constructor(props) {
     super(props);
@@ -22,7 +24,7 @@ export default class OrderBookEntry extends React.Component {
   render() {
     const orderAssetBalance = getLiteralAssetBalance(this.props.size, this.props.symbol);
     const formattedPrice = this.props.price;
-    const formattedAssetBalance = formatThousands(orderAssetBalance);
+    const formattedAssetBalance = orderAssetBalance === 0 ? MIN_QTY_LABEL: formatThousands(orderAssetBalance);
 
     return (
       <div style={{ background: this.bgCSS(), marginTop: '1px', marginBottom: '1px' }} className="orderLine">
