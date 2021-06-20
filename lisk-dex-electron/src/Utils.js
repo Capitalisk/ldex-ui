@@ -102,7 +102,7 @@ const getNumericAssetBalance = (assetAmount, assetName, decimal = 2) => {
 
 // returns string
 const getLiteralAssetBalance = (assetAmount, assetName, decimals = 4) => {
-  const unitValue = GlobalConfiguration.getAssetUnitValue(assetName);
+  const unitValue = Number(GlobalConfiguration.getAssetUnitValue(assetName));
   return parseFloat((assetAmount / unitValue).toFixed(decimals));
 };
 

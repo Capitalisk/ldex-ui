@@ -10,7 +10,18 @@ export function getClient(apiBaseURL) {
 
 export async function getOrderBook(instance, orderBookDepth) {
   const { data: orderBook } = await instance.get(`/order-book?depth=${orderBookDepth}`);
-  return orderBook;
+  return orderBook.map((orderLvl) => {
+    if (orderLvl.side === 'ask') {
+      return {
+        ...orderLvl,
+        sizeRemaining: Number(orderLvl.sizeRemaining)
+      };
+    }
+    return {
+      ...orderLvl,
+      valueRemaining: Number(orderLvl.valueRemaining)
+    };
+  });
 }
 
 export async function getBidsFromWallet(instance, sourceWalletAddress) {

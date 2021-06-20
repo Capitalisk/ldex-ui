@@ -46,8 +46,8 @@ export default class UserOrder extends React.Component {
   }
 
   render() {
-    const amountRemaining = this.props.order.side === 'ask' ? this.props.order.sizeRemaining : this.props.order.valueRemaining;
-    const amount = this.props.order.side === 'ask' ? this.props.order.size : this.props.order.value;
+    const amountRemaining = Number(this.props.order.side === 'ask' ? this.props.order.sizeRemaining : this.props.order.valueRemaining);
+    const amount = Number(this.props.order.side === 'ask' ? this.props.order.size : this.props.order.value);
     const asset = this.props.order.sourceChain;
     const amountRemainingVerbose = getLiteralAssetBalance(amountRemaining, asset);
     const amountVerbose = getLiteralAssetBalance(amount, asset);
