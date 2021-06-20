@@ -7,7 +7,7 @@
   "author": "Jax, Jong, sacOO7",
   "description": "Lisk DEX-UI app for exchanging tokens with sidechains",
   "dependencies": {
-    "axios": "^0.19.0",
+    "axios": "^0.21.1",
     "cors-anywhere": "^0.4.1",
     "ldex-ui-ldpos-adapter": "^4.0.0",
     "ldex-ui-lisk-adapter": "^1.2.0",
