@@ -817,7 +817,7 @@ class App extends React.Component {
     if (!activeMarket) {
       activeMarket = this.state.activeMarket;
     }
-    const activeAssets = activeMarket.split('/');
+    const activeAssets = GC.getMarketAssets(activeMarket);
     this.setState({
       yourOrders: [],
       orderBookData: {

@@ -27,7 +27,7 @@
     }
   },
   "markets": {
-    "lsh/lsk": {
+    "lsh/lskc": {
       "apiURL": "https://ldex.trading/dex/lsh-lsk/api",
       "assets": ["lsh", "lsk"],
       "orderBookDepth": 20,
