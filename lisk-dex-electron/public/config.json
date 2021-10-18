@@ -21,8 +21,19 @@
       "unitValue": 100000000,
       "adapter": {
         "type": "lisk",
-        "apiURL": "https://ldex.trading/chain/lsh/api",
+        "apiURL": "https://ldex.trading/chain/lsk/api",
         "apiMaxPageSize": 100
+      }
+    },
+    "clsk": {
+      "name": "Capitalisk",
+      "unitValue": 100000000,
+      "allowCustomWalletAddresses": true,
+      "adapter": {
+        "type": "ldpos",
+        "apiURL": "ws://34.227.22.98:8001",
+        "apiMaxPageSize": 100,
+        "chainModuleName": "capitalisk_chain"
       }
     }
   },
@@ -30,6 +41,12 @@
     "lsh/lskc": {
       "apiURL": "https://ldex.trading/dex/lsh-lsk/api",
       "assets": ["lsh", "lsk"],
+      "orderBookDepth": 20,
+      "pendingOrderExpiry": 120000
+    },
+    "clsk/lsk": {
+      "apiURL": "https://ldex.trading/dex/clsk-lsk/api",
+      "assets": ["clsk", "lsk"],
       "orderBookDepth": 20,
       "pendingOrderExpiry": 120000
     }
