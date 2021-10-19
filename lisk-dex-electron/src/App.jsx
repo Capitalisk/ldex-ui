@@ -102,7 +102,7 @@ class App extends React.Component {
       this.assetAdapters[asset] = assetAdapter;
     }
 
-    this.setState({
+    await this.setState({
       configuration: GC.getConfig(),
       activeMarket: GC.getDefaultActiveMarketName(),
       activeAssets: GC.getMarketAssets(GC.getDefaultActiveMarketName()),
@@ -275,7 +275,7 @@ class App extends React.Component {
     this.pendingOrders[this.state.activeMarket][order.id] = order;
     this.savePendingOrders();
 
-    this.setState(({ yourOrders, activeMarket }) => {
+    await this.setState(({ yourOrders, activeMarket }) => {
       const yourOrderMap = {};
       for (const yourOrder of yourOrders) {
         yourOrderMap[yourOrder.id] = yourOrder;
@@ -653,7 +653,7 @@ class App extends React.Component {
     } else {
       combinedStateUpdate.lastTradePrice = null;
     }
-    this.setState(combinedStateUpdate);
+    await this.setState(combinedStateUpdate);
   }
 
   componentDidUpdate() {
@@ -708,7 +708,7 @@ class App extends React.Component {
     }
 
     // The keys need to be updated on the state before we fetch the order book.
-    this.setState((state) => ({
+    await this.setState((state) => ({
       quoteAssetBalance: null,
       baseAssetBalance: null,
       keys: {
@@ -737,7 +737,7 @@ class App extends React.Component {
         console.error(error);
         this.notify('Failed to fetch asset balances - Check your connection.', true);
       }
-      this.setState({
+      await this.setState({
         ...combinedStateUpdate,
         displaySigninModal: false,
       });
@@ -757,7 +757,7 @@ class App extends React.Component {
   }
 
   signOut = async () => {
-    this.setState({ keys: {}, yourOrders: [] });
+    await this.setState({ keys: {}, yourOrders: [] });
     await this.updateUIWithNewData();
   }
 
@@ -820,7 +820,8 @@ class App extends React.Component {
       activeMarket = this.state.activeMarket;
     }
     const activeAssets = GC.getMarketAssets(activeMarket);
-    this.setState({
+    // We need to await setState or else this.updateUIWithNewData() may use the previous market state.
+    await this.setState({
       yourOrders: [],
       orderBookData: {
         orders: [], bids: [], asks: [], maxSize: { bid: 0, ask: 0 },
