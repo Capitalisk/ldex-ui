@@ -11,7 +11,7 @@
       "name": "Lisk testnet",
       "unitValue": 100000000,
       "adapter": {
-        "type": "lisk",
+        "type": "lisk3",
         "apiURL": "https://testnet-service.lisk.com",
         "networkIdentifier": "15f0dacc1060e91818224a94286b13aa04279c640bd5d6f193182031d133df7c",
         "apiMaxPageSize": 100

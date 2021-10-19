@@ -94,8 +94,10 @@ export default class MarketList extends React.PureComponent {
                 const keyDescriptor = marketInfoDescriptor[chainInfoKey];
                 if ('mult' in keyDescriptor) {
                   firstChainValue *= keyDescriptor.mult;
+                  firstChainValue = Math.round(firstChainValue * 10000) / 10000;
                   firstChainValue += '%';
                   secondChainValue *= keyDescriptor.mult;
+                  secondChainValue = Math.round(secondChainValue * 10000) / 10000;
                   secondChainValue += '%';
                 }
                 if ('isUnitValue' in keyDescriptor) {
