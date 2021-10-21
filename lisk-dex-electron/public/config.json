@@ -17,15 +17,6 @@
         "apiMaxPageSize": 100
       }
     },
-    "lsh": {
-      "name": "Leasehold",
-      "unitValue": 100000000,
-      "adapter": {
-        "type": "lisk",
-        "apiURL": "https://ldex.trading/chain/lsk/api",
-        "apiMaxPageSize": 100
-      }
-    },
     "clsk": {
       "name": "Capitalisk",
       "unitValue": 100000000,
@@ -36,15 +27,18 @@
         "apiMaxPageSize": 100,
         "chainModuleName": "capitalisk_chain"
       }
+    },
+    "lsh": {
+      "name": "Leasehold",
+      "unitValue": 100000000,
+      "adapter": {
+        "type": "lisk",
+        "apiURL": "https://ldex.trading/chain/lsk/api",
+        "apiMaxPageSize": 100
+      }
     }
   },
   "markets": {
-    "lsh/lskc": {
-      "apiURL": "https://ldex.trading/dex/lsh-lsk/api",
-      "assets": ["lsh", "lsk"],
-      "orderBookDepth": 20,
-      "pendingOrderExpiry": 120000
-    },
     "clsk/lsk": {
       "apiURL": "https://ldex.trading/dex/clsk-lsk/api",
       "assets": ["clsk", "lsk"],
