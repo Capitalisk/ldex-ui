@@ -13,7 +13,6 @@ import {
   getBidsFromWallet,
   getPendingTransfers,
   getRecentTransfers,
-  getProcessedHeights,
   getPriceHistory,
   getClient,
   getConfig,
@@ -258,17 +257,7 @@ class App extends React.Component {
   }
 
   orderSubmit = async (order) => {
-    const dexClient = this.getDexClient();
-    let processedHeights;
-    try {
-      processedHeights = await getProcessedHeights(dexClient);
-    } catch (error) {
-      console.error(error);
-      processedHeights = {};
-    }
-
     const pendingOrderExpiry = GC.getMarketPendingOrderExpiry(this.state.activeMarket);
-    order.submitHeight = processedHeights[order.sourceChain] || Infinity;
     order.submitExpiryTime = Date.now() + pendingOrderExpiry;
     order.status = 'pending';
 
@@ -562,12 +551,23 @@ class App extends React.Component {
       minAsk = asks[0].price;
     }
 
+    let yourOrders = Object.values(yourOrderMap);
+    for (let order of yourOrders) {
+      let existingPendingOrder = this.pendingOrders[activeMarket][order.id];
+      if (existingPendingOrder && existingPendingOrder.submitExpiryTime != null) {
+        order.submitExpiryTime = existingPendingOrder.submitExpiryTime;
+      } else {
+        const pendingOrderExpiry = GC.getMarketPendingOrderExpiry(activeMarket);
+        order.submitExpiryTime = Date.now() + pendingOrderExpiry;
+      }
+    }
+
     const newState = {
       orderBookData: { bids, asks, maxSize },
       priceDecimalPrecision: this.getPriceDecimalPrecision(),
       maxBid,
       minAsk,
-      yourOrders: Object.values(yourOrderMap),
+      yourOrders,
     };
     return newState;
   }
@@ -592,7 +592,7 @@ class App extends React.Component {
         try {
           const processedOrExpiredTransfers = await Promise.all(
             pendingOrders.map(async (order) => {
-              if (Date.now() >= order.submitExpiryTime) {
+              if (order.submitExpiryTime == null || Date.now() >= order.submitExpiryTime) {
                 return order.id;
               }
               const result = await getRecentTransfers(dexClient, order.id);
