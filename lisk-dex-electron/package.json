@@ -12,7 +12,7 @@
     "cors-anywhere": "^0.4.4",
     "ldex-ui-ldpos-adapter": "^4.3.0",
     "ldex-ui-lisk-adapter": "^1.2.0",
-    "ldex-ui-lisk-v3-adapter": "^1.2.1",
+    "ldex-ui-lisk-v3-adapter": "^1.2.2",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
     "react-scripts": "^3.4.1",
