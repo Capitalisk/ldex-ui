@@ -32,7 +32,7 @@
       "allowCustomWalletAddresses": true,
       "adapter": {
         "type": "ldpos",
-        "apiURL": "ws://34.227.22.98:7001",
+        "apiURL": "ws://34.227.22.98:7001/socketcluster/",
         "apiMaxPageSize": 100,
         "chainModuleName": "capitalisk_chain"
       }

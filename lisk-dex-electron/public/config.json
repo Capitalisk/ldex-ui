@@ -23,7 +23,7 @@
       "allowCustomWalletAddresses": true,
       "adapter": {
         "type": "ldpos",
-        "apiURL": "ws://54.84.239.82:8001",
+        "apiURL": "wss://ldex.trading/chain/clsk/",
         "apiMaxPageSize": 100,
         "chainModuleName": "capitalisk_chain"
       }

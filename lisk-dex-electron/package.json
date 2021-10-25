@@ -10,7 +10,7 @@
     "@liskhq/lisk-cryptography": "^3.1.0",
     "axios": "^0.21.1",
     "cors-anywhere": "^0.4.4",
-    "ldex-ui-ldpos-adapter": "^4.2.0",
+    "ldex-ui-ldpos-adapter": "^4.3.0",
     "ldex-ui-lisk-adapter": "^1.2.0",
     "ldex-ui-lisk-v3-adapter": "^1.2.1",
     "react": "^16.13.1",
