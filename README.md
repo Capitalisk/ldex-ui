@@ -13,7 +13,7 @@ Running this application directly from source on your own desktop is the most se
 ### To run for the first time (for traders):
 
 1. Using the terminal, navigate to the directory where you want to install this app.
-2. Clone this repository: `git clone https://github.com/Leasehold/ldex-ui.git`
+2. Clone this repository: `git clone https://github.com/Capitalisk/ldex-ui.git`
 3. `cd ldex-ui/lisk-dex-electron`
 4. `npm install`
 5. `npm run build-prod`

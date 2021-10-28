@@ -1,4 +1,3 @@
-// Price in LSK per leasehold, Amount in leaseholds
 const asks = [
   { price: 0.9500, amount: 2000.0000 },
   { price: 0.9000, amount: 913.4444 },
@@ -8,7 +7,6 @@ const asks = [
   { price: 0.7700, amount: 3.1169 },
 ];
 
-// Price in LSK per leasehold, Amount in lisks
 const bids = [
   { price: 0.6000, amount: 91.7376 },
   { price: 0.4000, amount: 62.6993 },
