@@ -488,7 +488,7 @@ class App extends React.Component {
 
     const yourOrderIds = new Set(yourOpenOrders.map(yourOrder => yourOrder.id));
     const previousYourOrders = this.state.yourOrders;
-    const yourRecentlyRemovedOrders = previousYourOrders.filter(yourOrder => !yourOrderIds.has(yourOrder.id));
+    const yourOutOfBookOrders = previousYourOrders.filter(yourOrder => !yourOrderIds.has(yourOrder.id));
 
     for (const order of yourOpenOrders) {
       let isPendingOutbound = false;
@@ -507,7 +507,7 @@ class App extends React.Component {
       }
     }
 
-    for (const order of yourRecentlyRemovedOrders) {
+    for (const order of yourOutOfBookOrders) {
       let isPendingOutbound = false;
       if (takerTradeOrderIds.has(order.id)) {
         order.status = 'processing';
@@ -627,15 +627,11 @@ class App extends React.Component {
   async updateUIWithNewData() {
     let combinedStateUpdate = {};
     try {
-      let fetchHistoryPromise = this.fetchPriceHistoryStateFromDEX();
-      const [newOrderBookState, newPriceHistoryState] = await Promise.all([
-        this.fetchOrderBookState(),
-        fetchHistoryPromise,
-      ]);
-      combinedStateUpdate = { ...newOrderBookState, ...newPriceHistoryState };
+      let newPriceHistoryState = await this.fetchPriceHistoryStateFromDEX();
+      combinedStateUpdate = { ...newPriceHistoryState };
     } catch (error) {
       console.error(error);
-      this.notify('Failed to refresh data - Check your connection.', true);
+      this.notify('Failed to update price history - Check your connection.', true);
 
       return;
     }
@@ -653,6 +649,17 @@ class App extends React.Component {
     } else {
       combinedStateUpdate.lastTradePrice = null;
     }
+
+    try {
+      let newOrderBookState = await this.fetchOrderBookState();
+      combinedStateUpdate = { ...combinedStateUpdate, ...newOrderBookState };
+    } catch (error) {
+      console.error(error);
+      this.notify('Failed to update order book - Check your connection.', true);
+
+      return;
+    }
+
     await this.setState(combinedStateUpdate);
   }
 
@@ -822,7 +829,7 @@ class App extends React.Component {
     const activeAssets = GC.getMarketAssets(activeMarket);
     // We need to await setState or else this.updateUIWithNewData() may use the previous market state.
     await this.setState({
-      yourOrders: [],
+      yourOrders: Object.values(this.pendingOrders[activeMarket] || {}),
       orderBookData: {
         orders: [], bids: [], asks: [], maxSize: { bid: 0, ask: 0 },
       },
