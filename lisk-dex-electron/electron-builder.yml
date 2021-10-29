@@ -1,11 +1,11 @@
-productName: "Lisk Dex"
+productName: "LDEX UI"
 appId: io.lisk.electron-cra
 compression: normal
 npmRebuild: true
 asar: true
 
 protocols:
-  name: Lisk Dex
+  name: LDEX UI
   schemes:
     - ldex.trading
 

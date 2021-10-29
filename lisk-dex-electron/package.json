@@ -5,7 +5,7 @@
   "homepage": "./",
   "main": "build/electron.js",
   "author": "Jax, Jong, sacOO7",
-  "description": "Lisk DEX-UI app for exchanging tokens with sidechains",
+  "description": "LDEX UI app for exchanging tokens with sidechains",
   "dependencies": {
     "@liskhq/lisk-cryptography": "^3.1.0",
     "axios": "^0.21.1",
