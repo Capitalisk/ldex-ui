@@ -176,6 +176,11 @@ li {
   background: #008800;
 }
 
+.button-primary:disabled {
+  cursor: default;
+  opacity: 0.6;
+}
+
 .button-secondary {
   cursor: pointer;
   font-size: 20px;

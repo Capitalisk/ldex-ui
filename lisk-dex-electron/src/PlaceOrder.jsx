@@ -10,7 +10,6 @@ import {
   EstimationStatus, getNumericAssetBalance, GlobalConfiguration as GC,
 } from './Utils';
 import InfoIcon from './InfoIcon';
-import marketInfoDescriptor from './Market';
 
 export default class PlaceOrder extends React.Component {
   static contextType = userContext;
@@ -134,17 +133,23 @@ export default class PlaceOrder extends React.Component {
     const priceDecimalPrecision = GC.getMarketPriceDecimalPrecision(this.context.activeMarket);
     const sourceAsset = this.getSourceAsset();
     const sourceAssetBaseFee = baseFee[sourceAsset];
-    const actualAssetBalance = getNumericAssetBalance(this.props.assetBalance, sourceAsset) - sourceAssetBaseFee;
-    const minOrderAmount = GC.getMarketChainMinOrderAmount(this.context.activeMarket, sourceAsset) / GC.getAssetUnitValue(sourceAsset);
+    const sourceAssetUnitValue = GC.getAssetUnitValue(sourceAsset);
+    const closeOrderCost = sourceAssetBaseFee + .01;
+    const actualAssetBalance = getNumericAssetBalance(this.props.assetBalance || 0, sourceAsset) - sourceAssetBaseFee;
+    const minOrderAmount = GC.getMarketChainMinOrderAmount(this.context.activeMarket, sourceAsset) / sourceAssetUnitValue;
     const isLimitOrder = !this.state.marketMode;
 
     function validateAmount(amount) {
       const numericAmount = parseFloat(amount);
       let amountError = null;
       if (Number.isNaN(amount) || amount === '') {
-        amountError = 'The order amount must be a number.';
+        amountError = 'The order amountnumericAmount must be a number.';
+      } else if (numericAmount === 0) {
+        amountError = 'The order amount cannot be 0.';
       } else if (numericAmount > actualAssetBalance) {
         amountError = 'Insufficient balance!';
+      } else if (numericAmount + closeOrderCost > actualAssetBalance) {
+        amountError = 'Balance too low!';
       } else if (numericAmount < minOrderAmount) {
         amountError = `The specified amount was less than the minimum order amount allowed by this DEX market which is ${
           minOrderAmount
@@ -402,10 +407,10 @@ export default class PlaceOrder extends React.Component {
     const chains = GC.getMarketChainNames(this.props.activeMarket);
     const firstChain = GC.getMarketChain(this.props.activeMarket, chains[0]);
     const secondChain = GC.getMarketChain(this.props.activeMarket, chains[1]);
-    const baseFeeKey = 'exchangeFeeBase';
-    const keyDescriptor = marketInfoDescriptor[baseFeeKey];
-    const firstChainBaseFee = firstChain[baseFeeKey] / keyDescriptor.div;
-    const secondChainBaseFee = secondChain[baseFeeKey] / keyDescriptor.div;
+    const firstAssetUnitValue = GC.getAssetUnitValue(chains[0]);
+    const secondAssetUnitValue = GC.getAssetUnitValue(chains[1]);
+    const firstChainBaseFee = Number(firstChain.exchangeFeeBase) / Number(firstAssetUnitValue);
+    const secondChainBaseFee = Number(secondChain.exchangeFeeBase) / Number(secondAssetUnitValue);
     return { [chains[0]]: firstChainBaseFee, [chains[1]]: secondChainBaseFee };
   }
 

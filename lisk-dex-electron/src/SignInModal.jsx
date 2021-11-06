@@ -12,12 +12,20 @@ export default class SignInModal extends React.Component {
       keyIndexes: {},
       failure: false,
       signingIn: false,
+      isLoading: false,
     };
+    this.isLoadingAddress = {};
+    this.isLoadingKeyIndex = {};
+    this.isLoadingNewWallet = {};
+
     this.assetAdapters = props.assetAdapters;
     let assetNames = GC.getAssetNames();
     for (let asset of assetNames) {
       this.state.passphrases[asset] = '';
       this.state.addresses[asset] = '';
+      this.isLoadingAddress[asset] = false;
+      this.isLoadingKeyIndex[asset] = false;
+      this.isLoadingNewWallet[asset] = false;
     }
   }
 
@@ -36,6 +44,12 @@ export default class SignInModal extends React.Component {
     return keyIndex || 0;
   }
 
+  isDataLoading() {
+    return Object.values(this.isLoadingAddress).some(value => value) ||
+      Object.values(this.isLoadingKeyIndex).some(value => value) ||
+      Object.values(this.isLoadingNewWallet).some(value => value)
+  }
+
   async updateAddress(asset, passphrase) {
     if (!passphrase) {
       await this.setState((prevState) => ({
@@ -51,6 +65,13 @@ export default class SignInModal extends React.Component {
 
       return '';
     }
+
+    this.isLoadingAddress[asset] = true;
+
+    await this.setState({
+      isLoading: this.isDataLoading(),
+    });
+
     passphrase = passphrase.trim();
     const assetAdapter = this.assetAdapters[asset];
     const isValidPassphrase = assetAdapter.validatePassphrase({ passphrase });
@@ -58,15 +79,18 @@ export default class SignInModal extends React.Component {
 
     const keyIndex = await this.getKeyIndex(asset, address);
 
-    this.setState((prevState) => ({
+    this.isLoadingAddress[asset] = false;
+
+    await this.setState((prevState) => ({
       addresses: {
         ...prevState.addresses,
         [asset]: address,
       },
       keyIndexes: {
         ...prevState.keyIndexes,
-        [asset]: keyIndex
+        [asset]: keyIndex,
       },
+      isLoading: this.isDataLoading(),
     }));
 
     return address;
@@ -77,17 +101,26 @@ export default class SignInModal extends React.Component {
     const value = target.value || '';
     const { name } = target;
 
-    const keyIndex = await this.getKeyIndex(name, value);
+    this.isLoadingKeyIndex[name] = true;
 
     this.setState((prevState) => ({
       addresses: {
         ...prevState.addresses,
         [name]: value,
       },
+      isLoading: this.isDataLoading(),
+    }));
+
+    const keyIndex = await this.getKeyIndex(name, value);
+
+    this.isLoadingKeyIndex[name] = false;
+
+    this.setState((prevState) => ({
       keyIndexes: {
         ...prevState.keyIndexes,
-        [name]: keyIndex
+        [name]: keyIndex,
       },
+      isLoading: this.isDataLoading(),
     }));
   }
 
@@ -129,10 +162,19 @@ export default class SignInModal extends React.Component {
     event.preventDefault();
     const asset = event.target.name;
     let assetAdapter = this.assetAdapters[asset];
+
+    this.isLoadingNewWallet[asset] = true;
+
+    this.setState({
+      isLoading: this.isDataLoading(),
+    });
+
     const { address, passphrase } = await assetAdapter.createWallet();
     const keyIndex = await this.getKeyIndex(asset, address);
 
-    this.setState((prevState) => ({
+    this.isLoadingNewWallet[asset] = false;
+
+    await this.setState((prevState) => ({
       passphrases: {
         ...prevState.passphrases,
         [asset]: passphrase,
@@ -145,6 +187,7 @@ export default class SignInModal extends React.Component {
         ...prevState.keyIndexes,
         [asset]: keyIndex
       },
+      isLoading: this.isDataLoading(),
     }));
 
     if (this.props.walletGenerated) {
@@ -194,7 +237,7 @@ export default class SignInModal extends React.Component {
         <div className="modal-foreground">
           <div id="sign-in-modal">
             <div className="sign-in-wrapper">
-              {this.state.signingIn && (
+              {(this.state.signingIn || this.state.isLoading) && (
                 <div className="sign-in-progress-area">
                     <div className="progress">
                       <div className="indeterminate" />
@@ -208,7 +251,7 @@ export default class SignInModal extends React.Component {
                 <form onSubmit={this.handleSubmit}>
                   <h2 className="sign-in-heading">Sign in using your blockchain passphrases.</h2>
                   {loginAssetPanels}
-                  <input className="button-primary" style={{ fontSize: '20px', marginTop: '15px' }} type="submit" value="Submit" />
+                  <input className="button-primary" style={{ fontSize: '20px', marginTop: '15px' }} type="submit" value="Submit" disabled={this.state.isLoading} />
                 </form>
               </div>
             </div>
