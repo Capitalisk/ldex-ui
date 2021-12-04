@@ -40,6 +40,12 @@ const GlobalConfiguration = (() => {
     getAssetUnitValue(assetName = required('assetName')) {
       return this.getAsset(assetName).unitValue;
     },
+    getAssetTimeOffset(assetName = required('assetName')) {
+      return this.getAsset(assetName).timeOffset;
+    },
+    getAssetTimeMultiplier(assetName = required('assetName')) {
+      return this.getAsset(assetName).timeMultiplier;
+    },
     getMarketNames() {
       return globalConfig.markets && Object.keys(globalConfig.markets);
     },

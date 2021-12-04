@@ -10,6 +10,8 @@
     "lsk": {
       "name": "Lisk testnet",
       "unitValue": 100000000,
+      "timeOffset": 0,
+      "timeMultiplier": 1000,
       "adapter": {
         "type": "lisk3",
         "apiURL": "https://testnet-service.lisk.com",

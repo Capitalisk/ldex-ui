@@ -15,7 +15,7 @@ const PriceTooltip = ({ active, payload, label }) => {
       <p className="time">
         <b>Chain time:</b>
         {' '}
-        {formatThousands(`${label}`)}
+        {(new Date(label)).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric', hour: 'numeric', minute: 'numeric' })}
       </p>
       <p className="price">
         <b>Price:</b>
@@ -34,11 +34,14 @@ const PriceTooltip = ({ active, payload, label }) => {
 const TimeAxisTick = ({
   // eslint-disable-next-line no-unused-vars
   x, y, stroke, payload,
-}) => (
-  <g transform={`translate(${x},${y})`}>
-    <text x={38} y={0} dy={16} fontSize="smaller" textAnchor="end" fill="#666">{formatThousands(Number(payload.value))}</text>
-  </g>
-);
+}) => {
+  let date = new Date(payload.value);
+  return (
+    <g transform={`translate(${x},${y})`}>
+      <text x={38} y={0} dy={16} fontSize="smaller" textAnchor="end" fill="#666">{`${date.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}`}</text>
+    </g>
+  );
+};
 
 class PriceHistoryChart extends React.PureComponent {
   constructor(props, context) {
@@ -103,7 +106,7 @@ class PriceHistoryChart extends React.PureComponent {
           style={{ position: 'relative', zIndex: 110 }}
         >
           <CartesianGrid strokeDasharray="3 3" stroke="#222222" />
-          <XAxis dataKey="baseTimestamp" tick={<TimeAxisTick />} label={{ value: 'Chain time (seconds)', dy: 30, fill: '#999999' }} />
+          <XAxis dataKey="baseTimestamp" tick={<TimeAxisTick />} label={{ value: 'Date', dy: 30, fill: '#999999' }} />
           <YAxis label={{
             value: `Price (${assetSymbol})`, angle: -90, fill: '#999999', dx: -25,
           }}
