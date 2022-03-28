@@ -33,9 +33,11 @@
     "lsh": {
       "name": "Leasehold",
       "unitValue": 100000000,
+      "timeOffset": 0,
+      "timeMultiplier": 1000,
       "adapter": {
         "type": "lisk",
-        "apiURL": "https://ldex.trading/chain/lsk/api",
+        "apiURL": "https://ldex.trading/chain/lsh/api",
         "apiMaxPageSize": 100
       }
     }
@@ -44,6 +46,12 @@
     "clsk/lsk": {
       "apiURL": "https://ldex.trading/dex/clsk-lsk/api",
       "assets": ["clsk", "lsk"],
+      "orderBookDepth": 20,
+      "pendingOrderExpiry": 180000
+    },
+    "lsh/clsk": {
+      "apiURL": "https://ldex.trading/dex/lsh-clsk/api",
+      "assets": ["lsh", "clsk"],
       "orderBookDepth": 20,
       "pendingOrderExpiry": 120000
     }

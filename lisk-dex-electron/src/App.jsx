@@ -158,8 +158,8 @@ class App extends React.Component {
   async fetchPriceHistoryStateFromDEX() {
     const baseChain = this.state.activeAssets[1];
     const unitValue = Number(GC.getAssetUnitValue(baseChain));
-    const timeOffset = Number(GC.getAssetTimeOffset(baseChain));
-    const timeMultiplier = Number(GC.getAssetTimeMultiplier(baseChain));
+    const timeOffset = Number(GC.getAssetTimeOffset(baseChain) || 0);
+    const timeMultiplier = Number(GC.getAssetTimeMultiplier(baseChain) || 1);
     const dexClient = this.getDexClient();
     const priceHistory = (await getPriceHistory(dexClient)).map((historyItem) => {
       return {
