@@ -1,6 +1,6 @@
 {
   "name": "lisk-dex-electron",
-  "version": "1.3.0",
+  "version": "1.4.0",
   "private": true,
   "homepage": "./",
   "main": "build/electron.js",
