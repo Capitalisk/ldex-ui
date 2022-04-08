@@ -19,15 +19,6 @@
         "apiMaxPageSize": 100
       }
     },
-    "lsh": {
-      "name": "Leasehold testnet",
-      "unitValue": 100000000,
-      "adapter": {
-        "type": "lisk",
-        "apiURL": "http://54.174.172.179:7010/api",
-        "apiMaxPageSize": 100
-      }
-    },
     "clsk": {
       "name": "Capitalisk testnet",
       "unitValue": 100000000,
@@ -44,12 +35,6 @@
     "clsk/lsk": {
       "apiURL": "http://34.227.22.98:7021",
       "assets": ["clsk", "lsk"],
-      "orderBookDepth": 20,
-      "pendingOrderExpiry": 120000
-    },
-    "lsh/lsk": {
-      "apiURL": "https://ldex.trading/dex/lsh-lsk/api",
-      "assets": ["lsh", "lsk"],
       "orderBookDepth": 20,
       "pendingOrderExpiry": 120000
     }

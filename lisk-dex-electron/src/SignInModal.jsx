@@ -7,6 +7,7 @@ export default class SignInModal extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
+      displayPassphrases: {},
       passphrases: {},
       addresses: {},
       keyIndexes: {},
@@ -19,14 +20,26 @@ export default class SignInModal extends React.Component {
     this.isLoadingNewWallet = {};
 
     this.assetAdapters = props.assetAdapters;
+    let activeKeys = props.activeKeys || {};
     let assetNames = GC.getAssetNames();
     for (let asset of assetNames) {
-      this.state.passphrases[asset] = '';
-      this.state.addresses[asset] = '';
+      let { address, passphrase } = activeKeys[asset] || {};
+      if (passphrase) {
+        this.state.displayPassphrases[asset] = this.getHiddenPassphrase(passphrase);
+        this.state.passphrases[asset] = passphrase;
+      } else {
+        this.state.displayPassphrases[asset] = '';
+        this.state.passphrases[asset] = '';
+      }
+      this.state.addresses[asset] = address || '';
       this.isLoadingAddress[asset] = false;
       this.isLoadingKeyIndex[asset] = false;
       this.isLoadingNewWallet[asset] = false;
     }
+  }
+
+  getHiddenPassphrase(passphrase) {
+    return (passphrase || '').replace(/./g, '\u2022');
   }
 
   async getKeyIndex(asset, address) {
@@ -135,6 +148,10 @@ export default class SignInModal extends React.Component {
     }
 
     this.setState((prevState) => ({
+      displayPassphrases: {
+        ...prevState.displayPassphrases,
+        [name]: value,
+      },
       passphrases: {
         ...prevState.passphrases,
         [name]: value,
@@ -175,6 +192,10 @@ export default class SignInModal extends React.Component {
     this.isLoadingNewWallet[asset] = false;
 
     await this.setState((prevState) => ({
+      displayPassphrases: {
+        ...prevState.displayPassphrases,
+        [asset]: passphrase,
+      },
       passphrases: {
         ...prevState.passphrases,
         [asset]: passphrase,
@@ -214,7 +235,7 @@ export default class SignInModal extends React.Component {
       loginAssetPanels.push(
         <div key={asset} style={{ marginBottom: '20px' }}>
           {<span>Wallet address for {asset.toUpperCase()}:</span>}
-          {<input style={addressInputStyles} name={asset} data-gramm={false} className="sign-in-input" value={this.state.addresses[asset]} onChange={this.handleWalletAddressChange} disabled={!assetConfig.allowCustomWalletAddresses} />}
+          {<input type="text" style={addressInputStyles} name={asset} data-gramm={false} className="sign-in-input" value={this.state.addresses[asset]} onChange={this.handleWalletAddressChange} disabled={!assetConfig.allowCustomWalletAddresses} />}
           <span>
             Passphrase for
             {' '}
@@ -222,7 +243,7 @@ export default class SignInModal extends React.Component {
             :
             {' '}
           </span>
-          <textarea style={styles} rows={4} name={asset} data-gramm={false} className="sign-in-textarea" value={this.state.passphrases[asset]} onChange={this.handlePassphraseChange} />
+          <textarea style={styles} rows={4} name={asset} data-gramm={false} className="sign-in-textarea" value={this.state.displayPassphrases[asset]} onChange={this.handlePassphraseChange} />
           <button type="button" className="button-secondary" name={asset} onClick={this.handleWalletCreate} style={{ marginRight: '10px' }}>Generate wallet</button>
           {this.state.keyIndexes[asset] != null && this.state.keyIndexes[asset] !== '' && <span><span>Next key index: </span><span>{this.state.keyIndexes[asset]}</span></span>}
         </div>,

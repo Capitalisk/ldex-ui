@@ -458,8 +458,8 @@ export default class PlaceOrder extends React.Component {
           <InfoIcon onClick={this.openActionInfoModal} alt="info" width="18px" />
         </span>
         <div className="market-limit-tabs" style={{ marginBottom: '10px' }}>
-          <button type="button" className="tab-button" disabled={this.state.marketMode} onClick={this.switchMode}>Market</button>
-          <button type="button" className="tab-button" disabled={!this.state.marketMode} onClick={this.switchMode}>Limit</button>
+          <button type="button" className="tab-button first" disabled={this.state.marketMode} onClick={this.switchMode}>Market</button>
+          <button type="button" className="tab-button last" disabled={!this.state.marketMode} onClick={this.switchMode}>Limit</button>
         </div>
         {this.props.side === 'bid' && this.context.keys[this.context.activeAssets[1]]
           && <BalanceDisplay asset={this.context.activeAssets[1]} balance={this.props.assetBalance} walletAddress={walletAddress2} />}

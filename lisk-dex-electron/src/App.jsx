@@ -871,7 +871,7 @@ class App extends React.Component {
     return (
       <>
         <userContext.Provider value={{ ...this.state }}>
-          {this.state.displaySigninModal && <SignInModal submitLoginDetails={this.submitLoginDetails} enabledAssets={this.state.activeAssets} close={this.closeSignInModal} walletGenerated={this.walletGenerated} assetAdapters={this.assetAdapters} />}
+          {this.state.displaySigninModal && <SignInModal submitLoginDetails={this.submitLoginDetails} enabledAssets={this.state.activeAssets} close={this.closeSignInModal} walletGenerated={this.walletGenerated} assetAdapters={this.assetAdapters} activeKeys={this.state.keys} />}
           {this.state.displayLeaveWarning && <LeaveWarning setDisplayLeaveWarning={this.setDisplayLeaveWarning} />}
           <div className="top-bar">
             <div className="top-bar-title">
