@@ -245,7 +245,7 @@ export default class SignInModal extends React.Component {
           </span>
           <textarea style={styles} rows={4} name={asset} data-gramm={false} className="sign-in-textarea" value={this.state.displayPassphrases[asset]} onChange={this.handlePassphraseChange} />
           <button type="button" className="button-secondary" name={asset} onClick={this.handleWalletCreate} style={{ marginRight: '10px' }}>Generate wallet</button>
-          {this.state.keyIndexes[asset] != null && this.state.keyIndexes[asset] !== '' && <span><span>Next key index: </span><span>{this.state.keyIndexes[asset]}</span></span>}
+          {this.state.keyIndexes[asset] != null && this.state.keyIndexes[asset] !== '' && <span className="next-key-index"><span>Next key index: </span><span>{this.state.keyIndexes[asset]}</span></span>}
         </div>,
       );
 

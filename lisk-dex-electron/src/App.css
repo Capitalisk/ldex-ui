@@ -324,6 +324,31 @@ li {
   .market-info-container {
     font-size: 9px;
   }
+
+  .button-primary {
+    border-radius: 5px;
+  }
+
+  .button-secondary {
+    border-radius: 5px;
+  }
+
+  .button-sign-out {
+    border-radius: 5px;
+  }
+
+  .tab-button.first {
+    border-radius: 5px;
+  }
+
+  .tab-button.last {
+    border-radius: 5px;
+  }
+
+  .next-key-index {
+    display: inline-block;
+    margin-top: 10px;
+  }
 }
 
 div {

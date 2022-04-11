@@ -32,6 +32,7 @@
   border-radius: 10px;
   background: #FFFFFF;
   pointer-events: none;
+  word-break: break-word;
 }
 
 .notification-container.active {
