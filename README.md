@@ -9,6 +9,7 @@
 ## How to run from source (recommended)
 
 Running this application directly from source on your own desktop is the most secure way to trade.
+It is strongly recommended to use Node.js version 11.0.0.
 
 ### To run for the first time (for traders):
 
