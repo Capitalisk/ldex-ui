@@ -36,7 +36,7 @@
       "apiURL": "http://34.227.22.98:7021",
       "assets": ["clsk", "lsk"],
       "orderBookDepth": 20,
-      "pendingOrderExpiry": 120000
+      "pendingOrderExpiry": 600000
     }
   }
 }

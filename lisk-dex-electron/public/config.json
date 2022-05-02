@@ -47,13 +47,13 @@
       "apiURL": "https://ldex.trading/dex/clsk-lsk/api",
       "assets": ["clsk", "lsk"],
       "orderBookDepth": 20,
-      "pendingOrderExpiry": 180000
+      "pendingOrderExpiry": 600000
     },
     "lsh/clsk": {
       "apiURL": "https://ldex.trading/dex/lsh-clsk/api",
       "assets": ["lsh", "clsk"],
       "orderBookDepth": 20,
-      "pendingOrderExpiry": 120000
+      "pendingOrderExpiry": 600000
     }
   }
 }
