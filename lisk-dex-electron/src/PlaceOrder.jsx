@@ -73,7 +73,7 @@ export default class PlaceOrder extends React.Component {
 
     const { asks } = orderBook;
     const { bids } = orderBook;
-    let estimatedReturns = { };
+    let estimatedReturns = {};
     let assetExchanged = '';
     let assetExchangedAgainst = '';
     const { price } = this.state;
@@ -128,22 +128,27 @@ export default class PlaceOrder extends React.Component {
 
   getSourceAsset = () => (this.props.side === 'bid' ? this.context.activeAssets[1] : this.context.activeAssets[0]);
 
+  getTargetAsset = () => (this.props.side === 'bid' ? this.context.activeAssets[0] : this.context.activeAssets[1]);
+
   validateOrder() {
     const baseFee = this.getBaseFees();
     const priceDecimalPrecision = GC.getMarketPriceDecimalPrecision(this.context.activeMarket);
     const sourceAsset = this.getSourceAsset();
+    const targetAsset = this.getTargetAsset();
     const sourceAssetBaseFee = baseFee[sourceAsset];
     const sourceAssetUnitValue = GC.getAssetUnitValue(sourceAsset);
+    const targetAssetUnitValue = GC.getAssetUnitValue(targetAsset);
     const closeOrderCost = sourceAssetBaseFee + .01;
     const actualAssetBalance = getNumericAssetBalance(this.props.assetBalance || 0, sourceAsset) - sourceAssetBaseFee;
     const minOrderAmount = GC.getMarketChainMinOrderAmount(this.context.activeMarket, sourceAsset) / sourceAssetUnitValue;
+    const minPartialTakeAmount = GC.getMarketChainMinPartialTakeAmount(this.context.activeMarket, targetAsset) / targetAssetUnitValue;
     const isLimitOrder = !this.state.marketMode;
 
     function validateAmount(amount) {
       const numericAmount = parseFloat(amount);
       let amountError = null;
       if (Number.isNaN(amount) || amount === '') {
-        amountError = 'The order amountnumericAmount must be a number.';
+        amountError = 'The order amount must be a number.';
       } else if (numericAmount === 0) {
         amountError = 'The order amount cannot be 0.';
       } else if (numericAmount > actualAssetBalance) {
@@ -171,13 +176,38 @@ export default class PlaceOrder extends React.Component {
       return priceError;
     }
 
+    const validateReturns = () => {
+      let amountError = null;
+      let returns = this.getEstimatedReturns();
+      let limitReturns;
+      let estimatedReturns;
+      const numericPrice = parseFloat(this.state.price);
+      if (isLimitOrder && !Number.isNaN(numericPrice)) {
+        if (this.props.side === 'bid') {
+          limitReturns = this.state.amount / numericPrice;
+        } else {
+          limitReturns = this.state.amount * numericPrice;
+        }
+        estimatedReturns = Math.max(returns.estimatedReturns, limitReturns);
+      } else {
+        estimatedReturns = returns.estimatedReturns;
+      }
+      if (estimatedReturns < minPartialTakeAmount) {
+        amountError = `The specified amount yields less than the minimum partial take amount of the target blockchain which is ${
+          minPartialTakeAmount
+        } ${sourceAsset.toUpperCase()}.`;
+      }
+      return amountError;
+    };
+
     const amountError = validateAmount(this.state.amount);
     const priceError = isLimitOrder && validatePrice(this.state.price);
-    const validated = !(amountError || priceError);
+    const returnsError = validateReturns();
+    const validated = !(amountError || priceError || returnsError);
 
     if (!validated) {
       const errors = {
-        amount: amountError,
+        amount: amountError || returnsError,
         price: priceError,
       };
       this.setState({
