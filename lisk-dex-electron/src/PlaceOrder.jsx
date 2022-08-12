@@ -195,7 +195,7 @@ export default class PlaceOrder extends React.Component {
       if (estimatedReturns < minPartialTakeAmount) {
         amountError = `The specified amount yields less than the minimum partial take amount of the target blockchain which is ${
           minPartialTakeAmount
-        } ${sourceAsset.toUpperCase()}.`;
+        } ${targetAsset.toUpperCase()}.`;
       }
       return amountError;
     };
