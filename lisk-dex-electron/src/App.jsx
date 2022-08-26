@@ -876,9 +876,6 @@ class App extends React.Component {
           <div className="top-bar">
             <div className="top-bar-title">
               <b style={{ fontSize: '21px' }}>{GC.getAppTitle()}</b>
-              {' '}
-              &nbsp;
-              <a className="feedback-link" style={{ fontSize: '14px' }} href={GC.getFeedbackLink()} rel="noopener noreferrer" target="_blank">{GC.getFeedbackText()}</a>
             </div>
             <div>
               <SignInState className="sign-in-state" showSignIn={this.showSignIn} keys={this.getActiveKeys()} signedIn={this.isSignedIn()} signOut={this.signOut} />

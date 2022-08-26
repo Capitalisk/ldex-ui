@@ -59,7 +59,7 @@
   margin-bottom: 8px;
 }
 
-@media only screen and (max-width: 950px), only screen and (max-height: 700px) {
+@media only screen and (max-width: 1200px), only screen and (max-height: 820px) {
   #sign-in-modal {
     padding: 20px;
     border: 0;
@@ -86,7 +86,12 @@
     font-size: 32px;
   }
 
+  .sign-in-input {
+    font-size: 16px;
+  }
+
   .sign-in-textarea {
+    font-size: 16px;
     height: 70px;
   }
 }

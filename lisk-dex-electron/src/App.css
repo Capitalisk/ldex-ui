@@ -1,6 +1,7 @@
 #root {
   height: 100%;
   width: 100%;
+  overflow-y: auto;
 }
 
 a {
@@ -19,7 +20,7 @@ li {
   border: 0;
   padding: 5px 15px 5px 15px;
   outline: none;
-  width: 105px;
+  width: 110px;
   vertical-align: top;
   background: #880000;
   border-radius: 5px;
@@ -278,7 +279,7 @@ li {
   }
 
   .modal-background {
-    height: 1400px;
+    height: 100%;
   }
 
   .price-chart {
@@ -317,10 +318,6 @@ li {
     grid-row: 1;
   }
 
-  .feedback-link {
-    display: none;
-  }
-
   .market-info-container {
     font-size: 9px;
   }
@@ -337,12 +334,20 @@ li {
     border-radius: 5px;
   }
 
+  .tab-button {
+    height: 25px;
+    line-height: 15px;
+  }
+
   .tab-button.first {
     border-radius: 5px;
+    font-size: 15px;
   }
 
   .tab-button.last {
     border-radius: 5px;
+    margin-top: 5px;
+    font-size: 15px;
   }
 
   .next-key-index {

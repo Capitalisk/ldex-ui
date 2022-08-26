@@ -25,10 +25,6 @@ const markets = Dictionary(Record({
 
 const UnprocessedDEXConfiguration = Record({
   appTitle: String,
-  feedbackLink: Record({
-    text: String,
-    url: String,
-  }),
   notificationDuration: Number,
   refreshInterval: Number,
   markets,
@@ -39,10 +35,6 @@ const UnprocessedDEXConfiguration = Record({
 // eslint-disable-next-line no-unused-vars
 const DEXConfiguration = Record({
   appTitle: String,
-  feedbackLink: Record({
-    text: String,
-    url: String,
-  }),
   notificationDuration: Number,
   refreshInterval: Number,
   assets: Dictionary(Record({

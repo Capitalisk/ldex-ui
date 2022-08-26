@@ -22,12 +22,6 @@ const GlobalConfiguration = (() => {
     getRefreshInterval() {
       return globalConfig.refreshInterval;
     },
-    getFeedbackLink() {
-      return globalConfig.feedbackLink.url;
-    },
-    getFeedbackText() {
-      return globalConfig.feedbackLink.text;
-    },
     getAssetNames() {
       return globalConfig.assets && Object.keys(globalConfig.assets);
     },
