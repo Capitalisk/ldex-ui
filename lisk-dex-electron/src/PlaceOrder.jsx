@@ -303,7 +303,7 @@ export default class PlaceOrder extends React.Component {
           const unitValue = GC.getAssetUnitValue(sourceChain);
           const sourceAssetAdapter = this.assetAdapters[sourceChain];
           const tx = await sourceAssetAdapter.createTransfer({
-            amount: String(Number(amount) * Number(unitValue)),
+            amount: String(Number(amount) * Number(unitValue)).split('.')[0],
             recipientAddress: dexAddress,
             message: `${targetChain},market,${destAddress}`,
             passphrase,
@@ -382,7 +382,7 @@ export default class PlaceOrder extends React.Component {
           const unitValue = GC.getAssetUnitValue(sourceChain);
           const sourceAssetAdapter = this.assetAdapters[sourceChain];
           const tx = await sourceAssetAdapter.createTransfer({
-            amount: String(Number(amount) * Number(unitValue)),
+            amount: String(Number(amount) * Number(unitValue)).split('.')[0],
             recipientAddress: dexAddress,
             message: `${targetChain},limit,${price},${destAddress}`,
             passphrase,
