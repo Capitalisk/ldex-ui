@@ -11,6 +11,10 @@ export default class UserOrder extends React.Component {
     this.state = {};
   }
 
+  clearOrder = async () => {
+    this.props.orderCleared(this.props.order);
+  }
+
   cancelOrder = async () => {
     const confirmed = window.confirm('Are you sure you want to cancel this limit order?');
     if (confirmed) {
@@ -57,23 +61,26 @@ export default class UserOrder extends React.Component {
       <div
         className={`your-order-entry ${orderStatusClass}`}
         style={{
-          width: '100%', fontSize: '14px', backgroundColor: this.props.side === 'bid' ? '#286113' : '#700d0d', borderBottom: '1px solid black', padding: '2px', boxSizing: 'border-box',
+          backgroundColor: this.props.side === 'bid' ? '#286113' : '#700d0d',
         }}
       >
-        {amountRemainingVerbose}
-        /
-        {amountVerbose}
-        {(this.props.order.status === 'ready' || this.props.order.status === 'matching') && <button type="button" className="cancel-order-button" onClick={this.cancelOrder}>Cancel</button>}
-        {this.props.order.status !== 'ready' && <div className="lds-dual-ring" style={{ float: 'right', marginRight: '10px' }} />}
-        <br />
-        {this.props.order.price != null && (
-        <div>
-          Price:
-          {' '}
-          {this.props.order.price.toFixed(4)}
+        <div className="your-order-amount-and-price">
+          {amountRemainingVerbose}/{amountVerbose}
+          <br />
+          {this.props.order.price != null && (
+            <div>
+              Price:
+              {' '}
+              {this.props.order.price.toFixed(4)}
+            </div>
+          )}
+          {this.props.order.price == null && <div>Market order</div>}
         </div>
-        )}
-        {this.props.order.price == null && <div>Market order</div>}
+        <div className="your-order-controls">
+          {(this.props.order.status === 'ready' || this.props.order.status === 'matching') && <button type="button" className="user-order-button" onClick={this.cancelOrder}>Cancel</button>}
+          {this.props.order.status === 'pending' && <button type="button" className="user-order-button" onClick={this.clearOrder}>Clear</button>}
+          {this.props.order.status !== 'ready' && <div className="lds-dual-ring" />}
+        </div>
       </div>
     );
   }

@@ -208,6 +208,26 @@ class App extends React.Component {
     }));
   }
 
+  orderClear = (order) => {
+    delete this.pendingOrders[this.state.activeMarket][order.id];
+    this.savePendingOrders();
+    this.setState(({ activeMarket, yourOrders }) => {
+      const yourOrderMap = {};
+      for (const yourOrder of yourOrders) {
+        yourOrderMap[yourOrder.id] = yourOrder;
+      }
+      const pendingMarketOrders = Object.values(this.pendingOrders[activeMarket] || {});
+
+      for (const pendingOrder of pendingMarketOrders) {
+        yourOrderMap[pendingOrder.id] = pendingOrder;
+      }
+      delete yourOrderMap[order.id];
+      return {
+        yourOrders: Object.values(yourOrderMap),
+      };
+    });
+  }
+
   showEstimateInfo = async (message) => {
     this.notify(message);
   }
@@ -497,8 +517,10 @@ class App extends React.Component {
         order.status = 'processing';
         isPendingOutbound = true;
       } else if (makerTradeOrderIds.has(order.id)) {
-        order.status = 'matching';
-        isPendingOutbound = true;
+        if (order.status !== 'canceling') {
+          order.status = 'matching';
+          isPendingOutbound = true;
+        }
       }
       if (isPendingOutbound && order.type === 'limit') {
         this.pendingOrders[activeMarket][order.id] = order;
@@ -514,8 +536,10 @@ class App extends React.Component {
         order.status = 'processing';
         isPendingOutbound = true;
       } else if (makerTradeOrderIds.has(order.id)) {
-        order.status = 'matching';
-        isPendingOutbound = true;
+        if (order.status !== 'canceling') {
+          order.status = 'matching';
+          isPendingOutbound = true;
+        }
       }
       if (isPendingOutbound && order.type === 'limit') {
         this.pendingOrders[activeMarket][order.id] = order;
@@ -927,7 +951,7 @@ class App extends React.Component {
               />
             </div>
             <div className="your-orders">
-              <YourOrders orders={this.state.yourOrders} orderCanceled={this.orderCancel} handleCancelFail={this.orderCancelFail} />
+              <YourOrders orders={this.state.yourOrders} orderCanceled={this.orderCancel} handleCancelFail={this.orderCancelFail} orderCleared={this.orderClear} />
             </div>
             <div className="market-name-and-stats">
               <MarketList activeMarket={this.state.activeMarket} signOut={this.signOut} />

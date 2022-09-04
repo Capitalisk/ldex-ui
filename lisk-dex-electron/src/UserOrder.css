@@ -1,17 +1,33 @@
-.cancel-order-button {
+.your-order-entry {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-sizing: border-box;
+  width: 100%;
+  min-height: 37px;
+  font-size: 14px;
+  padding: 2px;
+  border-bottom: 1px solid black;
+}
+
+.your-order-controls {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  margin-right: 5px;
+}
+
+.user-order-button {
   font-size: 12px;
   background-color: rgb(45, 46, 56);
   color: white;
-  float: right;
-  margin-right: 5px;
-  margin-top: 4px;
   border: 0;
   padding: 5px;
   outline: none;
   cursor: pointer;
 }
 
-.cancel-order-button:hover {
+.user-order-button:hover {
   text-decoration: underline;
 }
 
@@ -29,4 +45,14 @@
 
 .order-matching {
   opacity: 1;
+}
+
+@media only screen and (max-width: 950px) {
+  .your-order-entry {
+    font-size: 12px;
+  }
+
+  .your-order-controls {
+    margin-right: 2px;
+  }
 }

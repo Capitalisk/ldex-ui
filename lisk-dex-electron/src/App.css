@@ -233,15 +233,15 @@ li {
 .lds-dual-ring {
   display: block;
   position: relative;
-  width: 25px;
-  height: 25px;
+  width: 20px;
+  height: 20px;
 }
 .lds-dual-ring:after {
   content: " ";
   display: block;
   width: 85%;
   height: 85%;
-  margin: 4px;
+  margin: 2px;
   border-radius: 50%;
   border: 3px solid #fff;
   border-color: #fff transparent #fff transparent;
@@ -272,10 +272,6 @@ li {
     height: 1650px;
     grid-template-columns: 50% 50%;
     grid-template-rows: 16% 20% 22% 22% 20%;
-  }
-
-  .your-order-entry {
-    height: 50px;
   }
 
   .modal-background {

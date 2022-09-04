@@ -30,6 +30,10 @@ export default class YourOrders extends React.Component {
     event.preventDefault();
   }
 
+  handleClear = (order) => {
+    this.props.orderCleared(order);
+  }
+
   handleCancel = (order) => {
     this.props.orderCanceled(order);
   }
@@ -86,10 +90,10 @@ export default class YourOrders extends React.Component {
               Buying
             </div>
             <div style={{
-              width: '100%', height: 'calc(100% - 30px)', margin: 0, padding: 0, overflowY: 'scroll',
+              width: '100%', height: 'calc(100% - 30px)', margin: 0, padding: 0, overflowY: 'scroll', overflowX: 'hidden',
             }}
             >
-              {!!bids.length && bids.slice().reverse().map((order) => <UserOrder key={order.id} side="bid" order={order} orderCanceled={this.handleCancel} failedToCancelOrder={this.handleCancelFail} />)}
+              {!!bids.length && bids.slice().reverse().map((order) => <UserOrder key={order.id} side="bid" order={order} orderCanceled={this.handleCancel} orderCleared={this.handleClear} failedToCancelOrder={this.handleCancelFail} />)}
               {!bids.length && (
               <div style={{
                 display: 'flex', height: '100%', color: '#999999', alignItems: 'center', justifyContent: 'center',
@@ -114,10 +118,10 @@ export default class YourOrders extends React.Component {
               Selling
             </div>
             <div style={{
-              width: '100%', height: 'calc(100% - 30px)', margin: 0, padding: 0, overflowY: 'scroll',
+              width: '100%', height: 'calc(100% - 30px)', margin: 0, padding: 0, overflowY: 'scroll', overflowX: 'hidden',
             }}
             >
-              {!!asks.length && asks.map((order) => <UserOrder key={order.id} side="ask" order={order} orderCanceled={this.handleCancel} failedToCancelOrder={this.handleCancelFail} />)}
+              {!!asks.length && asks.map((order) => <UserOrder key={order.id} side="ask" order={order} orderCanceled={this.handleCancel} orderCleared={this.handleClear} failedToCancelOrder={this.handleCancelFail} />)}
               {!asks.length && (
               <div style={{
                 display: 'flex', height: '100%', color: '#999999', alignItems: 'center', justifyContent: 'center',
