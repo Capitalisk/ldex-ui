@@ -7,6 +7,6 @@ IF %ERRORLEVEL% NEQ 0 (
 	exit
 )
 
-cd lisk-dex-electron
+cd ldex-electron
 npm install
 npm start

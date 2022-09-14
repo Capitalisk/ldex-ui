@@ -15,7 +15,7 @@ It is strongly recommended to use Node.js version 11.0.0.
 
 1. Using the terminal, navigate to the directory where you want to install this app.
 2. Clone this repository: `git clone https://github.com/Capitalisk/ldex-ui.git`
-3. `cd ldex-ui/lisk-dex-electron`
+3. `cd ldex-ui/ldex-electron`
 4. `npm install`
 5. `npm run build-prod`
 6. `npm run electron`
@@ -23,7 +23,7 @@ It is strongly recommended to use Node.js version 11.0.0.
 ### To run every other time:
 
 1. Using the terminal, navigate to the directory where you installed the app.
-2. `cd ldex-ui/lisk-dex-electron`
+2. `cd ldex-ui/ldex-electron`
 3. `npm run electron`
 
 For development, use `npm run start` and view the running application at http://localhost:3000/

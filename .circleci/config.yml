@@ -3,7 +3,7 @@ jobs:
   build-and-test:
     docker:
       - image: mhart/alpine-node
-    working_directory: ~/repo/lisk-dex-electron
+    working_directory: ~/repo/ldex-electron
     steps:
       - checkout:
            path: ~/repo
@@ -20,7 +20,7 @@ jobs:
   win-linux:
     docker:
       - image: electronuserland/builder:wine
-    working_directory: ~/repo/lisk-dex-electron
+    working_directory: ~/repo/ldex-electron
     steps:
       - checkout:
            path: ~/repo
@@ -38,13 +38,13 @@ jobs:
             npm run multi-dist
             ci-scripts/artifacts-isolator.sh
       - store_artifacts:
-          path: ~/repo/lisk-dex-electron/dist/artifacts
+          path: ~/repo/ldex-electron/dist/artifacts
           destination: artifacts
 
   mac:
     macos:
       xcode: 11.3.0
-    working_directory: ~/repo/lisk-dex-electron
+    working_directory: ~/repo/ldex-electron
     steps:
       - checkout:
             path: ~/repo
@@ -74,7 +74,7 @@ jobs:
             npm run dist
             ci-scripts/artifacts-isolator.sh
       - store_artifacts:
-          path: ~/repo/lisk-dex-electron/dist/artifacts
+          path: ~/repo/ldex-electron/dist/artifacts
           destination: artifacts
 
 workflows:

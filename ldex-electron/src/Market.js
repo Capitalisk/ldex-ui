@@ -1,7 +1,7 @@
 const marketInfoDescriptor = {
   version: {
     name: 'Version',
-    desc: 'It is the version of lisk-dex for this market',
+    desc: 'It is the version of ldex for this market',
   },
   multisigAddress: {
     name: 'DEX address',
