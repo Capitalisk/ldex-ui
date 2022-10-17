@@ -3,6 +3,16 @@
   "notificationDuration": 10000,
   "refreshInterval": 15000,
   "assets": {
+    "ark": {
+      "name": "Ark",
+      "unitValue": 100000000,
+      "adapter": {
+        "type": "ark",
+        "apiURL": "https://api.ark.io/api",
+        "apiMaxPageSize": 100,
+        "env": "mainnet"
+      }
+    },
     "lsk": {
       "name": "Lisk",
       "unitValue": 100000000,
@@ -39,6 +49,12 @@
     }
   },
   "markets": {
+    "clsk/ark": {
+      "apiURL": "https://ldex.trading/dex/clsk-ark/api",
+      "assets": ["clsk", "ark"],
+      "orderBookDepth": 20,
+      "pendingOrderExpiry": 600000
+    },
     "clsk/lsk": {
       "apiURL": "https://ldex.trading/dex/clsk-lsk/api",
       "assets": ["clsk", "lsk"],
