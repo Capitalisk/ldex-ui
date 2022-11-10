@@ -1,6 +1,6 @@
 {
   "name": "ldex-electron",
-  "version": "1.6.0",
+  "version": "1.6.1",
   "private": true,
   "homepage": "./",
   "main": "build/electron.js",
@@ -18,7 +18,7 @@
     "react-scripts": "^3.4.4",
     "recharts": "^2.1.13",
     "runtypes": "^6.4.1",
-    "sodium-native": "^3.2.1"
+    "sodium-native": "^3.4.1"
   },
   "scripts": {
     "electron": "electron .",
@@ -71,8 +71,8 @@
   "devDependencies": {
     "@testing-library/jest-dom": "^5.5.0",
     "babel-eslint": "^10.1.0",
-    "electron": "^6.0.12",
-    "electron-builder": "^22.10.5",
+    "electron": "^21.2.3",
+    "electron-builder": "^23.6.0",
     "eslint": "^6.8.0",
     "eslint-plugin-import": "^2.20.2",
     "eslint-plugin-jsx-a11y": "^6.2.3",
