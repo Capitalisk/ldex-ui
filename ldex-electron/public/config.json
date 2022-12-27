@@ -49,15 +49,15 @@
     }
   },
   "markets": {
-    "clsk/ark": {
-      "apiURL": "https://ldex.trading/dex/clsk-ark/api",
-      "assets": ["clsk", "ark"],
-      "orderBookDepth": 20,
-      "pendingOrderExpiry": 600000
-    },
     "clsk/lsk": {
       "apiURL": "https://ldex.trading/dex/clsk-lsk/api",
       "assets": ["clsk", "lsk"],
+      "orderBookDepth": 20,
+      "pendingOrderExpiry": 600000
+    },
+    "clsk/ark": {
+      "apiURL": "https://ldex.trading/dex/clsk-ark/api",
+      "assets": ["clsk", "ark"],
       "orderBookDepth": 20,
       "pendingOrderExpiry": 600000
     },

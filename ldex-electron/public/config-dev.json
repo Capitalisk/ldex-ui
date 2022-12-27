@@ -37,15 +37,15 @@
     }
   },
   "markets": {
-    "clsk/ark": {
-      "apiURL": "http://34.227.22.98:7031",
-      "assets": ["clsk", "ark"],
-      "orderBookDepth": 20,
-      "pendingOrderExpiry": 600000
-    },
     "clsk/lsk": {
       "apiURL": "http://34.227.22.98:7021",
       "assets": ["clsk", "lsk"],
+      "orderBookDepth": 20,
+      "pendingOrderExpiry": 600000
+    },
+    "clsk/ark": {
+      "apiURL": "http://34.227.22.98:7031",
+      "assets": ["clsk", "ark"],
       "orderBookDepth": 20,
       "pendingOrderExpiry": 600000
     }
