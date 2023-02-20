@@ -55,12 +55,6 @@
       "orderBookDepth": 20,
       "pendingOrderExpiry": 600000
     },
-    "clsk/ark": {
-      "apiURL": "https://ldex.trading/dex/clsk-ark/api",
-      "assets": ["clsk", "ark"],
-      "orderBookDepth": 20,
-      "pendingOrderExpiry": 600000
-    },
     "lsh/clsk": {
       "apiURL": "https://ldex.trading/dex/lsh-clsk/api",
       "assets": ["lsh", "clsk"],
