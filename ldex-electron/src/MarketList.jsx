@@ -131,21 +131,25 @@ export default class MarketList extends React.PureComponent {
           </Modal>
           <div className="action-name">MARKETS</div>
           <div className="markets-container">
-            {GC.getMarketNames().map((marketSymbol) => (
-              <div key={marketSymbol}>
-                <p>
-                  <b>
-                    {
-                      marketSymbol === this.props.activeMarket
-                        ? marketSymbol.toUpperCase()
-                        : <a href={`#market=${marketSymbol}`}>{marketSymbol.toUpperCase()}</a>
-                    }
-                  </b>
-                  &nbsp;&nbsp;
-                  {marketSymbol === this.props.activeMarket && <InfoIcon alt="info" width="18px" marginBottom="-2px" onClick={this.onInfoIconClick} cursor="pointer" />}
-                </p>
-              </div>
-            ))}
+            {GC.getMarketNames().map((marketSymbol) => {
+              const chainNames = GC.getMarketChainNames(marketSymbol);
+              const isCentralized = chainNames.some((chainName) => GC.getMarketChainRequiredSignatureCount(marketSymbol, chainName) <= 1);
+              return (
+                  <div key={marketSymbol}>
+                  <p>
+                    <b>
+                      {
+                        marketSymbol === this.props.activeMarket
+                          ? marketSymbol.toUpperCase()
+                          : <a href={`#market=${marketSymbol}`}>{marketSymbol.toUpperCase()}</a>
+                      }
+                    </b>
+                    &nbsp;&nbsp;
+                    {marketSymbol === this.props.activeMarket && <InfoIcon alt="info" width="18px" marginBottom="-2px" onClick={this.onInfoIconClick} cursor="pointer" warn={isCentralized} />}
+                  </p>
+                </div>
+              );
+            })}
           </div>
           <p style={{ color: '#999999' }}>More markets coming soon!</p>
           <small>

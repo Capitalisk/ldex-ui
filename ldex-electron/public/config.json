@@ -47,6 +47,17 @@
         "apiURL": "https://ldex.trading/chain/lsh/api",
         "apiMaxPageSize": 100
       }
+    },
+    "sas": {
+      "name": "Saasufy",
+      "unitValue": 100000000,
+      "allowCustomWalletAddresses": true,
+      "adapter": {
+        "type": "ldpos",
+        "apiURL": "wss://ldex.trading/chain/sas/",
+        "apiMaxPageSize": 100,
+        "chainModuleName": "sas_chain"
+      }
     }
   },
   "markets": {
@@ -59,6 +70,12 @@
     "lsh/clsk": {
       "apiURL": "https://ldex.trading/dex/lsh-clsk/api",
       "assets": ["lsh", "clsk"],
+      "orderBookDepth": 20,
+      "pendingOrderExpiry": 600000
+    },
+    "sas/clsk": {
+      "apiURL": "https://ldex.trading/dex/sas-clsk/api",
+      "assets": ["sas", "clsk"],
       "orderBookDepth": 20,
       "pendingOrderExpiry": 600000
     }

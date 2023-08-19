@@ -92,6 +92,9 @@ const GlobalConfiguration = (() => {
     getMarketChainRequiredConfirmations(market = required('market'), assetName = required('assetName')) {
       return this.getMarketChain(market, assetName).requiredConfirmations;
     },
+    getMarketChainRequiredSignatureCount(market = required('market'), assetName = required('assetName')) {
+      return this.getMarketChain(market, assetName).multisigRequiredSignatureCount;
+    },
   };
 })();
 
