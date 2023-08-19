@@ -3,7 +3,7 @@ import axios from 'axios';
 export function getClient(apiBaseURL) {
   return axios.create({
     baseURL: apiBaseURL,
-    timeout: 10000
+    timeout: 20000
   });
 }
 
