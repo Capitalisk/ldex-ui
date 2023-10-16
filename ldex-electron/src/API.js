@@ -54,8 +54,8 @@ export async function getPriceHistory(instance, offset, limit) {
 }
 
 export async function getConfig(instance) {
-  if (process.env.REACT_APP_PRODUCTION) {
-    return (await instance.get('config.json')).data;
+  if (process.env.NODE_ENV === 'development') {
+    return (await instance.get('config-dev.json')).data;
   }
-  return (await instance.get('config-dev.json')).data;
+  return (await instance.get('config.json')).data;
 }
