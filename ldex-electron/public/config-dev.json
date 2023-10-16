@@ -4,48 +4,78 @@
   "refreshInterval": 15000,
   "assets": {
     "ark": {
-      "name": "Ark testnet",
+      "name": "Ark",
       "unitValue": 100000000,
       "adapter": {
         "type": "ark",
-        "apiURL": "https://dapi.ark.io/api",
-        "apiMaxPageSize": 100
+        "apiURL": "https://api.ark.io/api",
+        "apiMaxPageSize": 100,
+        "env": "mainnet"
       }
     },
     "lsk": {
-      "name": "Lisk testnet",
+      "name": "Lisk",
       "unitValue": 100000000,
       "timeOffset": 0,
       "timeMultiplier": 1000,
       "adapter": {
         "type": "lisk3",
-        "apiURL": "https://testnet-service.lisk.com",
-        "networkIdentifier": "15f0dacc1060e91818224a94286b13aa04279c640bd5d6f193182031d133df7c",
+        "_apiURL": "https://ldex.trading/chain/lsk",
+        "apiURL": "https://service.lisk.io",
+        "networkIdentifier": "4c09e6a781fc4c7bdb936ee815de8f94190f8a7519becd9de2081832be309a99",
         "apiMaxPageSize": 100
       }
     },
     "clsk": {
-      "name": "Capitalisk testnet",
+      "name": "Capitalisk",
       "unitValue": 100000000,
       "allowCustomWalletAddresses": true,
       "adapter": {
         "type": "ldpos",
-        "apiURL": "ws://34.227.22.98:7001/socketcluster/",
+        "apiURL": "wss://ldex.trading/chain/clsk/",
         "apiMaxPageSize": 100,
         "chainModuleName": "capitalisk_chain"
+      }
+    },
+    "lsh": {
+      "name": "Leasehold",
+      "unitValue": 100000000,
+      "timeOffset": 0,
+      "timeMultiplier": 1000,
+      "adapter": {
+        "type": "lisk",
+        "apiURL": "https://ldex.trading/chain/lsh/api",
+        "apiMaxPageSize": 100
+      }
+    },
+    "sas": {
+      "name": "Saasufy",
+      "unitValue": 100000000,
+      "allowCustomWalletAddresses": true,
+      "adapter": {
+        "type": "ldpos",
+        "apiURL": "wss://ldex.trading/chain/sas/",
+        "apiMaxPageSize": 100,
+        "chainModuleName": "sas_chain"
       }
     }
   },
   "markets": {
     "clsk/lsk": {
-      "apiURL": "http://34.227.22.98:7021",
+      "apiURL": "https://ldex.trading/dex/clsk-lsk/api",
       "assets": ["clsk", "lsk"],
       "orderBookDepth": 20,
       "pendingOrderExpiry": 600000
     },
-    "clsk/ark": {
-      "apiURL": "http://34.227.22.98:7031",
-      "assets": ["clsk", "ark"],
+    "lsh/clsk": {
+      "apiURL": "https://ldex.trading/dex/lsh-clsk/api",
+      "assets": ["lsh", "clsk"],
+      "orderBookDepth": 20,
+      "pendingOrderExpiry": 600000
+    },
+    "sas/clsk": {
+      "apiURL": "https://ldex.trading/dex/sas-clsk/api",
+      "assets": ["sas", "clsk"],
       "orderBookDepth": 20,
       "pendingOrderExpiry": 600000
     }
