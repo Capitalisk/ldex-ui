@@ -144,6 +144,9 @@ export default class PlaceOrder extends React.Component {
     const minPartialTakeAmount = GC.getMarketChainMinPartialTakeAmount(this.context.activeMarket, targetAsset) / targetAssetUnitValue;
     const isLimitOrder = !this.state.marketMode;
 
+    let maxAmount = Math.floor(Math.max(actualAssetBalance - closeOrderCost, 0) * 100) / 100;
+    let sourceAssetSymbol = sourceAsset.toUpperCase();
+
     function validateAmount(amount) {
       const numericAmount = parseFloat(amount);
       let amountError = null;
@@ -152,13 +155,13 @@ export default class PlaceOrder extends React.Component {
       } else if (numericAmount === 0) {
         amountError = 'The order amount cannot be 0.';
       } else if (numericAmount > actualAssetBalance) {
-        amountError = 'Insufficient balance!';
+        amountError = `Insufficient balance! The max amount is ${maxAmount} ${sourceAssetSymbol}.`;
       } else if (numericAmount + closeOrderCost > actualAssetBalance) {
-        amountError = 'Balance too low!';
+        amountError = `Balance too low! The max amount is ${maxAmount} ${sourceAssetSymbol}.`;
       } else if (numericAmount < minOrderAmount) {
         amountError = `The specified amount was less than the minimum order amount allowed by this DEX market which is ${
           minOrderAmount
-        } ${sourceAsset.toUpperCase()}.`;
+        } ${sourceAssetSymbol}.`;
       }
       return amountError;
     }
