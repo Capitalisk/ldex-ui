@@ -11,7 +11,8 @@ const assets = Dictionary(Record({
   adapter: Record({
     type: String,
     apiURL: String,
-    networkIdentifier: String.optional(),
+    chainId: String.optional(),
+    tokenId: String.optional(),
     apiMaxPageSize: Number,
   }),
 }));

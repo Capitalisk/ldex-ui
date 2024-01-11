@@ -7,7 +7,7 @@ import { formatThousands } from './Utils';
 const DEFAULT_VOLUME_DISPLAY_HEIGHT_RATIO = 0.2;
 
 const PriceTooltip = ({ active, payload, label }) => {
-  if (!active || !payload) {
+  if (!active || !payload || !payload.length) {
     return null;
   }
   return (

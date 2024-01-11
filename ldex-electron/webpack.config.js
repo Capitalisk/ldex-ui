@@ -66,6 +66,9 @@ module.exports = {
   },
 
   plugins: [
+    new webpack.IgnorePlugin({
+      resourceRegExp: /^@chainsafe\/blst(\/|$)/,
+    }),
     new HtmlWebpackPlugin({
       template: './src/index.html',
       filename: 'index.html',
