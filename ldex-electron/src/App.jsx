@@ -26,15 +26,13 @@ import { getNumericAssetBalance, GlobalConfiguration as GC } from './Utils';
 
 // Import supported adapters.
 import ArkAdapter from 'ldex-ui-ark-adapter';
-import LiskAdapter from 'ldex-ui-lisk-adapter';
-import LiskV4Adapter from 'ldex-ui-lisk-v4-adapter';
+import LiskAdapter from 'ldex-ui-lisk-v4-adapter';
 import LDPoSAdapter from 'ldex-ui-ldpos-adapter';
 
 // The property names in this object can be used as the adapter 'type' in the config file.
 const adapterClasses = {
   ark: ArkAdapter,
   lisk: LiskAdapter,
-  lisk4: LiskV4Adapter,
   ldpos: LDPoSAdapter,
 };
 

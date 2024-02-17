@@ -1,6 +1,6 @@
 {
   "name": "ldex-electron",
-  "version": "2.0.0",
+  "version": "3.0.0",
   "private": true,
   "homepage": "./",
   "main": "build/electron.js",
@@ -14,7 +14,6 @@
     "crypto-browserify": "^3.12.0",
     "ldex-ui-ark-adapter": "^4.3.3",
     "ldex-ui-ldpos-adapter": "^5.0.2",
-    "ldex-ui-lisk-adapter": "^1.2.0",
     "ldex-ui-lisk-v4-adapter": "^4.0.4",
     "os-browserify": "^0.3.0",
     "path-browserify": "^1.0.1",

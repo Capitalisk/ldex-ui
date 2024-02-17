@@ -153,7 +153,6 @@ const EstimationStatus = {
 
 Object.freeze(EstimationStatus);
 
-// considering price unit is same for both buyer and seller, for current application it's in terms of lsk per lsh
 const estimateBestReturnsForSeller = (amount, price, bids, isMarketOrder) => {
   bids = [...bids].sort((a, b) => {
     if (a.price > b.price) {
